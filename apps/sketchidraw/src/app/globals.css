@@ -136,3 +136,16 @@ body,
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(5px);
+  }
+}
+
+.animate-float {
+  animation: 2s ease-in-out 0s infinite alternate both running float;
+}
