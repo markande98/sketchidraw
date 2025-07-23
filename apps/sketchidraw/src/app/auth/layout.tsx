@@ -21,7 +21,7 @@ export default function AuthLayout({
           <div className="md:flex hidden">
             <h1
               className={cn(
-                "text-6xl font-extrabold text-sky-200 tracking-widest",
+                "text-6xl font-extrabold dark:text-sky-200 tracking-widest",
                 gochi.className
               )}
             >

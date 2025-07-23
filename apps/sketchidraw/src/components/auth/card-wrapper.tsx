@@ -7,6 +7,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BackButton } from "./back-button";
+import { Roboto_Condensed } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const roberto = Roboto_Condensed({
+  subsets: ["latin"],
+  weight: ["300", "400"],
+});
 
 interface CardWrapperProps {
   children: React.ReactNode;
@@ -24,9 +31,14 @@ export const CardWrapper = ({
   backButtonLabel,
 }: CardWrapperProps) => {
   return (
-    <Card className="w-full max-w-[480px] dark:bg-surface-low">
+    <Card
+      className={cn(
+        "w-full max-w-[480px] bg-yellow-100 dark:bg-surface-low tracking-wide",
+        roberto.className
+      )}
+    >
       <CardHeader className="flex items-center flex-col">
-        <CardTitle className="text-3xl font-bold text-neutral-300">
+        <CardTitle className="text-3xl font-bold dark:text-neutral-300">
           {title}
         </CardTitle>
         <CardDescription>{description}</CardDescription>

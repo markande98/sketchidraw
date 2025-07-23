@@ -45,7 +45,7 @@ export const SignUpform = () => {
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm text-neutral-300">
+                <FormLabel className="text-sm dark:text-neutral-300">
                   Username
                 </FormLabel>
                 <FormControl>
@@ -63,7 +63,7 @@ export const SignUpform = () => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm text-neutral-300">
+                <FormLabel className="text-sm dark:text-neutral-300">
                   Email
                 </FormLabel>
                 <FormControl>
@@ -81,7 +81,7 @@ export const SignUpform = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm text-neutral-300">
+                <FormLabel className="text-sm dark:text-neutral-300">
                   Password
                 </FormLabel>
                 <FormControl>
@@ -89,6 +89,7 @@ export const SignUpform = () => {
                     className="dark:bg-[#121212] dark:border-none inline-block p-5 dark:border-[#212121] dark:border-[1px] dark:rounded-[.25rem] dark:shadow-[0_0_0_1px_#212121] dark:focus:ring-violet-400 dark:text-[#ced4da] leading-1 whitespace-nowrap"
                     {...field}
                     placeholder="******"
+                    type="password"
                   />
                 </FormControl>
               </FormItem>
@@ -97,7 +98,7 @@ export const SignUpform = () => {
         </div>
         <Button
           type="submit"
-          className="w-full cursor-pointer dark:bg-violet-400 dark:hover:bg-violet-300 duration-150"
+          className="w-full cursor-pointer bg-blue-500 hover:bg-blue-400 dark:bg-violet-400 dark:hover:bg-violet-300 duration-150"
         >
           Sign up
         </Button>
