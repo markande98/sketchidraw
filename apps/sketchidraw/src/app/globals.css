@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-
 @custom-variant dark (&:where(.dark, .dark *));
 
 * {
@@ -49,6 +48,8 @@ body,
   --color-card: var(--card);
   --color-yellow-lighter: var(--yellow-lighter);
   --color-surface-lowest: var(--surface-lowest);
+  --color-surface-low: var(--surface-low);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -126,6 +127,7 @@ body,
   --sidebar-ring: oklch(0.556 0 0);
 
   --surface-lowest: oklch(0.1822 0 0);
+  --surface-low: oklch(0.2587 0.0112 285.59);
 }
 
 @layer base {

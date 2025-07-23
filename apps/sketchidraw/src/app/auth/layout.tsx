@@ -1,3 +1,11 @@
+import { cn } from "@/lib/utils";
+import { Gochi_Hand } from "next/font/google";
+
+const gochi = Gochi_Hand({
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
 export default function AuthLayout({
   children,
 }: {
@@ -8,7 +16,23 @@ export default function AuthLayout({
       <TopLeftSvg />
       <TopRightSvg />
       <BottomMidSvg />
-      {children}
+      <div className="h-fit min-h-screen w-full relative p-10 lg:p-12 overflow-hidden flex flex-col items-center justify-center">
+        <div className="relative z-10">
+          <div className="md:flex hidden">
+            <h1
+              className={cn(
+                "text-6xl font-extrabold text-sky-200 tracking-widest",
+                gochi.className
+              )}
+            >
+              SKETCHIDRAW
+            </h1>
+          </div>
+        </div>
+        <div className="my-12 flex w-full grow items-center justify-center">
+          <div className="relative w-full max-w-[30rem]">{children}</div>
+        </div>
+      </div>
     </div>
   );
 }
