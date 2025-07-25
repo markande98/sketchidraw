@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { SignInSchema } from "@repo/db/types";
 import {
   Form,
   FormControl,
@@ -12,25 +13,41 @@ import {
 } from "@/components/ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useState, useTransition } from "react";
+import { signin } from "@/actions/signin";
+import { FormError } from "./form-error";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const SignInForm = () => {
-  const signUpSchema = z.object({
-    email: z.email(),
-    password: z.string().min(6, {
-      message: "Password should contain atleast 6 characters.",
-    }),
-  });
-
-  const form = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
+  const router = useRouter();
+  const [error, setError] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition();
+  const form = useForm<z.infer<typeof SignInSchema>>({
+    resolver: zodResolver(SignInSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof signUpSchema>) => {
-    console.log(values);
+  const onSubmit = (values: z.infer<typeof SignInSchema>) => {
+    setError("");
+    startTransition(() => {
+      signin(values)
+        .then((data) => {
+          if (data?.error) {
+            form.reset();
+            setError(data.error);
+            return;
+          }
+
+          toast.success("Logged In");
+          router.push("/");
+          router.refresh();
+        })
+        .catch(() => setError("Something went wrong!"));
+    });
   };
 
   return (
@@ -75,7 +92,9 @@ export const SignInForm = () => {
             )}
           />
         </div>
+        <FormError message={error} />
         <Button
+          disabled={isPending}
           variant="default"
           type="submit"
           className="w-full cursor-pointer bg-blue-500 hover:bg-blue-400 dark:bg-violet-400 dark:hover:bg-violet-300 duration-150"

@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { SignUpSchema } from "@repo/db/types";
 import {
   Form,
   FormControl,
@@ -12,20 +13,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { useState, useTransition } from "react";
+import { signup } from "@/actions/signup";
+import { FormError } from "./form-error";
+import { FormSuccess } from "./form-success";
 
 export const SignUpform = () => {
-  const signUpSchema = z.object({
-    username: z.string().min(1, {
-      message: "Username must be atleast 2 characters",
-    }),
-    email: z.email(),
-    password: z.string().min(6, {
-      message: "Password should contain atleast 6 characters.",
-    }),
-  });
-
-  const form = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition();
+  const form = useForm<z.infer<typeof SignUpSchema>>({
+    resolver: zodResolver(SignUpSchema),
     defaultValues: {
       username: "",
       email: "",
@@ -33,8 +31,15 @@ export const SignUpform = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof signUpSchema>) => {
-    console.log(values);
+  const onSubmit = (values: z.infer<typeof SignUpSchema>) => {
+    setSuccess("");
+    setError("");
+    startTransition(() => {
+      signup(values).then((data) => {
+        setError(data.error);
+        setSuccess(data.success);
+      });
+    });
   };
   return (
     <Form {...form}>
@@ -96,7 +101,10 @@ export const SignUpform = () => {
             )}
           />
         </div>
+        <FormError message={error} />
+        <FormSuccess message={success} />
         <Button
+          disabled={isPending}
           type="submit"
           className="w-full cursor-pointer bg-blue-500 hover:bg-blue-400 dark:bg-violet-400 dark:hover:bg-violet-300 duration-150"
         >
