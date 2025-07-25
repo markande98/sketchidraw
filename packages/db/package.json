@@ -17,9 +17,11 @@
   },
   "dependencies": {
     "@prisma/client": "^6.12.0",
-    "@prisma/extension-accelerate": "^2.0.2"
+    "@prisma/extension-accelerate": "^2.0.2",
+    "zod": "^4.0.5"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./types": "./types.ts"
   }
 }
