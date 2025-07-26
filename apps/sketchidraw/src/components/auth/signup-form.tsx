@@ -16,11 +16,12 @@ import { Button } from "../ui/button";
 import { useState, useTransition } from "react";
 import { signup } from "@/actions/signup";
 import { FormError } from "./form-error";
-import { FormSuccess } from "./form-success";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export const SignUpform = () => {
+  const router = useRouter();
   const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof SignUpSchema>>({
     resolver: zodResolver(SignUpSchema),
@@ -32,13 +33,19 @@ export const SignUpform = () => {
   });
 
   const onSubmit = (values: z.infer<typeof SignUpSchema>) => {
-    setSuccess("");
     setError("");
     startTransition(() => {
-      signup(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
-      });
+      signup(values)
+        .then((data) => {
+          if (data.error) {
+            setError(data.error);
+            return;
+          }
+          router.push("/auth/signin");
+          router.refresh();
+          toast.success(data.success);
+        })
+        .catch(() => setError("Something went wrong!"));
     });
   };
   return (
@@ -102,7 +109,6 @@ export const SignUpform = () => {
           />
         </div>
         <FormError message={error} />
-        <FormSuccess message={success} />
         <Button
           disabled={isPending}
           type="submit"

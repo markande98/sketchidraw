@@ -42,9 +42,9 @@ export const SignInForm = () => {
             return;
           }
 
-          toast.success("Logged In");
           router.push("/");
           router.refresh();
+          toast.success("Logged In");
         })
         .catch(() => setError("Something went wrong!"));
     });
