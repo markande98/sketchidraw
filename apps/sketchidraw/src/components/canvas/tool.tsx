@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
+import { cn } from "@/lib/utils";
+import { ToolType } from "@/types/tools";
 
 const iconMap = {
   MousePointer,
@@ -30,16 +32,37 @@ interface ToolProps {
   label: string;
   iconName: keyof typeof iconMap;
   index: number;
+  onClick: (value: ToolType) => void;
+  isSelected: boolean;
 }
 
-export const Tool = ({ label, iconName, index }: ToolProps) => {
+export const Tool = ({
+  label,
+  iconName,
+  index,
+  onClick,
+  isSelected,
+}: ToolProps) => {
   const Icon = iconMap[iconName];
+
+  const handleClick = () => {
+    onClick(iconName);
+  };
+
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="relative p-2 cursor-pointer hover:bg-surface-high hover:rounded-md">
-          {Icon && <Icon size={13} />}
-          <span className="absolute right-0 bottom-0 text-[10px]">{index}</span>
+      <TooltipTrigger onClick={handleClick} asChild>
+        <div
+          className={cn(
+            "relative p-3 cursor-pointer flex items-center justify-center",
+            isSelected && "bg-violet-400/50 rounded-md",
+            !isSelected && "hover:rounded-md hover:bg-surface-high"
+          )}
+        >
+          {Icon && <Icon size={13} fill={isSelected ? "white" : ""} />}
+          <span className="absolute right-[5px] bottom-[1px] text-[10px]">
+            {index}
+          </span>
         </div>
       </TooltipTrigger>
       <TooltipContent>
