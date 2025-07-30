@@ -11,4 +11,6 @@ export const tools = [
 ] as const;
 
 type ToolWithoutLabel = Omit<(typeof tools)[number], "label">;
-export type ToolType = ToolWithoutLabel[keyof ToolWithoutLabel];
+type ToolWithLabel = Omit<(typeof tools)[number], "iconName">;
+export type ToolIconName = ToolWithoutLabel[keyof ToolWithoutLabel];
+export type ToolType = ToolWithLabel[keyof ToolWithLabel];

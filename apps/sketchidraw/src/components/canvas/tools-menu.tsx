@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { Tool } from "./tool";
-import { tools, ToolType } from "@/types/tools";
+import { tools } from "@/types/tools";
+import { useTool } from "@/hooks/use-tool-store";
 
 export const ToolsMenu = () => {
-  const [toolSelected, setToolSelected] = useState<ToolType | undefined>(
-    undefined
-  );
+  const { type } = useTool();
   return (
     <div className="flex items-center bg-surface-high/50 p-2 gap-6 rounded-md transition duration-200">
       {tools.map((tool, index) => (
@@ -16,8 +14,7 @@ export const ToolsMenu = () => {
           label={tool.label}
           iconName={tool.iconName}
           index={index + 1}
-          isSelected={toolSelected === tool.iconName}
-          onClick={(value) => setToolSelected(value)}
+          isSelected={type === tool.label}
         />
       ))}
     </div>

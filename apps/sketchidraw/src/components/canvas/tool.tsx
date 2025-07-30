@@ -15,6 +15,7 @@ import {
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { ToolType } from "@/types/tools";
+import { useTool } from "@/hooks/use-tool-store";
 
 const iconMap = {
   MousePointer,
@@ -29,24 +30,18 @@ const iconMap = {
 };
 
 interface ToolProps {
-  label: string;
+  label: ToolType;
   iconName: keyof typeof iconMap;
   index: number;
-  onClick: (value: ToolType) => void;
   isSelected: boolean;
 }
 
-export const Tool = ({
-  label,
-  iconName,
-  index,
-  onClick,
-  isSelected,
-}: ToolProps) => {
+export const Tool = ({ label, iconName, index, isSelected }: ToolProps) => {
+  const { onSelect } = useTool();
   const Icon = iconMap[iconName];
 
   const handleClick = () => {
-    onClick(iconName);
+    onSelect(label);
   };
 
   return (
