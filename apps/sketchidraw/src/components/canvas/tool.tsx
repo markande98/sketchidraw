@@ -54,7 +54,9 @@ export const Tool = ({ label, iconName, index, isSelected }: ToolProps) => {
             !isSelected && "hover:rounded-md hover:bg-surface-high"
           )}
         >
-          {Icon && <Icon size={13} fill={isSelected ? "white" : ""} />}
+          {Icon && (
+            <Icon size={13} fill={isSelected ? "white" : "transparent"} />
+          )}
           <span className="absolute right-[5px] bottom-[1px] text-[10px]">
             {index}
           </span>
