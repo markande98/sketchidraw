@@ -15,7 +15,7 @@ import {
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { ToolType } from "@/types/tools";
-import { useTool } from "@/hooks/use-tool-store";
+import { useCanva } from "@/hooks/use-canva-store";
 
 const iconMap = {
   MousePointer,
@@ -37,11 +37,11 @@ interface ToolProps {
 }
 
 export const Tool = ({ label, iconName, index, isSelected }: ToolProps) => {
-  const { onSelect } = useTool();
+  const { onSelectTooltype } = useCanva();
   const Icon = iconMap[iconName];
 
   const handleClick = () => {
-    onSelect(label);
+    onSelectTooltype(label);
   };
 
   return (

@@ -5,8 +5,8 @@ export const AppHamburger = () => {
     <div className="dark:bg-surface-high p-3 rounded-md cursor-pointer transition-colors hover:bg-surface-high/70 duration-200">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
+        width="15"
+        height="15"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

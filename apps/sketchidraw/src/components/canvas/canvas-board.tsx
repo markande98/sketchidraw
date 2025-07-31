@@ -3,21 +3,19 @@
 import rough from "roughjs";
 
 import { useEffect, useRef, useState } from "react";
-import { RoughCanvas } from "roughjs/bin/canvas";
-import { useTool } from "@/hooks/use-tool-store";
 import { useDraw } from "@/hooks/use-draw";
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
+import { useCanva } from "@/hooks/use-canva-store";
+import { RoughCanvas } from "roughjs/bin/canvas";
 
 export const CanvasBoard = () => {
+  const { onSetCanva, onSetRoughCanvas } = useCanva();
   const [canvasEngine, setCanvasEngine] = useState<CanvasEngine | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const roughCanvas = useRef<RoughCanvas | null>(null);
-  const { type } = useTool();
   const { handleMouseDown, handleMouseMove, handleMouseUp } = useDraw({
-    toolType: type,
-    canvas: canvasRef.current,
     canvasEngine,
   });
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const roughCanvas = useRef<RoughCanvas>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -26,9 +24,11 @@ export const CanvasBoard = () => {
       canvas.height = window.innerHeight;
       roughCanvas.current = rough.canvas(canvas);
       const canvasEngine = new CanvasEngine(canvas, roughCanvas.current);
+      onSetCanva(canvas);
+      onSetRoughCanvas(rough.canvas(canvas));
       setCanvasEngine(canvasEngine);
     }
-  }, []);
+  }, [onSetCanva, onSetRoughCanvas]);
 
   return (
     <canvas
