@@ -1,18 +1,16 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-
-const bgColors = [
-  "#F8FAE5", // light cream
-  "#A3C9A8", // soft green
-  "#84A9C0", // muted blue
-  "#FFD6E0", // pastel pink
-  "#F9B572", // warm peach
-];
+import { ColorToolTip } from "./color-tooltip";
+import { BACKGROUND_COLOR } from "@/constants/color";
+import { useCanva } from "@/hooks/use-canva-store";
 
 export const BackgroundOptions = () => {
-  const [bgColor, setBgColor] = useState(bgColors[0]);
+  const { canvaBgColor, onSetCanvaBgColor } = useCanva();
+
+  const onChange = (color: string | null) => {
+    onSetCanvaBgColor(color);
+  };
 
   return (
     <div className="flex flex-col space-y-2">
@@ -21,23 +19,21 @@ export const BackgroundOptions = () => {
       </h3>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
-          {bgColors.map((color, index) => (
+          {BACKGROUND_COLOR.map((color, index) => (
             <div
               key={index}
               className={cn(
-                "h-6 w-6 rounded-sm cursor-pointer opacity-30",
-                color === bgColor && "ring-2 ring-white"
+                "h-6 w-6 rounded-sm cursor-pointer opacity-30 hover:scale-100 transition duration-200",
+                color === canvaBgColor &&
+                  "ring-2 ring-offset-2 ring-offset-pink"
               )}
               style={{ backgroundColor: color }}
-              onClick={() => setBgColor(color)}
+              onClick={() => onChange(color)}
             />
           ))}
         </div>
         <div className="w-[1px] h-[20px] bg-surface-high/80" />
-        <div
-          className="h-6 w-6 rounded-md cursor-pointer"
-          style={{ backgroundColor: bgColor }}
-        />
+        <ColorToolTip color={canvaBgColor} onChange={onChange} />
       </div>
     </div>
   );

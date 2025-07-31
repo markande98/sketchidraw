@@ -8,7 +8,14 @@ type DrawProps = {
 };
 
 export const useDraw = ({ canvasEngine }: DrawProps) => {
-  const { canvas, tooltype } = useCanva();
+  const {
+    canvas,
+    tooltype,
+    canvaBgColor,
+    canvaStrokeColor,
+    canvaStrokeWidth,
+    canvaStrokeDashOffset,
+  } = useCanva();
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -42,6 +49,10 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       y: pos.y,
       height: 0,
       width: 0,
+      fill: canvaBgColor,
+      stroke: canvaStrokeColor,
+      strokeWidth: canvaStrokeWidth,
+      strokeDashOffset: canvaStrokeDashOffset,
     });
     setDragStart(pos);
   };
@@ -57,6 +68,10 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             y: Math.min(pos.y, dragStart.y),
             height: Math.abs(pos.y - dragStart.y),
             width: Math.abs(pos.x - dragStart.x),
+            fill: canvaBgColor,
+            stroke: canvaStrokeColor,
+            strokeWidth: canvaStrokeWidth,
+            strokeDashOffset: canvaStrokeDashOffset,
           });
           break;
         default:

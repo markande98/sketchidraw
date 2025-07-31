@@ -1,3 +1,4 @@
+import { useCanva } from "@/hooks/use-canva-store";
 import { Shape } from "@/types/shape";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
@@ -7,13 +8,24 @@ export class CanvasEngine {
   private shapes: Shape[];
   private stColor: string | null;
   private bgColor: string | null;
+  private stWidth: number | null;
+  private stDashOffset: number | null;
+  private unsubscribe: () => void;
 
   constructor(canvas: HTMLCanvasElement, roughCanvas: RoughCanvas) {
     this.shapes = [];
+    this.canvas = canvas;
     this.stColor = "";
     this.bgColor = "";
-    this.canvas = canvas;
+    this.stWidth = 0;
+    this.stDashOffset = 0;
     this.roughCanvas = roughCanvas;
+    this.unsubscribe = useCanva.subscribe((state) => {
+      this.bgColor = state.canvaBgColor;
+      this.stColor = state.canvaStrokeColor;
+      this.stWidth = state.canvaStrokeWidth;
+      this.stDashOffset = state.canvaStrokeDashOffset;
+    });
   }
 
   set backgroundColor(value: string) {
@@ -50,10 +62,12 @@ export class CanvasEngine {
             shape.width,
             shape.height,
             {
-              stroke: "#ef4444",
-              strokeWidth: 2,
-              fill: "rgba(239, 68, 68, 0.1)",
-              fillStyle: "hachure",
+              stroke: shape.stroke,
+              strokeWidth: shape.strokeWidth,
+              fill: shape.fill,
+              fillStyle: "solid",
+              roughness: 0,
+              strokeLineDash: [shape.strokeDashOffset ?? 0],
             }
           );
           break;
@@ -72,15 +86,23 @@ export class CanvasEngine {
           shape.width,
           shape.height,
           {
-            stroke: "#ef4444",
-            strokeWidth: 2,
-            fill: "rgba(239, 68, 68, 0.1)",
-            fillStyle: "hachure",
+            stroke: this.stColor ?? undefined,
+            strokeWidth: this.stWidth ?? 0,
+            fill: this.bgColor ?? "",
+            fillStyle: "solid",
+            roughness: 0,
+            strokeLineDash: [this.stDashOffset ?? 0],
           }
         );
         break;
       default:
         break;
+    }
+  }
+
+  public destroy() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
     }
   }
 }

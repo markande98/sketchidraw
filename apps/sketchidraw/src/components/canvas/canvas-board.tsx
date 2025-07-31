@@ -28,6 +28,12 @@ export const CanvasBoard = () => {
       onSetRoughCanvas(rough.canvas(canvas));
       setCanvasEngine(canvasEngine);
     }
+
+    return () => {
+      if (canvasEngine) {
+        canvasEngine.destroy();
+      }
+    };
   }, [onSetCanva, onSetRoughCanvas]);
 
   return (

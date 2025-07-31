@@ -1,41 +1,48 @@
 "use client";
 
+import { STROKE_DASH_OFFSET } from "@/constants/color";
+import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 export const StrokeStyle = () => {
-  const [strokeStyle, setStrokeColor] = useState(0);
+  const { onSetCanvaStrokeDashOffset } = useCanva();
+  const [strokeDashIndex, setStrokeDashIndex] = useState(0);
 
+  const onClick = (index: number) => {
+    onSetCanvaStrokeDashOffset(STROKE_DASH_OFFSET[index]);
+    setStrokeDashIndex(index);
+  };
   return (
     <div className="flex flex-col space-y-2">
       <h3 className="text-white text-[11px] font-normal tracking-tigher">
-        Stroke width
+        Stroke style
       </h3>
       <div className="flex items-center">
         <div className="flex items-center gap-2">
           <div
-            onClick={() => setStrokeColor(0)}
+            onClick={() => onClick(0)}
             className={cn(
               "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
-              strokeStyle === 0 && "ring-1 ring-white bg-[#403e6a]"
+              strokeDashIndex === 0 && "ring-1 ring-white bg-[#403e6a]"
             )}
           >
             <D1 />
           </div>
           <div
-            onClick={() => setStrokeColor(1)}
+            onClick={() => onClick(1)}
             className={cn(
               "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
-              strokeStyle === 1 && "ring-1 ring-white bg-[#403e6a]"
+              strokeDashIndex === 1 && "ring-1 ring-white bg-[#403e6a]"
             )}
           >
             <D2 />
           </div>
           <div
-            onClick={() => setStrokeColor(2)}
+            onClick={() => onClick(2)}
             className={cn(
               "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
-              strokeStyle === 2 && "ring-1 ring-white bg-[#403e6a]"
+              strokeDashIndex === 2 && "ring-1 ring-white bg-[#403e6a]"
             )}
           >
             <D3 />

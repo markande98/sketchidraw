@@ -6,6 +6,10 @@ type Rectangle = {
   y: number;
   width: number;
   height: number;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+  strokeDashOffset: number;
 };
 
 export type Shape = Rectangle;
