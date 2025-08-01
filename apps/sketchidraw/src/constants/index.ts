@@ -1,3 +1,4 @@
+// color constants
 export const STROKE_COLORS = [
   "#d3d3d3",
   "#ff7976",
@@ -14,6 +15,7 @@ export const BACKGROUND_COLOR = [
   "#342400",
 ];
 
+// stroke constants
 export const STROKE_WIDTH = [1, 2, 3];
 export const STROKE_DASH_OFFSET = [0, 5, 10];
 
@@ -25,10 +27,11 @@ export enum FillStyle {
 
 export enum Sloppiness {
   Architect = 0,
-  Artist = 1,
-  Cartoonist = 2,
+  Artist = 0.3,
+  Cartoonist = 0.6,
 }
 
-// export enum Edges {
-//   Sharp,
-// }
+export enum Edges {
+  Sharp = 0,
+  Round = 30,
+}

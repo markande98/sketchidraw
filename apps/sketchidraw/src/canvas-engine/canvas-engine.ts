@@ -1,4 +1,4 @@
-import { FillStyle, Sloppiness } from "@/constants/index";
+import { Edges, FillStyle, Sloppiness } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { Shape } from "@/types/shape";
 import { RoughCanvas } from "roughjs/bin/canvas";
@@ -13,6 +13,7 @@ export class CanvasEngine {
   private stDashOffset: number | null;
   private fillStyle: FillStyle;
   private sloppiness: Sloppiness;
+  private edgeType: Edges;
   private unsubscribe: () => void;
 
   constructor(canvas: HTMLCanvasElement, roughCanvas: RoughCanvas) {
@@ -25,6 +26,7 @@ export class CanvasEngine {
     this.roughCanvas = roughCanvas;
     this.fillStyle = FillStyle.CrossHatch;
     this.sloppiness = Sloppiness.Architect;
+    this.edgeType = Edges.Sharp;
     this.unsubscribe = useCanva.subscribe((state) => {
       this.bgColor = state.canvaBgColor;
       this.stColor = state.canvaStrokeColor;
@@ -32,6 +34,7 @@ export class CanvasEngine {
       this.stDashOffset = state.canvaStrokeDashOffset;
       this.fillStyle = state.canvaFillstyle;
       this.sloppiness = state.canvaSloppiness;
+      this.edgeType = state.canvaEdge;
     });
   }
 
@@ -63,24 +66,25 @@ export class CanvasEngine {
     this.shapes.forEach((shape) => {
       switch (shape.type) {
         case "Rectangle":
-          this.roughCanvas.rectangle(
+          const path = this.roundedRectPath(
             shape.x,
             shape.y,
             shape.width,
             shape.height,
-            {
-              stroke: shape.stroke,
-              strokeWidth: shape.strokeWidth,
-              roughness: shape.sloppiness,
-              fill: shape.fill,
-              fillStyle: shape.fillStyle,
-              strokeLineDash: [shape.strokeDashOffset ?? 0],
-              hachureAngle: 120,
-              hachureGap: 20,
-              fillWeight: 2,
-              bowing: 6,
-            }
+            shape.edgeType
           );
+          this.roughCanvas.path(path, {
+            stroke: shape.stroke,
+            strokeWidth: shape.strokeWidth,
+            roughness: shape.sloppiness,
+            fill: shape.fill,
+            fillStyle: shape.fillStyle,
+            strokeLineDash: [shape.strokeDashOffset ?? 0],
+            hachureAngle: 120,
+            hachureGap: 20,
+            fillWeight: 2,
+            bowing: 6,
+          });
           break;
         default:
           break;
@@ -93,7 +97,7 @@ export class CanvasEngine {
     y: number,
     width: number,
     height: number,
-    radius: number
+    radius: Edges
   ): string {
     return `M ${x + radius} ${y}
           L ${x + width - radius} ${y}
@@ -109,24 +113,25 @@ export class CanvasEngine {
   public drawShape(shape: Shape): void {
     switch (shape.type) {
       case "Rectangle":
-        this.roughCanvas.rectangle(
+        const path = this.roundedRectPath(
           shape.x,
           shape.y,
           shape.width,
           shape.height,
-          {
-            stroke: this.stColor ?? undefined,
-            strokeWidth: this.stWidth ?? 0,
-            roughness: this.sloppiness,
-            fill: this.bgColor ?? "",
-            fillStyle: this.fillStyle,
-            strokeLineDash: [this.stDashOffset ?? 0],
-            hachureAngle: 120,
-            hachureGap: 20,
-            fillWeight: 2,
-            bowing: 6,
-          }
+          shape.edgeType
         );
+        this.roughCanvas.path(path, {
+          stroke: this.stColor ?? undefined,
+          strokeWidth: this.stWidth ?? 0,
+          roughness: this.sloppiness,
+          fill: this.bgColor ?? "",
+          fillStyle: this.fillStyle,
+          strokeLineDash: [this.stDashOffset ?? 0],
+          hachureAngle: 120,
+          hachureGap: 20,
+          fillWeight: 2,
+          bowing: 6,
+        });
         break;
       default:
         break;
