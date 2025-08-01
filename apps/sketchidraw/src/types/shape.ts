@@ -1,3 +1,4 @@
+import { FillStyle } from "@/constants/color";
 import { ToolType } from "./tools";
 
 type Rectangle = {
@@ -7,6 +8,7 @@ type Rectangle = {
   width: number;
   height: number;
   fill: string;
+  fillStyle: FillStyle;
   stroke: string;
   strokeWidth: number;
   strokeDashOffset: number;

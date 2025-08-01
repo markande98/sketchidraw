@@ -1,4 +1,5 @@
 import { BackgroundOptions } from "./background-options";
+import { FillStyle } from "./fill-style";
 import { StrokeOptions } from "./stroke-options";
 import { StrokeStyle } from "./stroke-style";
 import { StrokeWidth } from "./stroke-width";
@@ -11,6 +12,7 @@ export const CanvasProperty = () => {
         <div className="px-3 py-2 space-y-6 text-neutral-800">
           <StrokeOptions />
           <BackgroundOptions />
+          <FillStyle />
           <StrokeWidth />
           <StrokeStyle />
         </div>

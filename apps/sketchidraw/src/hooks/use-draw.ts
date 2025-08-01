@@ -15,6 +15,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     canvaStrokeColor,
     canvaStrokeWidth,
     canvaStrokeDashOffset,
+    canvaFillstyle,
   } = useCanva();
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
@@ -50,6 +51,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       height: 0,
       width: 0,
       fill: canvaBgColor,
+      fillStyle: canvaFillstyle,
       stroke: canvaStrokeColor,
       strokeWidth: canvaStrokeWidth,
       strokeDashOffset: canvaStrokeDashOffset,
@@ -69,6 +71,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             height: Math.abs(pos.y - dragStart.y),
             width: Math.abs(pos.x - dragStart.x),
             fill: canvaBgColor,
+            fillStyle: canvaFillstyle,
             stroke: canvaStrokeColor,
             strokeWidth: canvaStrokeWidth,
             strokeDashOffset: canvaStrokeDashOffset,

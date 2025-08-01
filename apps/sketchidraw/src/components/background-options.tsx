@@ -8,7 +8,7 @@ import { useCanva } from "@/hooks/use-canva-store";
 export const BackgroundOptions = () => {
   const { canvaBgColor, onSetCanvaBgColor } = useCanva();
 
-  const onChange = (color: string | null) => {
+  const onChange = (color: string | "transparent") => {
     onSetCanvaBgColor(color);
   };
 
@@ -23,7 +23,7 @@ export const BackgroundOptions = () => {
             <div
               key={index}
               className={cn(
-                "h-6 w-6 rounded-sm cursor-pointer opacity-30 hover:scale-100 transition duration-200",
+                "h-6 w-6 rounded-sm cursor-pointer opacity-50 hover:scale-100 transition duration-200",
                 color === canvaBgColor &&
                   "ring-2 ring-offset-2 ring-offset-pink"
               )}

@@ -16,3 +16,9 @@ export const BACKGROUND_COLOR = [
 
 export const STROKE_WIDTH = [1, 2, 3];
 export const STROKE_DASH_OFFSET = [0, 5, 10];
+
+export enum FillStyle {
+  Hachure = "hachure",
+  CrossHatch = "cross-hatch",
+  Solid = "solid",
+}

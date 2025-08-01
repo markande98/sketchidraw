@@ -1,3 +1,4 @@
+import { FillStyle } from "@/constants/color";
 import { useCanva } from "@/hooks/use-canva-store";
 import { Shape } from "@/types/shape";
 import { RoughCanvas } from "roughjs/bin/canvas";
@@ -10,6 +11,7 @@ export class CanvasEngine {
   private bgColor: string | null;
   private stWidth: number | null;
   private stDashOffset: number | null;
+  private fillStyle: FillStyle;
   private unsubscribe: () => void;
 
   constructor(canvas: HTMLCanvasElement, roughCanvas: RoughCanvas) {
@@ -20,11 +22,13 @@ export class CanvasEngine {
     this.stWidth = 0;
     this.stDashOffset = 0;
     this.roughCanvas = roughCanvas;
+    this.fillStyle = FillStyle.CrossHatch;
     this.unsubscribe = useCanva.subscribe((state) => {
       this.bgColor = state.canvaBgColor;
       this.stColor = state.canvaStrokeColor;
       this.stWidth = state.canvaStrokeWidth;
       this.stDashOffset = state.canvaStrokeDashOffset;
+      this.fillStyle = state.canvaFillstyle;
     });
   }
 
@@ -65,9 +69,12 @@ export class CanvasEngine {
               stroke: shape.stroke,
               strokeWidth: shape.strokeWidth,
               fill: shape.fill,
-              fillStyle: "solid",
-              roughness: 0,
+              fillStyle: shape.fillStyle,
+              roughness: 3,
               strokeLineDash: [shape.strokeDashOffset ?? 0],
+              hachureAngle: 120,
+              hachureGap: 20,
+              fillWeight: 3,
             }
           );
           break;
@@ -89,9 +96,12 @@ export class CanvasEngine {
             stroke: this.stColor ?? undefined,
             strokeWidth: this.stWidth ?? 0,
             fill: this.bgColor ?? "",
-            fillStyle: "solid",
-            roughness: 0,
+            fillStyle: this.fillStyle,
+            roughness: 3,
             strokeLineDash: [this.stDashOffset ?? 0],
+            hachureAngle: 120,
+            hachureGap: 20,
+            fillWeight: 3,
           }
         );
         break;
