@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-import { STROKE_COLORS } from "@/constants/color";
+import { STROKE_COLORS } from "@/constants/index";
 import { ColorToolTip } from "./color-tooltip";
 import { useCanva } from "@/hooks/use-canva-store";
 

@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { ColorToolTip } from "./color-tooltip";
-import { BACKGROUND_COLOR } from "@/constants/color";
+import { BACKGROUND_COLOR } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 
 export const BackgroundOptions = () => {

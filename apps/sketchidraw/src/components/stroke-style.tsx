@@ -1,6 +1,6 @@
 "use client";
 
-import { STROKE_DASH_OFFSET } from "@/constants/color";
+import { STROKE_DASH_OFFSET } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
 import { useState } from "react";

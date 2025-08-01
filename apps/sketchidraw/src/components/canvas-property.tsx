@@ -1,5 +1,6 @@
 import { BackgroundOptions } from "./background-options";
 import { FillStyle } from "./fill-style";
+import { Sloppiness } from "./sloppiness";
 import { StrokeOptions } from "./stroke-options";
 import { StrokeStyle } from "./stroke-style";
 import { StrokeWidth } from "./stroke-width";
@@ -15,6 +16,7 @@ export const CanvasProperty = () => {
           <FillStyle />
           <StrokeWidth />
           <StrokeStyle />
+          <Sloppiness />
         </div>
       </ScrollArea>
     </div>

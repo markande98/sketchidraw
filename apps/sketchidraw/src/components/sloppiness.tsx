@@ -1,52 +1,53 @@
 "use client";
 
-import { CrossHatchSvg, HachureSvg, SolidSvg } from "@/constants/svg";
-import { FillStyle as FILLSTYLE } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
+import { Sloppiness as SLOPPINESS } from "@/constants/index";
+import { ArchitectSvg, ArtistSvg, CartoonistSvg } from "@/constants/svg";
 import { cn } from "@/lib/utils";
 
-export const FillStyle = () => {
-  const { canvaFillstyle, onSetCanvaFillstyle } = useCanva();
+export const Sloppiness = () => {
+  const { canvaSloppiness, onSetCanvaSloppiness } = useCanva();
 
-  const onClick = (fillStyle: FILLSTYLE) => {
-    onSetCanvaFillstyle(fillStyle);
+  const onClick = (sloppiness: SLOPPINESS) => {
+    onSetCanvaSloppiness(sloppiness);
   };
+
   return (
     <div className="flex flex-col space-y-2">
       <h3 className="text-white text-[11px] font-normal tracking-tigher">
-        Fill
+        Sloppiness
       </h3>
       <div className="flex items-center">
         <div className="flex items-center gap-2">
           <div
-            onClick={() => onClick(FILLSTYLE.Hachure)}
+            onClick={() => onClick(SLOPPINESS.Architect)}
             className={cn(
               "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
-              canvaFillstyle === FILLSTYLE.Hachure &&
+              canvaSloppiness === SLOPPINESS.Architect &&
                 "ring-1 ring-white bg-[#403e6a]"
             )}
           >
-            <HachureSvg />
+            <ArchitectSvg />
           </div>
           <div
-            onClick={() => onClick(FILLSTYLE.CrossHatch)}
+            onClick={() => onClick(SLOPPINESS.Artist)}
             className={cn(
               "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
-              canvaFillstyle === FILLSTYLE.CrossHatch &&
+              canvaSloppiness === SLOPPINESS.Artist &&
                 "ring-1 ring-white bg-[#403e6a]"
             )}
           >
-            <CrossHatchSvg />
+            <ArtistSvg />
           </div>
           <div
-            onClick={() => onClick(FILLSTYLE.Solid)}
+            onClick={() => onClick(SLOPPINESS.Cartoonist)}
             className={cn(
               "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
-              canvaFillstyle === FILLSTYLE.Solid &&
+              canvaSloppiness === SLOPPINESS.Cartoonist &&
                 "ring-1 ring-white bg-[#403e6a]"
             )}
           >
-            <SolidSvg />
+            <CartoonistSvg />
           </div>
         </div>
       </div>

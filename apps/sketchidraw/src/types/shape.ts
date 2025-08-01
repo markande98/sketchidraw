@@ -1,5 +1,6 @@
-import { FillStyle } from "@/constants/color";
+import { FillStyle } from "@/constants/index";
 import { ToolType } from "./tools";
+import { Sloppiness } from "@/constants";
 
 type Rectangle = {
   type: ToolType;
@@ -9,6 +10,7 @@ type Rectangle = {
   height: number;
   fill: string;
   fillStyle: FillStyle;
+  sloppiness: Sloppiness;
   stroke: string;
   strokeWidth: number;
   strokeDashOffset: number;

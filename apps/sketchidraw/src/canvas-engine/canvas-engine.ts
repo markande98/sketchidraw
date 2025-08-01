@@ -1,4 +1,4 @@
-import { FillStyle } from "@/constants/color";
+import { FillStyle, Sloppiness } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { Shape } from "@/types/shape";
 import { RoughCanvas } from "roughjs/bin/canvas";
@@ -12,6 +12,7 @@ export class CanvasEngine {
   private stWidth: number | null;
   private stDashOffset: number | null;
   private fillStyle: FillStyle;
+  private sloppiness: Sloppiness;
   private unsubscribe: () => void;
 
   constructor(canvas: HTMLCanvasElement, roughCanvas: RoughCanvas) {
@@ -23,12 +24,14 @@ export class CanvasEngine {
     this.stDashOffset = 0;
     this.roughCanvas = roughCanvas;
     this.fillStyle = FillStyle.CrossHatch;
+    this.sloppiness = Sloppiness.Architect;
     this.unsubscribe = useCanva.subscribe((state) => {
       this.bgColor = state.canvaBgColor;
       this.stColor = state.canvaStrokeColor;
       this.stWidth = state.canvaStrokeWidth;
       this.stDashOffset = state.canvaStrokeDashOffset;
       this.fillStyle = state.canvaFillstyle;
+      this.sloppiness = state.canvaSloppiness;
     });
   }
 
@@ -68,13 +71,14 @@ export class CanvasEngine {
             {
               stroke: shape.stroke,
               strokeWidth: shape.strokeWidth,
+              roughness: shape.sloppiness,
               fill: shape.fill,
               fillStyle: shape.fillStyle,
-              roughness: 3,
               strokeLineDash: [shape.strokeDashOffset ?? 0],
               hachureAngle: 120,
               hachureGap: 20,
-              fillWeight: 3,
+              fillWeight: 2,
+              bowing: 6,
             }
           );
           break;
@@ -82,6 +86,24 @@ export class CanvasEngine {
           break;
       }
     });
+  }
+
+  private roundedRectPath(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radius: number
+  ): string {
+    return `M ${x + radius} ${y}
+          L ${x + width - radius} ${y}
+          Q ${x + width} ${y} ${x + width} ${y + radius}
+          L ${x + width} ${y + height - radius}
+          Q ${x + width} ${y + height} ${x + width - radius} ${y + height}
+          L ${x + radius} ${y + height}
+          Q ${x} ${y + height} ${x} ${y + height - radius}
+          L ${x} ${y + radius}
+          Q ${x} ${y} ${x + radius} ${y} Z`;
   }
 
   public drawShape(shape: Shape): void {
@@ -95,13 +117,14 @@ export class CanvasEngine {
           {
             stroke: this.stColor ?? undefined,
             strokeWidth: this.stWidth ?? 0,
+            roughness: this.sloppiness,
             fill: this.bgColor ?? "",
             fillStyle: this.fillStyle,
-            roughness: 3,
             strokeLineDash: [this.stDashOffset ?? 0],
             hachureAngle: 120,
             hachureGap: 20,
-            fillWeight: 3,
+            fillWeight: 2,
+            bowing: 6,
           }
         );
         break;

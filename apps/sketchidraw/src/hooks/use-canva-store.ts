@@ -5,10 +5,11 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 import {
   BACKGROUND_COLOR,
   FillStyle,
+  Sloppiness,
   STROKE_COLORS,
   STROKE_DASH_OFFSET,
   STROKE_WIDTH,
-} from "@/constants/color";
+} from "@/constants/index";
 
 interface CanvaStore {
   canvas: HTMLCanvasElement | null;
@@ -19,6 +20,7 @@ interface CanvaStore {
   canvaStrokeWidth: number;
   canvaStrokeDashOffset: number;
   canvaFillstyle: FillStyle;
+  canvaSloppiness: Sloppiness;
 
   onSetCanva: (canvas: HTMLCanvasElement) => void;
   onSelectTooltype: (tooltype: ToolType) => void;
@@ -28,6 +30,7 @@ interface CanvaStore {
   onSetCanvaStrokeWidth: (width: number) => void;
   onSetCanvaStrokeDashOffset: (offset: number) => void;
   onSetCanvaFillstyle: (style: FillStyle) => void;
+  onSetCanvaSloppiness: (sloppiness: Sloppiness) => void;
 }
 
 export const useCanva = create<CanvaStore>((set) => ({
@@ -39,6 +42,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   canvaStrokeWidth: STROKE_WIDTH[0],
   canvaStrokeDashOffset: STROKE_DASH_OFFSET[0],
   canvaFillstyle: FillStyle.Hachure,
+  canvaSloppiness: Sloppiness.Architect,
 
   onSetCanva: (canvas: HTMLCanvasElement) => set({ canvas }),
   onSetRoughCanvas: (roughCanvas: RoughCanvas) => set({ roughCanvas }),
@@ -49,4 +53,6 @@ export const useCanva = create<CanvaStore>((set) => ({
   onSetCanvaStrokeDashOffset: (offset: number) =>
     set({ canvaStrokeDashOffset: offset }),
   onSetCanvaFillstyle: (style: FillStyle) => set({ canvaFillstyle: style }),
+  onSetCanvaSloppiness: (sloppiness: Sloppiness) =>
+    set({ canvaSloppiness: sloppiness }),
 }));

@@ -1,6 +1,6 @@
 "use client";
 
-import { STROKE_WIDTH } from "@/constants/color";
+import { STROKE_WIDTH } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
 import { Minus } from "lucide-react";

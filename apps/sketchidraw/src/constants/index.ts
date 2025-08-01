@@ -22,3 +22,13 @@ export enum FillStyle {
   CrossHatch = "cross-hatch",
   Solid = "solid",
 }
+
+export enum Sloppiness {
+  Architect = 0,
+  Artist = 1,
+  Cartoonist = 2,
+}
+
+// export enum Edges {
+//   Sharp,
+// }
