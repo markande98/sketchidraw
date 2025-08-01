@@ -25,15 +25,25 @@ export const BackgroundOptions = () => {
               className={cn(
                 "h-6 w-6 rounded-sm cursor-pointer opacity-50 hover:scale-100 transition duration-200",
                 color === canvaBgColor &&
-                  "ring-2 ring-offset-2 ring-offset-pink"
+                  "ring-1 border border-black ring-blue-400"
               )}
-              style={{ backgroundColor: color }}
+              style={
+                color === "transparent"
+                  ? {
+                      backgroundImage: "url('/background-transparent.png')",
+                      backgroundColor: "white",
+                    }
+                  : {
+                      backgroundColor: color,
+                    }
+              }
+              // ...existing
               onClick={() => onChange(color)}
             />
           ))}
         </div>
         <div className="w-[1px] h-[20px] bg-surface-high/80" />
-        <ColorToolTip color={canvaBgColor} onChange={onChange} />
+        <ColorToolTip isCanvaBg />
       </div>
     </div>
   );

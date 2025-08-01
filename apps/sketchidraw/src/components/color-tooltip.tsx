@@ -3,13 +3,24 @@
 import { Edit, Hash } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Input } from "./ui/input";
+import { cn } from "@/lib/utils";
+import { useCanva } from "@/hooks/use-canva-store";
+import { useEffect, useState } from "react";
 
 interface ColorToolTipProps {
-  color: string;
-  onChange: (value: string) => void;
+  isCanvaBg?: boolean;
 }
 
-export const ColorToolTip = ({ color, onChange }: ColorToolTipProps) => {
+export const ColorToolTip = ({ isCanvaBg }: ColorToolTipProps) => {
+  const {
+    canvaBgColor,
+    onSetCanvaBgColor,
+    canvaStrokeColor,
+    onSetCanvaStrokeColor,
+  } = useCanva();
+  const [color, setColor] = useState(
+    isCanvaBg ? canvaBgColor : canvaStrokeColor
+  );
   const validateHex = (value: string): boolean => {
     const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
     return hexRegex.test(value);
@@ -17,15 +28,37 @@ export const ColorToolTip = ({ color, onChange }: ColorToolTipProps) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const hexValue = "#" + e.target.value;
+    setColor(hexValue);
     if (!validateHex(hexValue)) return;
-    onChange(hexValue);
+    if (isCanvaBg) {
+      onSetCanvaBgColor(hexValue);
+      return;
+    }
+    onSetCanvaStrokeColor(hexValue);
   };
+
+  useEffect(() => {
+    setColor(isCanvaBg ? canvaBgColor : canvaStrokeColor);
+  }, [canvaBgColor, canvaStrokeColor, isCanvaBg]);
+
   return (
     <Popover>
       <PopoverTrigger>
         <div
-          className="h-6 w-6 rounded-sm cursor-pointer hover:scale-110 transition duration-200"
-          style={{ backgroundColor: color ?? "transparent" }}
+          className={cn(
+            "h-6 w-6 rounded-sm cursor-pointer hover:scale-110 transition duration-200",
+            isCanvaBg && canvaBgColor === "transparent" && "opacity-50"
+          )}
+          style={
+            isCanvaBg && canvaBgColor === "transparent"
+              ? {
+                  backgroundImage: "url('/background-transparent.png')",
+                  backgroundColor: "white",
+                }
+              : {
+                  backgroundColor: isCanvaBg ? canvaBgColor : canvaStrokeColor,
+                }
+          }
         />
       </PopoverTrigger>
       <PopoverContent
@@ -42,6 +75,7 @@ export const ColorToolTip = ({ color, onChange }: ColorToolTipProps) => {
               className="border-none dark:focus:ring-0 dark:focus:ring-offset-0 placeholder:text-sm placeholder:tracking-tighter"
               placeholder="color"
               onChange={handleChange}
+              value={color.replace("#", "")}
             />
             <Edit size={16} />
           </div>

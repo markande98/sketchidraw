@@ -33,5 +33,5 @@ export enum Sloppiness {
 
 export enum Edges {
   Sharp = 0,
-  Round = 30,
+  Round = 20,
 }

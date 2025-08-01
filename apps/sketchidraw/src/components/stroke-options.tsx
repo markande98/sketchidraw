@@ -25,7 +25,7 @@ export const StrokeOptions = () => {
               className={cn(
                 "h-6 w-6 rounded-sm cursor-pointer hover:scale-110 transition duration-200",
                 color === canvaStrokeColor &&
-                  "ring-2 ring-offset-2 ring-offset-pink"
+                  "ring-1 border border-black ring-blue-400"
               )}
               style={{ backgroundColor: color }}
               onClick={() => onChange(color)}
@@ -33,7 +33,7 @@ export const StrokeOptions = () => {
           ))}
         </div>
         <div className="w-[1px] h-[20px] bg-surface-high/80" />
-        <ColorToolTip color={canvaStrokeColor} onChange={onChange} />
+        <ColorToolTip />
       </div>
     </div>
   );
