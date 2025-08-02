@@ -9,14 +9,17 @@ import { useEffect, useState } from "react";
 
 interface ColorToolTipProps {
   isCanvaBg?: boolean;
+  isThemeBg?: boolean;
 }
 
-export const ColorToolTip = ({ isCanvaBg }: ColorToolTipProps) => {
+export const ColorToolTip = ({ isCanvaBg, isThemeBg }: ColorToolTipProps) => {
   const {
     canvaBgColor,
     onSetCanvaBgColor,
     canvaStrokeColor,
     onSetCanvaStrokeColor,
+    themeColor,
+    onSetThemeColor,
   } = useCanva();
   const [color, setColor] = useState(
     isCanvaBg ? canvaBgColor : canvaStrokeColor
@@ -34,12 +37,18 @@ export const ColorToolTip = ({ isCanvaBg }: ColorToolTipProps) => {
       onSetCanvaBgColor(hexValue);
       return;
     }
+    if (isThemeBg) {
+      onSetThemeColor(hexValue);
+      return;
+    }
     onSetCanvaStrokeColor(hexValue);
   };
 
   useEffect(() => {
-    setColor(isCanvaBg ? canvaBgColor : canvaStrokeColor);
-  }, [canvaBgColor, canvaStrokeColor, isCanvaBg]);
+    setColor(
+      isThemeBg ? themeColor : isCanvaBg ? canvaBgColor : canvaStrokeColor
+    );
+  }, [canvaBgColor, canvaStrokeColor, themeColor, isCanvaBg, isThemeBg]);
 
   return (
     <Popover>
@@ -56,7 +65,11 @@ export const ColorToolTip = ({ isCanvaBg }: ColorToolTipProps) => {
                   backgroundColor: "white",
                 }
               : {
-                  backgroundColor: isCanvaBg ? canvaBgColor : canvaStrokeColor,
+                  backgroundColor: isThemeBg
+                    ? themeColor
+                    : isCanvaBg
+                      ? canvaBgColor
+                      : canvaStrokeColor,
                 }
           }
         />

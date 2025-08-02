@@ -9,7 +9,7 @@ import { useCanva } from "@/hooks/use-canva-store";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
 export const CanvasBoard = () => {
-  const { onSetCanva, onSetRoughCanvas } = useCanva();
+  const { onSetCanva, onSetRoughCanvas, themeColor } = useCanva();
   const [canvasEngine, setCanvasEngine] = useState<CanvasEngine | null>(null);
   const { handleMouseDown, handleMouseMove, handleMouseUp } = useDraw({
     canvasEngine,
@@ -41,8 +41,9 @@ export const CanvasBoard = () => {
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      className="absolute z-[5]"
       ref={canvasRef}
+      className="absolute inset-0"
+      style={{ backgroundColor: themeColor }}
     />
   );
 };

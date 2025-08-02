@@ -16,7 +16,7 @@ export const ToolsMenu = () => {
   return (
     <div
       className={cn(
-        "flex items-center bg-surface-high/50 p-1 gap-6 rounded-md transition duration-200",
+        "z-[100] flex items-center bg-surface-high/50 p-1 gap-6 rounded-md transition duration-200",
         gochi.className
       )}
     >

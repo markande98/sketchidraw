@@ -4,6 +4,7 @@ import { ToolType } from "@/types/tools";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import {
   BACKGROUND_COLOR,
+  CANVAS_BG_COLOR,
   Edges,
   FillStyle,
   Sloppiness,
@@ -15,6 +16,7 @@ import {
 interface CanvaStore {
   canvas: HTMLCanvasElement | null;
   roughCanvas: RoughCanvas | null;
+  themeColor: string;
   tooltype: ToolType;
   canvaBgColor: string | "transparent";
   canvaStrokeColor: string;
@@ -25,6 +27,7 @@ interface CanvaStore {
   canvaEdge: Edges;
 
   onSetCanva: (canvas: HTMLCanvasElement) => void;
+  onSetThemeColor: (color: string) => void;
   onSelectTooltype: (tooltype: ToolType) => void;
   onSetRoughCanvas: (roughCanvas: RoughCanvas) => void;
   onSetCanvaBgColor: (color: string) => void;
@@ -38,6 +41,7 @@ interface CanvaStore {
 
 export const useCanva = create<CanvaStore>((set) => ({
   canvas: null,
+  themeColor: CANVAS_BG_COLOR[0],
   roughCanvas: null,
   tooltype: "Rectangle",
   canvaBgColor: BACKGROUND_COLOR[0],
@@ -49,6 +53,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   canvaEdge: Edges.Sharp,
 
   onSetCanva: (canvas: HTMLCanvasElement) => set({ canvas }),
+  onSetThemeColor: (color: string) => set({ themeColor: color }),
   onSetRoughCanvas: (roughCanvas: RoughCanvas) => set({ roughCanvas }),
   onSelectTooltype: (tooltype: ToolType) => set({ tooltype }),
   onSetCanvaBgColor: (color: string) => set({ canvaBgColor: color }),
