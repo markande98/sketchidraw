@@ -19,6 +19,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     canvaSloppiness,
     canvaEdge,
   } = useCanva();
+  const { tooltype } = useCanva();
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -46,28 +47,46 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const pos = getMousePos(e);
     setIsDrawing(true);
-    setCurrentShape({
-      type: ToolType.Rectangle,
-      x: pos.x,
-      y: pos.y,
-      height: 0,
-      width: 0,
-      fill: canvaBgColor,
-      fillStyle: canvaFillstyle,
-      stroke: canvaStrokeColor,
-      strokeWidth: canvaStrokeWidth,
-      strokeDashOffset: canvaStrokeDashOffset,
-      sloppiness: canvaSloppiness,
-      edgeType: canvaEdge,
-    });
+    switch (tooltype) {
+      case ToolType.Rectangle:
+        setCurrentShape({
+          type: ToolType.Rectangle,
+          x: pos.x,
+          y: pos.y,
+          height: 0,
+          width: 0,
+          fill: canvaBgColor,
+          fillStyle: canvaFillstyle,
+          stroke: canvaStrokeColor,
+          strokeWidth: canvaStrokeWidth,
+          strokeDashOffset: canvaStrokeDashOffset,
+          sloppiness: canvaSloppiness,
+          edgeType: canvaEdge,
+        });
+        break;
+      case ToolType.Ellipse:
+        setCurrentShape({
+          type: ToolType.Ellipse,
+          centerX: pos.x,
+          centerY: pos.y,
+          height: 0,
+          width: 0,
+          fill: canvaBgColor,
+          fillStyle: canvaFillstyle,
+          stroke: canvaStrokeColor,
+          strokeWidth: canvaStrokeWidth,
+          strokeDashOffset: canvaStrokeDashOffset,
+          sloppiness: canvaSloppiness,
+        });
+    }
     setDragStart(pos);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const pos = getMousePos(e);
     if (isDrawing && currentShape) {
-      switch (currentShape.type) {
-        case "rectangle":
+      switch (tooltype) {
+        case ToolType.Rectangle:
           setCurrentShape({
             type: ToolType.Rectangle,
             x: Math.min(pos.x, dragStart.x),
@@ -83,6 +102,20 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             edgeType: canvaEdge,
           });
           break;
+        case ToolType.Ellipse:
+          setCurrentShape({
+            type: ToolType.Ellipse,
+            centerX: dragStart.x + (pos.x - dragStart.x) / 2,
+            centerY: dragStart.y + (pos.y - dragStart.y) / 2,
+            height: Math.abs(pos.y - dragStart.y),
+            width: Math.abs(pos.x - dragStart.x),
+            fill: canvaBgColor,
+            fillStyle: canvaFillstyle,
+            stroke: canvaStrokeColor,
+            strokeWidth: canvaStrokeWidth,
+            strokeDashOffset: canvaStrokeDashOffset,
+            sloppiness: canvaSloppiness,
+          });
         default:
           break;
       }

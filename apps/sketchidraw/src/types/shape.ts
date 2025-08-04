@@ -1,5 +1,6 @@
 import { Edges, FillStyle } from "@/constants/index";
 import { Sloppiness } from "@/constants";
+import { ToolType } from "./tools";
 
 type ShapeOptions = {
   fill?: string;
@@ -11,7 +12,7 @@ type ShapeOptions = {
 };
 
 type Rectangle = ShapeOptions & {
-  type: "rectangle";
+  type: ToolType.Rectangle;
   x: number;
   y: number;
   width: number;
@@ -20,9 +21,9 @@ type Rectangle = ShapeOptions & {
 };
 
 type Ellipse = ShapeOptions & {
-  type: "ellipse";
-  x: number;
-  y: number;
+  type: ToolType.Ellipse;
+  centerX: number;
+  centerY: number;
   width: number;
   height: number;
 };

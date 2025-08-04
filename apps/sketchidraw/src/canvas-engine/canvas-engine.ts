@@ -1,6 +1,7 @@
 import { Edges, FillStyle, Sloppiness } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { Shape } from "@/types/shape";
+import { ToolType } from "@/types/tools";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
 export class CanvasEngine {
@@ -54,6 +55,22 @@ export class CanvasEngine {
     return this.stColor;
   }
 
+  private getCanvaOptions() {
+    const options = {
+      stroke: this.stColor ?? undefined,
+      strokeWidth: this.stWidth ?? 0,
+      roughness: this.sloppiness,
+      fill: this.bgColor ?? "",
+      fillStyle: this.fillStyle,
+      strokeLineDash: [this.stDashOffset ?? 0],
+      hachureAngle: 120,
+      hachureGap: 20,
+      fillWeight: 2,
+      seed: 234562432,
+    };
+    return options;
+  }
+
   public addShape(shape: Shape): void {
     this.shapes = [...this.shapes, shape];
   }
@@ -65,7 +82,7 @@ export class CanvasEngine {
 
     this.shapes.forEach((shape) => {
       switch (shape.type) {
-        case "rectangle":
+        case ToolType.Rectangle:
           const path = this.roundedRectPath(
             shape.x,
             shape.y,
@@ -73,7 +90,6 @@ export class CanvasEngine {
             shape.height,
             shape.edgeType
           );
-
           this.roughCanvas.path(path, {
             stroke: shape.stroke,
             strokeWidth: shape.strokeWidth,
@@ -87,6 +103,25 @@ export class CanvasEngine {
             seed: 234562432,
           });
           break;
+        case ToolType.Ellipse:
+          this.roughCanvas.ellipse(
+            shape.centerX,
+            shape.centerY,
+            shape.width,
+            shape.height,
+            {
+              stroke: shape.stroke,
+              strokeWidth: shape.strokeWidth,
+              roughness: shape.sloppiness,
+              fill: shape.fill,
+              fillStyle: shape.fillStyle,
+              strokeLineDash: [shape.strokeDashOffset ?? 0],
+              hachureAngle: 120,
+              hachureGap: 20,
+              fillWeight: 2,
+              seed: 234562432,
+            }
+          );
         default:
           break;
       }
@@ -111,8 +146,9 @@ export class CanvasEngine {
   }
 
   public drawShape(shape: Shape): void {
+    const options = this.getCanvaOptions();
     switch (shape.type) {
-      case "rectangle":
+      case ToolType.Rectangle:
         const path = this.roundedRectPath(
           shape.x,
           shape.y,
@@ -120,19 +156,16 @@ export class CanvasEngine {
           shape.height,
           shape.edgeType
         );
-        this.roughCanvas.path(path, {
-          stroke: this.stColor ?? undefined,
-          strokeWidth: this.stWidth ?? 0,
-          roughness: this.sloppiness,
-          fill: this.bgColor ?? "",
-          fillStyle: this.fillStyle,
-          strokeLineDash: [this.stDashOffset ?? 0],
-          hachureAngle: 120,
-          hachureGap: 20,
-          fillWeight: 2,
-          seed: 234562432,
-        });
+        this.roughCanvas.path(path, options);
         break;
+      case ToolType.Ellipse:
+        this.roughCanvas.ellipse(
+          shape.centerX,
+          shape.centerY,
+          shape.width,
+          shape.height,
+          options
+        );
       default:
         break;
     }
