@@ -122,6 +122,26 @@ export class CanvasEngine {
               seed: 234562432,
             }
           );
+          break;
+        case ToolType.Diamond:
+          const points = this.getDiamondPoints(
+            shape.centerX,
+            shape.centerY,
+            shape.width,
+            shape.height
+          );
+          this.roughCanvas.polygon(points, {
+            stroke: shape.stroke,
+            strokeWidth: shape.strokeWidth,
+            roughness: shape.sloppiness,
+            fill: shape.fill,
+            fillStyle: shape.fillStyle,
+            strokeLineDash: [shape.strokeDashOffset ?? 0],
+            hachureAngle: 120,
+            hachureGap: 20,
+            fillWeight: 2,
+            seed: 234562432,
+          });
         default:
           break;
       }
@@ -145,6 +165,21 @@ export class CanvasEngine {
           Q ${x} ${y} ${x + radius} ${y} Z`;
   }
 
+  private getDiamondPoints(
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number
+  ): [number, number][] {
+    const points: [number, number][] = [
+      [centerX, centerY - height],
+      [centerX + width, centerY],
+      [centerX, centerY + height],
+      [centerX - width, centerY],
+    ];
+    return points;
+  }
+
   public drawShape(shape: Shape): void {
     const options = this.getCanvaOptions();
     switch (shape.type) {
@@ -166,6 +201,15 @@ export class CanvasEngine {
           shape.height,
           options
         );
+        break;
+      case ToolType.Diamond:
+        const points = this.getDiamondPoints(
+          shape.centerX,
+          shape.centerY,
+          shape.width,
+          shape.height
+        );
+        this.roughCanvas.polygon(points, options);
       default:
         break;
     }

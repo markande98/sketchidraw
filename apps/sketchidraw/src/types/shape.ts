@@ -2,7 +2,7 @@ import { Edges, FillStyle } from "@/constants/index";
 import { Sloppiness } from "@/constants";
 import { ToolType } from "./tools";
 
-type ShapeOptions = {
+export type ShapeOptions = {
   fill?: string;
   fillStyle?: FillStyle;
   sloppiness?: Sloppiness;
@@ -28,4 +28,12 @@ type Ellipse = ShapeOptions & {
   height: number;
 };
 
-export type Shape = Rectangle | Ellipse;
+type Diamond = ShapeOptions & {
+  type: ToolType.Diamond;
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
+};
+
+export type Shape = Rectangle | Ellipse | Diamond;

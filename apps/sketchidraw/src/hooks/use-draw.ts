@@ -1,8 +1,11 @@
+"use client";
+
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { Shape } from "@/types/shape";
 import { useEffect, useState } from "react";
 import { useCanva } from "./use-canva-store";
 import { ToolType } from "@/types/tools";
+import { ShapeOptions } from "@/types/shape";
 
 type DrawProps = {
   canvasEngine: CanvasEngine | null;
@@ -24,6 +27,15 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const options: ShapeOptions = {
+    fill: canvaBgColor,
+    fillStyle: canvaFillstyle,
+    stroke: canvaStrokeColor,
+    strokeWidth: canvaStrokeWidth,
+    strokeDashOffset: canvaStrokeDashOffset,
+    sloppiness: canvaSloppiness,
+  };
 
   useEffect(() => {
     if (canvas && canvasEngine) {
@@ -55,13 +67,8 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           y: pos.y,
           height: 0,
           width: 0,
-          fill: canvaBgColor,
-          fillStyle: canvaFillstyle,
-          stroke: canvaStrokeColor,
-          strokeWidth: canvaStrokeWidth,
-          strokeDashOffset: canvaStrokeDashOffset,
-          sloppiness: canvaSloppiness,
           edgeType: canvaEdge,
+          ...options,
         });
         break;
       case ToolType.Ellipse:
@@ -71,13 +78,21 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           centerY: pos.y,
           height: 0,
           width: 0,
-          fill: canvaBgColor,
-          fillStyle: canvaFillstyle,
-          stroke: canvaStrokeColor,
-          strokeWidth: canvaStrokeWidth,
-          strokeDashOffset: canvaStrokeDashOffset,
-          sloppiness: canvaSloppiness,
+          ...options,
         });
+        break;
+      case ToolType.Diamond:
+        setCurrentShape({
+          type: ToolType.Diamond,
+          centerX: pos.x,
+          centerY: pos.y,
+          height: 0,
+          width: 0,
+          ...options,
+        });
+        break;
+      default:
+        break;
     }
     setDragStart(pos);
   };
@@ -93,13 +108,8 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             y: Math.min(pos.y, dragStart.y),
             height: Math.abs(pos.y - dragStart.y),
             width: Math.abs(pos.x - dragStart.x),
-            fill: canvaBgColor,
-            fillStyle: canvaFillstyle,
-            stroke: canvaStrokeColor,
-            strokeWidth: canvaStrokeWidth,
-            strokeDashOffset: canvaStrokeDashOffset,
-            sloppiness: canvaSloppiness,
             edgeType: canvaEdge,
+            ...options,
           });
           break;
         case ToolType.Ellipse:
@@ -109,12 +119,17 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             centerY: dragStart.y + (pos.y - dragStart.y) / 2,
             height: Math.abs(pos.y - dragStart.y),
             width: Math.abs(pos.x - dragStart.x),
-            fill: canvaBgColor,
-            fillStyle: canvaFillstyle,
-            stroke: canvaStrokeColor,
-            strokeWidth: canvaStrokeWidth,
-            strokeDashOffset: canvaStrokeDashOffset,
-            sloppiness: canvaSloppiness,
+            ...options,
+          });
+          break;
+        case ToolType.Diamond:
+          setCurrentShape({
+            type: ToolType.Diamond,
+            centerX: dragStart.x + (pos.x - dragStart.x) / 2,
+            centerY: dragStart.y + (pos.y - dragStart.y) / 2,
+            height: Math.abs(pos.y - dragStart.y) / 2,
+            width: Math.abs(pos.x - dragStart.x) / 2,
+            ...options,
           });
         default:
           break;
