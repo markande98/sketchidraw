@@ -65,7 +65,7 @@ export class CanvasEngine {
 
     this.shapes.forEach((shape) => {
       switch (shape.type) {
-        case "Rectangle":
+        case "rectangle":
           const path = this.roundedRectPath(
             shape.x,
             shape.y,
@@ -73,6 +73,7 @@ export class CanvasEngine {
             shape.height,
             shape.edgeType
           );
+
           this.roughCanvas.path(path, {
             stroke: shape.stroke,
             strokeWidth: shape.strokeWidth,
@@ -83,7 +84,7 @@ export class CanvasEngine {
             hachureAngle: 120,
             hachureGap: 20,
             fillWeight: 2,
-            bowing: 6,
+            seed: 234562432,
           });
           break;
         default:
@@ -91,7 +92,6 @@ export class CanvasEngine {
       }
     });
   }
-
   private roundedRectPath(
     x: number,
     y: number,
@@ -112,7 +112,7 @@ export class CanvasEngine {
 
   public drawShape(shape: Shape): void {
     switch (shape.type) {
-      case "Rectangle":
+      case "rectangle":
         const path = this.roundedRectPath(
           shape.x,
           shape.y,
@@ -130,7 +130,7 @@ export class CanvasEngine {
           hachureAngle: 120,
           hachureGap: 20,
           fillWeight: 2,
-          bowing: 6,
+          seed: 234562432,
         });
         break;
       default:

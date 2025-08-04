@@ -22,6 +22,7 @@ export const CanvasBoard = () => {
     if (canvas) {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      canvas.style.cursor = "crosshair";
       roughCanvas.current = rough.canvas(canvas);
       const canvasEngine = new CanvasEngine(canvas, roughCanvas.current);
       onSetCanva(canvas);

@@ -43,7 +43,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   canvas: null,
   themeColor: CANVAS_BG_COLOR[0],
   roughCanvas: null,
-  tooltype: "Rectangle",
+  tooltype: ToolType.Rectangle,
   canvaBgColor: BACKGROUND_COLOR[0],
   canvaStrokeColor: STROKE_COLORS[0],
   canvaStrokeWidth: STROKE_WIDTH[0],

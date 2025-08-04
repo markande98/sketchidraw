@@ -2,6 +2,7 @@ import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { Shape } from "@/types/shape";
 import { useEffect, useState } from "react";
 import { useCanva } from "./use-canva-store";
+import { ToolType } from "@/types/tools";
 
 type DrawProps = {
   canvasEngine: CanvasEngine | null;
@@ -10,7 +11,6 @@ type DrawProps = {
 export const useDraw = ({ canvasEngine }: DrawProps) => {
   const {
     canvas,
-    tooltype,
     canvaBgColor,
     canvaStrokeColor,
     canvaStrokeWidth,
@@ -47,7 +47,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     const pos = getMousePos(e);
     setIsDrawing(true);
     setCurrentShape({
-      type: tooltype,
+      type: ToolType.Rectangle,
       x: pos.x,
       y: pos.y,
       height: 0,
@@ -67,9 +67,9 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     const pos = getMousePos(e);
     if (isDrawing && currentShape) {
       switch (currentShape.type) {
-        case "Rectangle":
+        case "rectangle":
           setCurrentShape({
-            type: tooltype,
+            type: ToolType.Rectangle,
             x: Math.min(pos.x, dragStart.x),
             y: Math.min(pos.y, dragStart.y),
             height: Math.abs(pos.y - dragStart.y),

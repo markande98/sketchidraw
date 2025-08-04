@@ -10,7 +10,14 @@ export const tools = [
   { iconName: "Eraser" as const, label: "Eraser" },
 ] as const;
 
-type ToolWithoutLabel = Omit<(typeof tools)[number], "label">;
-type ToolWithLabel = Omit<(typeof tools)[number], "iconName">;
-export type ToolIconName = ToolWithoutLabel[keyof ToolWithoutLabel];
-export type ToolType = ToolWithLabel[keyof ToolWithLabel];
+export enum ToolType {
+  Rectangle = "rectangle",
+  Ellipse = "ellipse",
+  Diamond = "diamond",
+  Pencil = "pencil",
+  Grab = "grab",
+  Select = "select",
+  Line = "line",
+  Arrow = "arrow",
+  Eraser = "eraser",
+}

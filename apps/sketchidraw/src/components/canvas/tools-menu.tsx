@@ -2,7 +2,7 @@
 
 import { useCanva } from "@/hooks/use-canva-store";
 import { Tool } from "./tool";
-import { tools } from "@/types/tools";
+import { tools, ToolType } from "@/types/tools";
 import { Gochi_Hand } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +13,15 @@ const gochi = Gochi_Hand({
 
 export const ToolsMenu = () => {
   const { tooltype } = useCanva();
+
+  const getTooltype = (label: string): ToolType => {
+    return (
+      Object.values(ToolType).find(
+        (type) => type.toLowerCase() === label.toLowerCase()
+      ) ?? ToolType.Select
+    );
+  };
+
   return (
     <div
       className={cn(
@@ -26,7 +35,8 @@ export const ToolsMenu = () => {
           label={tool.label}
           iconName={tool.iconName}
           index={index + 1}
-          isSelected={tooltype === tool.label}
+          isSelected={tooltype === getTooltype(tool.label)}
+          toolType={getTooltype(tool.label)}
         />
       ))}
     </div>

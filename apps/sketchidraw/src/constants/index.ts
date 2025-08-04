@@ -35,8 +35,8 @@ export enum FillStyle {
 
 export enum Sloppiness {
   Architect = 0,
-  Artist = 0.5,
-  Cartoonist = 1,
+  Artist = 1.5,
+  Cartoonist = 2.5,
 }
 
 export enum Edges {

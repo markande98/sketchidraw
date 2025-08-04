@@ -7,12 +7,12 @@ export const AppHamburger = React.forwardRef<
   <button
     ref={ref}
     {...props}
-    className="z-[100] dark:bg-surface-high/50 p-3 rounded-md cursor-pointer transition-colors hover:bg-surface-high/70 duration-200"
+    className="z-[100] dark:bg-surface-high/50 px-3 rounded-md cursor-pointer transition-colors hover:bg-surface-high/70 duration-200"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="15"
-      height="15"
+      width="16"
+      height="16"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

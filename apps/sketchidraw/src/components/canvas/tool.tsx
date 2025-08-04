@@ -14,8 +14,8 @@ import {
 
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
-import { ToolType } from "@/types/tools";
 import { useCanva } from "@/hooks/use-canva-store";
+import { ToolType } from "@/types/tools";
 
 const iconMap = {
   MousePointer,
@@ -30,23 +30,30 @@ const iconMap = {
 };
 
 interface ToolProps {
-  label: ToolType;
+  label: string;
   iconName: keyof typeof iconMap;
   index: number;
   isSelected: boolean;
+  toolType: ToolType;
 }
 
-export const Tool = ({ label, iconName, index, isSelected }: ToolProps) => {
+export const Tool = ({
+  label,
+  iconName,
+  index,
+  isSelected,
+  toolType,
+}: ToolProps) => {
   const { onSelectTooltype } = useCanva();
   const Icon = iconMap[iconName];
 
-  const handleClick = () => {
-    onSelectTooltype(label);
+  const handleClick = (toolType: ToolType) => {
+    onSelectTooltype(toolType);
   };
 
   return (
     <Tooltip>
-      <TooltipTrigger onClick={handleClick} asChild>
+      <TooltipTrigger onClick={() => handleClick(toolType)} asChild>
         <div
           className={cn(
             "relative p-3 cursor-pointer flex items-center justify-center",
