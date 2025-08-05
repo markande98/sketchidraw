@@ -57,4 +57,9 @@ type Arrow = ShapeOptions & {
   arrowType: ArrowTypes;
 };
 
-export type Shape = Rectangle | Ellipse | Diamond | Line | Arrow;
+type Pencil = ShapeOptions & {
+  type: ToolType.Pencil;
+  points: [x: number, y: number][];
+};
+
+export type Shape = Rectangle | Ellipse | Diamond | Line | Arrow | Pencil;

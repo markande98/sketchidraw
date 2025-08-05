@@ -48,7 +48,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     }
   }, [shapes, currentShape, canvas, canvasEngine]);
 
-  const getMousePos = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     return {
@@ -57,7 +57,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     };
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const pos = getMousePos(e);
     setIsDrawing(true);
     switch (tooltype) {
@@ -113,13 +113,21 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           ...options,
         });
         break;
+      case ToolType.Pencil:
+        setCurrentShape({
+          type: ToolType.Pencil,
+          points: [[pos.x, pos.y]],
+          ...options,
+        });
+        break;
       default:
         break;
     }
     setDragStart(pos);
+    (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const pos = getMousePos(e);
     if (isDrawing && currentShape) {
       switch (tooltype) {
@@ -175,24 +183,35 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             ...options,
           });
           break;
+        case ToolType.Pencil:
+          setCurrentShape((prev) => {
+            if (!prev || prev.type !== ToolType.Pencil) return prev;
+            return {
+              ...prev,
+              points: [...prev.points, [pos.x, pos.y]],
+              ...options,
+            };
+          });
+          break;
         default:
           break;
       }
     }
   };
 
-  const handleMouseUp = () => {
+  const handlePointUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (isDrawing && currentShape) {
       setShapes([...shapes, currentShape]);
       canvasEngine?.addShape(currentShape);
       setCurrentShape(null);
     }
     setIsDrawing(false);
+    (e.target as HTMLCanvasElement).releasePointerCapture(e.pointerId);
   };
 
   return {
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
+    handlePointDown,
+    handlePointMove,
+    handlePointUp,
   };
 };

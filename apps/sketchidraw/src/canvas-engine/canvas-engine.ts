@@ -1,3 +1,4 @@
+import { getStroke } from "perfect-freehand";
 import { ArrowTypes, Edges, FillStyle, Sloppiness } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { Shape, ShapeOptions } from "@/types/shape";
@@ -144,6 +145,10 @@ export class CanvasEngine {
             options,
             shape.stroke
           );
+          break;
+        case ToolType.Pencil:
+          this.drawWithPencil(shape.points, options);
+          break;
         default:
           break;
       }
@@ -235,6 +240,37 @@ export class CanvasEngine {
     }
   }
 
+  private drawWithPencil(
+    points: [x: number, y: number][],
+    options: ShapeOptions
+  ) {
+    const ctx = this.canvas.getContext("2d");
+    if (!ctx) return;
+    if (points.length < 2) return;
+
+    const stroke = getStroke(points, {
+      size: options.strokeWidth ? options.strokeWidth * 5 : 4,
+      thinning: 0.5,
+      smoothing: 0.5,
+      streamline: 0.5,
+    });
+
+    console.log(stroke);
+    if (stroke.length === 0) return;
+
+    ctx.fillStyle = options.stroke;
+    ctx.beginPath();
+
+    ctx.moveTo(stroke[0][0], stroke[0][1]);
+
+    for (let i = 1; i < stroke.length; i++) {
+      ctx.lineTo(stroke[i][0], stroke[i][1]);
+    }
+
+    ctx.closePath();
+    ctx.fill();
+  }
+
   public drawShape(shape: Shape): void {
     const options = this.getCanvaOptions();
     switch (shape.type) {
@@ -285,6 +321,9 @@ export class CanvasEngine {
           options,
           shape.stroke
         );
+        break;
+      case ToolType.Pencil:
+        this.drawWithPencil(shape.points, options);
         break;
       default:
         break;

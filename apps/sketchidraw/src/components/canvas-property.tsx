@@ -17,6 +17,7 @@ export const CanvasProperty = () => {
 
   const isEllipseTool = tooltype === ToolType.Ellipse;
   const isArrowTool = tooltype === ToolType.Arrow;
+  const isPencilTool = tooltype === ToolType.Pencil;
   return (
     <ScrollArea className="z-[100] absolute top-22 bg-surface-high/50 rounded-md left-6 w-[200px] max-h-[calc(100vh-250px)] overflow-y-auto">
       <div className="p-3 space-y-6 text-neutral-800">
@@ -24,10 +25,10 @@ export const CanvasProperty = () => {
         <BackgroundOptions />
         <FillStyle />
         <StrokeWidth />
-        <StrokeStyle />
-        <Sloppiness />
-        {!isEllipseTool && !isArrowTool && <EdgeStyle />}
-        {isArrowTool && <ArrowHeads />}
+        {!isPencilTool && <StrokeStyle />}
+        {!isPencilTool && <Sloppiness />}
+        {!isEllipseTool && !isArrowTool && !isPencilTool && <EdgeStyle />}
+        {isArrowTool && !isPencilTool && <ArrowHeads />}
       </div>
     </ScrollArea>
   );

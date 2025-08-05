@@ -11,7 +11,7 @@ import { RoughCanvas } from "roughjs/bin/canvas";
 export const CanvasBoard = () => {
   const { onSetCanva, onSetRoughCanvas, themeColor } = useCanva();
   const [canvasEngine, setCanvasEngine] = useState<CanvasEngine | null>(null);
-  const { handleMouseDown, handleMouseMove, handleMouseUp } = useDraw({
+  const { handlePointDown, handlePointMove, handlePointUp } = useDraw({
     canvasEngine,
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -22,7 +22,6 @@ export const CanvasBoard = () => {
     if (canvas) {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      canvas.style.cursor = "crosshair";
       roughCanvas.current = rough.canvas(canvas);
       const canvasEngine = new CanvasEngine(canvas, roughCanvas.current);
       onSetCanva(canvas);
@@ -39,12 +38,16 @@ export const CanvasBoard = () => {
 
   return (
     <canvas
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
+      onPointerDown={handlePointDown}
+      onPointerMove={handlePointMove}
+      onPointerUp={handlePointUp}
       ref={canvasRef}
       className="absolute inset-0"
-      style={{ backgroundColor: themeColor }}
+      style={{
+        backgroundColor: themeColor,
+        cursor: "crosshair",
+        touchAction: "none",
+      }}
     />
   );
 };
