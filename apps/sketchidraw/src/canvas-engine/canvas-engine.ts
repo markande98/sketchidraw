@@ -81,6 +81,18 @@ export class CanvasEngine {
     ctx?.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.shapes.forEach((shape) => {
+      const options = {
+        stroke: shape.stroke,
+        strokeWidth: shape.strokeWidth,
+        roughness: shape.sloppiness,
+        fill: shape.fill,
+        fillStyle: shape.fillStyle,
+        strokeLineDash: [shape.strokeDashOffset ?? 0],
+        hachureAngle: 120,
+        hachureGap: 20,
+        fillWeight: 2,
+        seed: 234562432,
+      };
       switch (shape.type) {
         case ToolType.Rectangle:
           const path = this.roundedRectPath(
@@ -90,18 +102,7 @@ export class CanvasEngine {
             shape.height,
             shape.edgeType
           );
-          this.roughCanvas.path(path, {
-            stroke: shape.stroke,
-            strokeWidth: shape.strokeWidth,
-            roughness: shape.sloppiness,
-            fill: shape.fill,
-            fillStyle: shape.fillStyle,
-            strokeLineDash: [shape.strokeDashOffset ?? 0],
-            hachureAngle: 120,
-            hachureGap: 20,
-            fillWeight: 2,
-            seed: 234562432,
-          });
+          this.roughCanvas.path(path, options);
           break;
         case ToolType.Ellipse:
           this.roughCanvas.ellipse(
@@ -109,18 +110,7 @@ export class CanvasEngine {
             shape.centerY,
             shape.width,
             shape.height,
-            {
-              stroke: shape.stroke,
-              strokeWidth: shape.strokeWidth,
-              roughness: shape.sloppiness,
-              fill: shape.fill,
-              fillStyle: shape.fillStyle,
-              strokeLineDash: [shape.strokeDashOffset ?? 0],
-              hachureAngle: 120,
-              hachureGap: 20,
-              fillWeight: 2,
-              seed: 234562432,
-            }
+            options
           );
           break;
         case ToolType.Diamond:
@@ -130,18 +120,17 @@ export class CanvasEngine {
             shape.width,
             shape.height
           );
-          this.roughCanvas.polygon(points, {
-            stroke: shape.stroke,
-            strokeWidth: shape.strokeWidth,
-            roughness: shape.sloppiness,
-            fill: shape.fill,
-            fillStyle: shape.fillStyle,
-            strokeLineDash: [shape.strokeDashOffset ?? 0],
-            hachureAngle: 120,
-            hachureGap: 20,
-            fillWeight: 2,
-            seed: 234562432,
-          });
+          this.roughCanvas.polygon(points, options);
+          break;
+        case ToolType.Line:
+          this.roughCanvas.line(
+            shape.startX,
+            shape.startY,
+            shape.endX,
+            shape.endY,
+            options
+          );
+          break;
         default:
           break;
       }
@@ -210,6 +199,16 @@ export class CanvasEngine {
           shape.height
         );
         this.roughCanvas.polygon(points, options);
+        break;
+      case ToolType.Line:
+        this.roughCanvas.line(
+          shape.startX,
+          shape.startY,
+          shape.endX,
+          shape.endY,
+          options
+        );
+        break;
       default:
         break;
     }

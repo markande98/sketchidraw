@@ -91,6 +91,14 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           ...options,
         });
         break;
+      case ToolType.Line:
+        setCurrentShape({
+          type: ToolType.Line,
+          startX: pos.x,
+          startY: pos.y,
+          endX: pos.x,
+          endY: pos.y,
+        });
       default:
         break;
     }
@@ -131,6 +139,17 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             width: Math.abs(pos.x - dragStart.x) / 2,
             ...options,
           });
+          break;
+        case ToolType.Line:
+          setCurrentShape({
+            type: ToolType.Line,
+            startX: dragStart.x,
+            startY: dragStart.y,
+            endX: pos.x,
+            endY: pos.y,
+            ...options,
+          });
+          break;
         default:
           break;
       }

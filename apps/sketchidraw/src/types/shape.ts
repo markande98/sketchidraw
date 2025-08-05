@@ -36,4 +36,11 @@ type Diamond = ShapeOptions & {
   height: number;
 };
 
-export type Shape = Rectangle | Ellipse | Diamond;
+type Line = ShapeOptions & {
+  type: ToolType.Line;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+};
+export type Shape = Rectangle | Ellipse | Diamond | Line;
