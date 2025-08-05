@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { ToolType } from "@/types/tools";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import {
+  ArrowTypes,
   BACKGROUND_COLOR,
   CANVAS_BG_COLOR,
   Edges,
@@ -25,6 +26,7 @@ interface CanvaStore {
   canvaFillstyle: FillStyle;
   canvaSloppiness: Sloppiness;
   canvaEdge: Edges;
+  canvaArrowType: ArrowTypes;
 
   onSetCanva: (canvas: HTMLCanvasElement) => void;
   onSetThemeColor: (color: string) => void;
@@ -37,6 +39,7 @@ interface CanvaStore {
   onSetCanvaFillstyle: (style: FillStyle) => void;
   onSetCanvaSloppiness: (sloppiness: Sloppiness) => void;
   onSetCanvaEdge: (edge: Edges) => void;
+  onsetCanvaArrowType: (type: ArrowTypes) => void;
 }
 
 export const useCanva = create<CanvaStore>((set) => ({
@@ -51,6 +54,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   canvaFillstyle: FillStyle.Hachure,
   canvaSloppiness: Sloppiness.Architect,
   canvaEdge: Edges.Sharp,
+  canvaArrowType: ArrowTypes.Arrow,
 
   onSetCanva: (canvas: HTMLCanvasElement) => set({ canvas }),
   onSetThemeColor: (color: string) => set({ themeColor: color }),
@@ -65,4 +69,5 @@ export const useCanva = create<CanvaStore>((set) => ({
   onSetCanvaSloppiness: (sloppiness: Sloppiness) =>
     set({ canvaSloppiness: sloppiness }),
   onSetCanvaEdge: (edge: Edges) => set({ canvaEdge: edge }),
+  onsetCanvaArrowType: (type: ArrowTypes) => set({ canvaArrowType: type }),
 }));

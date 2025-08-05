@@ -415,3 +415,60 @@ export const SystemSvg = () => {
     </svg>
   );
 };
+
+export const ArrowSvg = () => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      role="img"
+      viewBox="0 0 40 20"
+      className="h-4 w-4 text-white/90"
+    >
+      <g transform="" stroke="currentColor" strokeWidth="2" fill="none">
+        <path d="M34 10H6M34 10L27 5M34 10L27 15"></path>
+        <path d="M27.5 5L34.5 10L27.5 15"></path>
+      </g>
+    </svg>
+  );
+};
+
+export const TriangleSvg = () => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      role="img"
+      viewBox="0 0 40 20"
+      className="h-4 w-4 text-white/90"
+    >
+      <g stroke="currentColor" fill="currentColor" transform="">
+        <path d="M32 10L6 10" strokeWidth="2"></path>
+        <path d="M27.5 5.5L34.5 10L27.5 14.5L27.5 5.5"></path>
+      </g>
+    </svg>
+  );
+};
+
+export const TriangleOutlineSvg = () => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      role="img"
+      viewBox="0 0 40 20"
+      className="h-4 w-4 text-white/90"
+    >
+      <g
+        stroke="currentColor"
+        fill="none"
+        transform=""
+        strokeWidth="2"
+        strokeLinejoin="round"
+      >
+        <path d="M6,9.5H27"></path>
+        <path d="M27,5L34,10L27,14Z" fill="none"></path>
+      </g>
+    </svg>
+  );
+};

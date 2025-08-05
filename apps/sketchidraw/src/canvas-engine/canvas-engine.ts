@@ -1,6 +1,6 @@
-import { Edges, FillStyle, Sloppiness } from "@/constants/index";
+import { ArrowTypes, Edges, FillStyle, Sloppiness } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
-import { Shape } from "@/types/shape";
+import { Shape, ShapeOptions } from "@/types/shape";
 import { ToolType } from "@/types/tools";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
@@ -15,6 +15,7 @@ export class CanvasEngine {
   private fillStyle: FillStyle;
   private sloppiness: Sloppiness;
   private edgeType: Edges;
+  private arrowType: ArrowTypes;
   private unsubscribe: () => void;
 
   constructor(canvas: HTMLCanvasElement, roughCanvas: RoughCanvas) {
@@ -28,6 +29,7 @@ export class CanvasEngine {
     this.fillStyle = FillStyle.CrossHatch;
     this.sloppiness = Sloppiness.Architect;
     this.edgeType = Edges.Sharp;
+    this.arrowType = ArrowTypes.Arrow;
     this.unsubscribe = useCanva.subscribe((state) => {
       this.bgColor = state.canvaBgColor;
       this.stColor = state.canvaStrokeColor;
@@ -36,6 +38,7 @@ export class CanvasEngine {
       this.fillStyle = state.canvaFillstyle;
       this.sloppiness = state.canvaSloppiness;
       this.edgeType = state.canvaEdge;
+      this.arrowType = state.canvaArrowType;
     });
   }
 
@@ -131,6 +134,16 @@ export class CanvasEngine {
             options
           );
           break;
+        case ToolType.Arrow:
+          this.drawLineWithArrow(
+            shape.startX,
+            shape.startY,
+            shape.endX,
+            shape.endY,
+            shape.arrowType,
+            options,
+            shape.stroke
+          );
         default:
           break;
       }
@@ -167,6 +180,59 @@ export class CanvasEngine {
       [centerX - width, centerY],
     ];
     return points;
+  }
+
+  private drawLineWithArrow(
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
+    arrowType: ArrowTypes,
+    options: ShapeOptions,
+    fill?: string
+  ) {
+    this.roughCanvas.line(startX, startY, endX, endY, options);
+
+    const arrowSize = 20;
+    const angle = Math.atan2(endY - startY, endX - startX);
+    const arrowAngle = Math.PI / 6;
+
+    const arrowX1 = endX - arrowSize * Math.cos(angle - arrowAngle);
+    const arrowY1 = endY - arrowSize * Math.sin(angle - arrowAngle);
+    const arrowX2 = endX - arrowSize * Math.cos(angle + arrowAngle);
+    const arrowY2 = endY - arrowSize * Math.sin(angle + arrowAngle);
+
+    const arrowPoint1: [number, number] = [
+      endX - arrowSize * Math.cos(angle - Math.PI / 6),
+      endY - arrowSize * Math.sin(angle - Math.PI / 6),
+    ];
+
+    const arrowPoint2: [number, number] = [
+      endX - arrowSize * Math.cos(angle + Math.PI / 6),
+      endY - arrowSize * Math.sin(angle + Math.PI / 6),
+    ];
+
+    switch (arrowType) {
+      case ArrowTypes.Arrow:
+        this.roughCanvas.line(endX, endY, arrowX1, arrowY1, options);
+        this.roughCanvas.line(endX, endY, arrowX2, arrowY2, options);
+        break;
+      case ArrowTypes.TriangleOutline:
+        this.roughCanvas.polygon(
+          [[endX, endY], arrowPoint1, arrowPoint2],
+          options
+        );
+        break;
+      case ArrowTypes.Triangle:
+        this.roughCanvas.polygon([[endX, endY], arrowPoint1, arrowPoint2], {
+          ...options,
+          fill,
+          fillStyle: "solid",
+        });
+        break;
+      default:
+        break;
+    }
   }
 
   public drawShape(shape: Shape): void {
@@ -207,6 +273,17 @@ export class CanvasEngine {
           shape.endX,
           shape.endY,
           options
+        );
+        break;
+      case ToolType.Arrow:
+        this.drawLineWithArrow(
+          shape.startX,
+          shape.startY,
+          shape.endX,
+          shape.endY,
+          shape.arrowType,
+          options,
+          shape.stroke
         );
         break;
       default:

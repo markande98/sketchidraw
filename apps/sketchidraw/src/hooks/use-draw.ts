@@ -21,6 +21,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     canvaFillstyle,
     canvaSloppiness,
     canvaEdge,
+    canvaArrowType,
   } = useCanva();
   const { tooltype } = useCanva();
   const [shapes, setShapes] = useState<Shape[]>([]);
@@ -98,7 +99,20 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           startY: pos.y,
           endX: pos.x,
           endY: pos.y,
+          ...options,
         });
+        break;
+      case ToolType.Arrow:
+        setCurrentShape({
+          type: ToolType.Arrow,
+          startX: pos.x,
+          startY: pos.y,
+          endX: pos.x,
+          endY: pos.y,
+          arrowType: canvaArrowType,
+          ...options,
+        });
+        break;
       default:
         break;
     }
@@ -147,6 +161,17 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             startY: dragStart.y,
             endX: pos.x,
             endY: pos.y,
+            ...options,
+          });
+          break;
+        case ToolType.Arrow:
+          setCurrentShape({
+            type: ToolType.Arrow,
+            startX: dragStart.x,
+            startY: dragStart.y,
+            endX: pos.x,
+            endY: pos.y,
+            arrowType: canvaArrowType,
             ...options,
           });
           break;

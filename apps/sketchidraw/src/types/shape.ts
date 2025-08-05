@@ -1,4 +1,4 @@
-import { Edges, FillStyle } from "@/constants/index";
+import { ArrowTypes, Edges, FillStyle } from "@/constants/index";
 import { Sloppiness } from "@/constants";
 import { ToolType } from "./tools";
 
@@ -9,6 +9,10 @@ export type ShapeOptions = {
   stroke?: string;
   strokeWidth?: number;
   strokeDashOffset?: number;
+  hachureAngle?: number;
+  hachureGap?: number;
+  fillWeight?: number;
+  seed?: number;
 };
 
 type Rectangle = ShapeOptions & {
@@ -43,4 +47,14 @@ type Line = ShapeOptions & {
   endX: number;
   endY: number;
 };
-export type Shape = Rectangle | Ellipse | Diamond | Line;
+
+type Arrow = ShapeOptions & {
+  type: ToolType.Arrow;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  arrowType: ArrowTypes;
+};
+
+export type Shape = Rectangle | Ellipse | Diamond | Line | Arrow;

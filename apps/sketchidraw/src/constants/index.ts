@@ -43,3 +43,9 @@ export enum Edges {
   Sharp = 0,
   Round = 20,
 }
+
+export enum ArrowTypes {
+  Arrow = "arrow",
+  Triangle = "triangle",
+  TriangleOutline = "triangleOutline",
+}
