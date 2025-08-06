@@ -13,12 +13,14 @@ import {
   STROKE_DASH_OFFSET,
   STROKE_WIDTH,
 } from "@/constants/index";
+import { Shape } from "@/types/shape";
 
 interface CanvaStore {
   canvas: HTMLCanvasElement | null;
   roughCanvas: RoughCanvas | null;
   themeColor: string;
   tooltype: ToolType;
+  canvaShapes: Shape[];
   canvaBgColor: string | "transparent";
   canvaStrokeColor: string;
   canvaStrokeWidth: number;
@@ -32,6 +34,7 @@ interface CanvaStore {
   onSetThemeColor: (color: string) => void;
   onSelectTooltype: (tooltype: ToolType) => void;
   onSetRoughCanvas: (roughCanvas: RoughCanvas) => void;
+  onSetCanvaShapes: (shapes: Shape[]) => void;
   onSetCanvaBgColor: (color: string) => void;
   onSetCanvaStrokeColor: (color: string) => void;
   onSetCanvaStrokeWidth: (width: number) => void;
@@ -47,6 +50,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   themeColor: CANVAS_BG_COLOR[0],
   roughCanvas: null,
   tooltype: ToolType.Rectangle,
+  canvaShapes: [],
   canvaBgColor: BACKGROUND_COLOR[0],
   canvaStrokeColor: STROKE_COLORS[0],
   canvaStrokeWidth: STROKE_WIDTH[0],
@@ -60,6 +64,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   onSetThemeColor: (color: string) => set({ themeColor: color }),
   onSetRoughCanvas: (roughCanvas: RoughCanvas) => set({ roughCanvas }),
   onSelectTooltype: (tooltype: ToolType) => set({ tooltype }),
+  onSetCanvaShapes: (shapes: Shape[]) => set({ canvaShapes: shapes }),
   onSetCanvaBgColor: (color: string) => set({ canvaBgColor: color }),
   onSetCanvaStrokeColor: (color: string) => set({ canvaStrokeColor: color }),
   onSetCanvaStrokeWidth: (width: number) => set({ canvaStrokeWidth: width }),

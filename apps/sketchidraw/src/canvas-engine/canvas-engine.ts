@@ -32,6 +32,7 @@ export class CanvasEngine {
     this.edgeType = Edges.Sharp;
     this.arrowType = ArrowTypes.Arrow;
     this.unsubscribe = useCanva.subscribe((state) => {
+      this.shapes = state.canvaShapes;
       this.bgColor = state.canvaBgColor;
       this.stColor = state.canvaStrokeColor;
       this.stWidth = state.canvaStrokeWidth;
@@ -75,16 +76,217 @@ export class CanvasEngine {
     return options;
   }
 
-  public addShape(shape: Shape): void {
-    this.shapes = [...this.shapes, shape];
+  public isPointInshape(point: { x: number; y: number }, shape: Shape) {
+    let isInside = false;
+    switch (shape.type) {
+      case ToolType.Rectangle:
+        isInside =
+          point.x >= shape.x &&
+          point.x <= shape.x + shape.width &&
+          point.y >= shape.y &&
+          point.y <= shape.y + shape.height;
+        break;
+      default:
+        break;
+    }
+    return isInside;
   }
 
-  public redrawShapes(): void {
+  public resizeRectShape(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    dx: number,
+    dy: number,
+    resizeHandle: string | null
+  ): { x: number; y: number; width: number; height: number } {
+    switch (resizeHandle) {
+      case "nw":
+        x += dx;
+        y += dy;
+        width -= dx;
+        height -= dy;
+        break;
+      case "ne":
+        y += dy;
+        width += dx;
+        height -= dy;
+        break;
+      case "sw":
+        x += dx;
+        width -= dx;
+        height += dy;
+        break;
+      case "se":
+        width += dx;
+        height += dy;
+        break;
+      case "n":
+        y += dy;
+        height -= dy;
+        break;
+      case "s":
+        height += dy;
+        break;
+      case "w":
+        x += dx;
+        width -= dx;
+        break;
+      case "e":
+        width += dx;
+        break;
+    }
+    return {
+      x,
+      y,
+      width,
+      height,
+    };
+  }
+
+  public getResizeHandle(point: { x: number; y: number }, shape: Shape) {
+    const handleSize = 8;
+    let handles: { x: number; y: number; type: string }[] = [];
+    switch (shape.type) {
+      case ToolType.Rectangle:
+        handles = [
+          {
+            x: shape.x - handleSize / 2,
+            y: shape.y - handleSize / 2,
+            type: "nw",
+          },
+          {
+            x: shape.x + shape.width - handleSize / 2,
+            y: shape.y - handleSize / 2,
+            type: "ne",
+          },
+          {
+            x: shape.x - handleSize / 2,
+            y: shape.y + shape.height - handleSize / 2,
+            type: "sw",
+          },
+          {
+            x: shape.x + shape.width - handleSize / 2,
+            y: shape.y + shape.height - handleSize / 2,
+            type: "se",
+          },
+          {
+            x: shape.x + shape.width / 2 - handleSize / 2,
+            y: shape.y - handleSize / 2,
+            type: "n",
+          },
+          {
+            x: shape.x + shape.width / 2 - handleSize / 2,
+            y: shape.y + shape.height - handleSize / 2,
+            type: "s",
+          },
+          {
+            x: shape.x - handleSize / 2,
+            y: shape.y + shape.height / 2 - handleSize / 2,
+            type: "w",
+          },
+          {
+            x: shape.x + shape.width - handleSize / 2,
+            y: shape.y + shape.height / 2 - handleSize / 2,
+            type: "e",
+          },
+        ];
+        break;
+      default:
+        break;
+    }
+
+    for (const handle of handles) {
+      if (
+        point.x >= handle.x &&
+        point.x <= handle.x + handleSize &&
+        point.y >= handle.y &&
+        point.y <= handle.y + handleSize
+      ) {
+        return handle.type;
+      }
+    }
+    return null;
+  }
+
+  public drawResizeHandles(shape: Shape) {
+    const handleSize = 8;
+    const ctx = this.canvas.getContext("2d");
+    switch (shape.type) {
+      case ToolType.Rectangle:
+        const handles = [
+          {
+            x: shape.x - handleSize / 2,
+            y: shape.y - handleSize / 2,
+            cursor: "nw-resize",
+            type: "nw",
+          },
+          {
+            x: shape.x + shape.width - handleSize / 2,
+            y: shape.y - handleSize / 2,
+            cursor: "ne-resize",
+            type: "ne",
+          },
+          {
+            x: shape.x - handleSize / 2,
+            y: shape.y + shape.height - handleSize / 2,
+            cursor: "sw-resize",
+            type: "sw",
+          },
+          {
+            x: shape.x + shape.width - handleSize / 2,
+            y: shape.y + shape.height - handleSize / 2,
+            cursor: "se-resize",
+            type: "se",
+          },
+          {
+            x: shape.x + shape.width / 2 - handleSize / 2,
+            y: shape.y - handleSize / 2,
+            cursor: "n-resize",
+            type: "n",
+          },
+          {
+            x: shape.x + shape.width / 2 - handleSize / 2,
+            y: shape.y + shape.height - handleSize / 2,
+            cursor: "s-resize",
+            type: "s",
+          },
+          {
+            x: shape.x - handleSize / 2,
+            y: shape.y + shape.height / 2 - handleSize / 2,
+            cursor: "w-resize",
+            type: "w",
+          },
+          {
+            x: shape.x + shape.width - handleSize / 2,
+            y: shape.y + shape.height / 2 - handleSize / 2,
+            cursor: "e-resize",
+            type: "e",
+          },
+        ];
+        if (ctx) {
+          ctx.fillStyle = "#4f46e5";
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 1;
+        }
+        handles.forEach((handle) => {
+          ctx?.fillRect(handle.x, handle.y, handleSize, handleSize);
+          ctx?.strokeRect(handle.x, handle.y, handleSize, handleSize);
+        });
+        break;
+      default:
+        break;
+    }
+  }
+
+  public redrawShapes(selectedShapeIndex: number | null): void {
     const ctx = this.canvas.getContext("2d");
 
     ctx?.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.shapes.forEach((shape) => {
+    this.shapes.forEach((shape, index) => {
+      const isSelected = selectedShapeIndex === index;
       const options = {
         stroke: shape.stroke,
         strokeWidth: shape.strokeWidth,
@@ -151,6 +353,10 @@ export class CanvasEngine {
           break;
         default:
           break;
+      }
+
+      if (isSelected) {
+        this.drawResizeHandles(shape);
       }
     });
   }

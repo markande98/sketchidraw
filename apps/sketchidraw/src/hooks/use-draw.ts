@@ -23,11 +23,16 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     canvaEdge,
     canvaArrowType,
   } = useCanva();
-  const { tooltype } = useCanva();
-  const [shapes, setShapes] = useState<Shape[]>([]);
+  const { tooltype, canvaShapes, onSetCanvaShapes } = useCanva();
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
+    null
+  );
+  const [resizeHandle, setResizehandle] = useState<string | null>(null);
 
   const options: ShapeOptions = {
     fill: canvaBgColor,
@@ -40,13 +45,13 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
 
   useEffect(() => {
     if (canvas && canvasEngine) {
-      canvasEngine.redrawShapes();
+      canvasEngine.redrawShapes(selectedShapeIndex);
 
       if (currentShape) {
         canvasEngine.drawShape(currentShape);
       }
     }
-  }, [shapes, currentShape, canvas, canvasEngine]);
+  }, [canvaShapes, currentShape, canvas, canvasEngine, selectedShapeIndex]);
 
   const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvas) return { x: 0, y: 0 };
@@ -59,77 +64,160 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
 
   const handlePointDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const pos = getMousePos(e);
-    setIsDrawing(true);
-    switch (tooltype) {
-      case ToolType.Rectangle:
-        setCurrentShape({
-          type: ToolType.Rectangle,
-          x: pos.x,
-          y: pos.y,
-          height: 0,
-          width: 0,
-          edgeType: canvaEdge,
-          ...options,
-        });
-        break;
-      case ToolType.Ellipse:
-        setCurrentShape({
-          type: ToolType.Ellipse,
-          centerX: pos.x,
-          centerY: pos.y,
-          height: 0,
-          width: 0,
-          ...options,
-        });
-        break;
-      case ToolType.Diamond:
-        setCurrentShape({
-          type: ToolType.Diamond,
-          centerX: pos.x,
-          centerY: pos.y,
-          height: 0,
-          width: 0,
-          ...options,
-        });
-        break;
-      case ToolType.Line:
-        setCurrentShape({
-          type: ToolType.Line,
-          startX: pos.x,
-          startY: pos.y,
-          endX: pos.x,
-          endY: pos.y,
-          ...options,
-        });
-        break;
-      case ToolType.Arrow:
-        setCurrentShape({
-          type: ToolType.Arrow,
-          startX: pos.x,
-          startY: pos.y,
-          endX: pos.x,
-          endY: pos.y,
-          arrowType: canvaArrowType,
-          ...options,
-        });
-        break;
-      case ToolType.Pencil:
-        setCurrentShape({
-          type: ToolType.Pencil,
-          points: [[pos.x, pos.y]],
-          ...options,
-        });
-        break;
-      default:
-        break;
+
+    if (selectedShapeIndex !== null) {
+      const shape = canvaShapes[selectedShapeIndex];
+      const handle = canvasEngine?.getResizeHandle(pos, shape);
+      if (handle) {
+        setIsResizing(true);
+        setResizehandle(handle);
+        setDragStart(pos);
+        return;
+      }
     }
-    setDragStart(pos);
+
+    if (tooltype === ToolType.Select) {
+      let clickedShape = null;
+      for (let i = 0; i < canvaShapes.length; i++) {
+        if (canvasEngine?.isPointInshape(pos, canvaShapes[i])) {
+          clickedShape = i;
+          break;
+        }
+      }
+      if (clickedShape != null) {
+        setSelectedShapeIndex(clickedShape);
+        setIsDragging(true);
+        const shape = canvaShapes[clickedShape];
+        switch (shape.type) {
+          case ToolType.Rectangle:
+            setDragStart({
+              x: pos.x - shape.x,
+              y: pos.y - shape.y,
+            });
+            break;
+          default:
+            break;
+        }
+      } else {
+        setSelectedShapeIndex(null);
+      }
+    } else {
+      setSelectedShapeIndex(null);
+      setIsDrawing(true);
+      switch (tooltype) {
+        case ToolType.Rectangle:
+          setCurrentShape({
+            type: ToolType.Rectangle,
+            x: pos.x,
+            y: pos.y,
+            height: 0,
+            width: 0,
+            edgeType: canvaEdge,
+            ...options,
+          });
+          break;
+        case ToolType.Ellipse:
+          setCurrentShape({
+            type: ToolType.Ellipse,
+            centerX: pos.x,
+            centerY: pos.y,
+            height: 0,
+            width: 0,
+            ...options,
+          });
+          break;
+        case ToolType.Diamond:
+          setCurrentShape({
+            type: ToolType.Diamond,
+            centerX: pos.x,
+            centerY: pos.y,
+            height: 0,
+            width: 0,
+            ...options,
+          });
+          break;
+        case ToolType.Line:
+          setCurrentShape({
+            type: ToolType.Line,
+            startX: pos.x,
+            startY: pos.y,
+            endX: pos.x,
+            endY: pos.y,
+            ...options,
+          });
+          break;
+        case ToolType.Arrow:
+          setCurrentShape({
+            type: ToolType.Arrow,
+            startX: pos.x,
+            startY: pos.y,
+            endX: pos.x,
+            endY: pos.y,
+            arrowType: canvaArrowType,
+            ...options,
+          });
+          break;
+        case ToolType.Pencil:
+          setCurrentShape({
+            type: ToolType.Pencil,
+            points: [[pos.x, pos.y]],
+            ...options,
+          });
+          break;
+        default:
+          break;
+      }
+      setDragStart(pos);
+    }
     (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
   };
 
   const handlePointMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const pos = getMousePos(e);
-    if (isDrawing && currentShape) {
+    if (isResizing && selectedShapeIndex !== null) {
+      const shape = { ...canvaShapes[selectedShapeIndex] };
+      const dx = pos.x - dragStart.x;
+      const dy = pos.y - dragStart.y;
+      switch (shape.type) {
+        case ToolType.Rectangle:
+          const result = canvasEngine?.resizeRectShape(
+            shape.x,
+            shape.y,
+            shape.width,
+            shape.height,
+            dx,
+            dy,
+            resizeHandle
+          );
+          if (!result) return;
+          const { x, y, width, height } = result;
+          shape.x = x;
+          shape.y = y;
+          shape.width = width;
+          shape.height = height;
+          break;
+        default:
+          break;
+      }
+      const newShapes = [...canvaShapes];
+      newShapes[selectedShapeIndex] = shape;
+      onSetCanvaShapes(newShapes);
+      setDragStart(pos);
+    } else if (isDragging && selectedShapeIndex != null) {
+      const newShapes = [...canvaShapes];
+      switch (newShapes[selectedShapeIndex].type) {
+        case ToolType.Rectangle:
+          newShapes[selectedShapeIndex] = {
+            ...newShapes[selectedShapeIndex],
+            x: pos.x - dragStart.x,
+            y: pos.y - dragStart.y,
+          };
+          break;
+        default:
+          break;
+      }
+      onSetCanvaShapes(newShapes);
+    } else if (isDrawing && currentShape) {
       switch (tooltype) {
         case ToolType.Rectangle:
           setCurrentShape({
@@ -201,11 +289,12 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
 
   const handlePointUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (isDrawing && currentShape) {
-      setShapes([...shapes, currentShape]);
-      canvasEngine?.addShape(currentShape);
+      onSetCanvaShapes([...canvaShapes, currentShape]);
       setCurrentShape(null);
     }
     setIsDrawing(false);
+    setIsDragging(false);
+    setIsResizing(false);
     (e.target as HTMLCanvasElement).releasePointerCapture(e.pointerId);
   };
 
