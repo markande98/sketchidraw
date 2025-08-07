@@ -26,18 +26,18 @@ type Rectangle = ShapeOptions & {
 
 type Ellipse = ShapeOptions & {
   type: ToolType.Ellipse;
-  centerX: number;
-  centerY: number;
-  width: number;
-  height: number;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
 };
 
 type Diamond = ShapeOptions & {
   type: ToolType.Diamond;
-  centerX: number;
-  centerY: number;
-  width: number;
-  height: number;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
 };
 
 type Line = ShapeOptions & {

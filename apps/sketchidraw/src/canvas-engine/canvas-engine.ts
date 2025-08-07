@@ -92,6 +92,16 @@ export class CanvasEngine {
           point.y >= Math.min(shape.startY, shape.endY) &&
           point.y <= Math.max(shape.startY, shape.endY);
         break;
+      case ToolType.Ellipse:
+        const centerX = (shape.startX + shape.endX) / 2;
+        const centerY = (shape.startY + shape.endY) / 2;
+        isInside =
+          Math.pow(point.x - centerX, 2) /
+            Math.pow((shape.endX - shape.startX) / 2, 2) +
+            Math.pow(point.y - centerY, 2) /
+              Math.pow((shape.endY - shape.startY) / 2, 2) <=
+          1;
+        break;
       default:
         break;
     }
@@ -137,6 +147,7 @@ export class CanvasEngine {
     let handles: { x: number; y: number; type: string }[] = [];
     switch (shape.type) {
       case ToolType.Rectangle:
+      case ToolType.Ellipse:
         handles = [
           {
             x: shape.startX - HANDLE_SIZE,
@@ -180,6 +191,7 @@ export class CanvasEngine {
   public drawResizeHandles(shape: Shape) {
     switch (shape.type) {
       case ToolType.Rectangle:
+      case ToolType.Ellipse:
         const handles = [
           {
             x: Math.min(shape.startX, shape.endX),
@@ -332,19 +344,19 @@ export class CanvasEngine {
           break;
         case ToolType.Ellipse:
           this.roughCanvas.ellipse(
-            shape.centerX,
-            shape.centerY,
-            shape.width,
-            shape.height,
+            (shape.startX + shape.endX) / 2,
+            (shape.startY + shape.endY) / 2,
+            shape.endX - shape.startX,
+            shape.endY - shape.startY,
             options
           );
           break;
         case ToolType.Diamond:
           const points = this.getDiamondPoints(
-            shape.centerX,
-            shape.centerY,
-            shape.width,
-            shape.height
+            (shape.startX + shape.endX) / 2,
+            (shape.startY + shape.endY) / 2,
+            (shape.endX - shape.startX) / 2,
+            (shape.endY - shape.startY) / 2
           );
           this.roughCanvas.polygon(points, options);
           break;
@@ -512,19 +524,19 @@ export class CanvasEngine {
         break;
       case ToolType.Ellipse:
         this.roughCanvas.ellipse(
-          shape.centerX,
-          shape.centerY,
-          shape.width,
-          shape.height,
+          (shape.startX + shape.endX) / 2,
+          (shape.startY + shape.endY) / 2,
+          shape.endX - shape.startX,
+          shape.endY - shape.startY,
           options
         );
         break;
       case ToolType.Diamond:
         const points = this.getDiamondPoints(
-          shape.centerX,
-          shape.centerY,
-          shape.width,
-          shape.height
+          (shape.startX + shape.endX) / 2,
+          (shape.startY + shape.endY) / 2,
+          (shape.endX - shape.startX) / 2,
+          (shape.endY - shape.startY) / 2
         );
         this.roughCanvas.polygon(points, options);
         break;

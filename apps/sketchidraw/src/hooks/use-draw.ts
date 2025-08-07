@@ -98,20 +98,14 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           break;
         }
       }
+      console.log(clickedShape);
       if (clickedShape != null) {
         setSelectedShapeIndex(clickedShape);
         setIsDragging(true);
-        const shape = canvaShapes[clickedShape];
-        switch (shape.type) {
-          case ToolType.Rectangle:
-            setDragStart({
-              x: pos.x,
-              y: pos.y,
-            });
-            break;
-          default:
-            break;
-        }
+        setDragStart({
+          x: pos.x,
+          y: pos.y,
+        });
       } else {
         setSelectedShapeIndex(null);
       }
@@ -133,20 +127,20 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Ellipse:
           setCurrentShape({
             type: ToolType.Ellipse,
-            centerX: pos.x,
-            centerY: pos.y,
-            height: 0,
-            width: 0,
+            startX: pos.x,
+            startY: pos.y,
+            endX: pos.x,
+            endY: pos.y,
             ...options,
           });
           break;
         case ToolType.Diamond:
           setCurrentShape({
             type: ToolType.Diamond,
-            centerX: pos.x,
-            centerY: pos.y,
-            height: 0,
-            width: 0,
+            startX: pos.x,
+            startY: pos.y,
+            endX: pos.x,
+            endY: pos.y,
             ...options,
           });
           break;
@@ -194,6 +188,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       const dy = pos.y - dragStart.y;
       switch (shape.type) {
         case ToolType.Rectangle:
+        case ToolType.Ellipse:
           const result = canvasEngine?.resizeRectShape(
             shape.startX,
             shape.startY,
@@ -223,6 +218,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       const dy = pos.y - dragStart.y;
       switch (newShapes[selectedShapeIndex].type) {
         case ToolType.Rectangle:
+        case ToolType.Ellipse:
           const shape = newShapes[selectedShapeIndex];
           const updatedShape = {
             ...shape,
@@ -255,20 +251,20 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Ellipse:
           setCurrentShape({
             type: ToolType.Ellipse,
-            centerX: dragStart.x + (pos.x - dragStart.x) / 2,
-            centerY: dragStart.y + (pos.y - dragStart.y) / 2,
-            height: Math.abs(pos.y - dragStart.y),
-            width: Math.abs(pos.x - dragStart.x),
+            startX: Math.min(pos.x, dragStart.x),
+            startY: Math.min(pos.y, dragStart.y),
+            endX: Math.max(pos.x, dragStart.x),
+            endY: Math.max(pos.y, dragStart.y),
             ...options,
           });
           break;
         case ToolType.Diamond:
           setCurrentShape({
             type: ToolType.Diamond,
-            centerX: dragStart.x + (pos.x - dragStart.x) / 2,
-            centerY: dragStart.y + (pos.y - dragStart.y) / 2,
-            height: Math.abs(pos.y - dragStart.y) / 2,
-            width: Math.abs(pos.x - dragStart.x) / 2,
+            startX: Math.min(pos.x, dragStart.x),
+            startY: Math.min(pos.y, dragStart.y),
+            endX: Math.max(pos.x, dragStart.x),
+            endY: Math.max(pos.y, dragStart.y),
             ...options,
           });
           break;
@@ -319,6 +315,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       const shape = canvaShapes[selectedShapeIndex];
       switch (shape.type) {
         case ToolType.Rectangle:
+        case ToolType.Ellipse:
           const updatedShape = {
             ...shape,
             startX: Math.min(shape.startX, shape.endX),
