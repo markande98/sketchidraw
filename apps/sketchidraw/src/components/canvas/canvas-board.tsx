@@ -9,7 +9,8 @@ import { useCanva } from "@/hooks/use-canva-store";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
 export const CanvasBoard = () => {
-  const { onSetCanva, onSetRoughCanvas, themeColor } = useCanva();
+  const { onSetCanva, onSetRoughCanvas, themeColor, canvaCursorType } =
+    useCanva();
   const [canvasEngine, setCanvasEngine] = useState<CanvasEngine | null>(null);
   const { handlePointDown, handlePointMove, handlePointUp } = useDraw({
     canvasEngine,
@@ -36,6 +37,7 @@ export const CanvasBoard = () => {
     };
   }, [onSetCanva, onSetRoughCanvas]);
 
+  console.log(canvaCursorType);
   return (
     <canvas
       onPointerDown={handlePointDown}
@@ -45,7 +47,7 @@ export const CanvasBoard = () => {
       className="absolute inset-0"
       style={{
         backgroundColor: themeColor,
-        cursor: "crosshair",
+        cursor: canvaCursorType,
         touchAction: "none",
       }}
     />

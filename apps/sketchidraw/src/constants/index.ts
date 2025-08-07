@@ -53,3 +53,10 @@ export enum ArrowTypes {
   Triangle = "triangle",
   TriangleOutline = "triangleOutline",
 }
+
+export enum CursorType {
+  Crosshair = "crosshair",
+  Crossmove = "move",
+  NWSEResize = "nwse-resize",
+  NESWResize = "nesw-resize",
+}

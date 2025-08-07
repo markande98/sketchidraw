@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useCanva } from "./use-canva-store";
 import { ToolType } from "@/types/tools";
 import { ShapeOptions } from "@/types/shape";
+import { CursorType } from "@/constants";
 
 type DrawProps = {
   canvasEngine: CanvasEngine | null;
@@ -23,7 +24,8 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     canvaEdge,
     canvaArrowType,
   } = useCanva();
-  const { tooltype, canvaShapes, onSetCanvaShapes } = useCanva();
+  const { tooltype, canvaShapes, onSetCanvaShapes, onSetCanvaCursorType } =
+    useCanva();
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
@@ -72,6 +74,18 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         setIsResizing(true);
         setResizehandle(handle);
         setDragStart(pos);
+        switch (handle) {
+          case "ne":
+          case "sw":
+            onSetCanvaCursorType(CursorType.NESWResize);
+            break;
+          case "nw":
+          case "se":
+            onSetCanvaCursorType(CursorType.NWSEResize);
+            break;
+          default:
+            break;
+        }
         return;
       }
     }
@@ -222,6 +236,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         default:
           break;
       }
+      onSetCanvaCursorType(CursorType.Crossmove);
       onSetCanvaShapes(newShapes);
       setDragStart(pos);
     } else if (isDrawing && currentShape) {
@@ -318,6 +333,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           break;
       }
     }
+    onSetCanvaCursorType(CursorType.Crosshair);
     setIsDrawing(false);
     setIsDragging(false);
     setIsResizing(false);
