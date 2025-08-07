@@ -17,10 +17,10 @@ export type ShapeOptions = {
 
 type Rectangle = ShapeOptions & {
   type: ToolType.Rectangle;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
   edgeType: Edges;
 };
 

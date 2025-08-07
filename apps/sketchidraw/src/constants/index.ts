@@ -27,6 +27,10 @@ export const CANVAS_BG_COLOR = [
 export const STROKE_WIDTH = [1, 2, 3];
 export const STROKE_DASH_OFFSET = [0, 5, 10];
 
+// Handle constants
+export const HANDLE_OFFSET = 10;
+export const HANDLE_SIZE = 8;
+
 export enum FillStyle {
   Hachure = "hachure",
   CrossHatch = "cross-hatch",

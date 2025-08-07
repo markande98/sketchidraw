@@ -1,5 +1,11 @@
 import { getStroke } from "perfect-freehand";
-import { ArrowTypes, Edges, FillStyle, Sloppiness } from "@/constants/index";
+import {
+  ArrowTypes,
+  Edges,
+  FillStyle,
+  HANDLE_SIZE,
+  Sloppiness,
+} from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { Shape, ShapeOptions } from "@/types/shape";
 import { ToolType } from "@/types/tools";
@@ -81,10 +87,10 @@ export class CanvasEngine {
     switch (shape.type) {
       case ToolType.Rectangle:
         isInside =
-          point.x >= shape.x &&
-          point.x <= shape.x + shape.width &&
-          point.y >= shape.y &&
-          point.y <= shape.y + shape.height;
+          point.x >= Math.min(shape.startX, shape.endX) &&
+          point.x <= Math.max(shape.startX, shape.endX) &&
+          point.y >= Math.min(shape.startY, shape.endY) &&
+          point.y <= Math.max(shape.startY, shape.endY);
         break;
       default:
         break;
@@ -93,103 +99,64 @@ export class CanvasEngine {
   }
 
   public resizeRectShape(
-    x: number,
-    y: number,
-    width: number,
-    height: number,
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
     dx: number,
     dy: number,
     resizeHandle: string | null
-  ): { x: number; y: number; width: number; height: number } {
+  ): { startX: number; startY: number; endX: number; endY: number } {
     switch (resizeHandle) {
       case "nw":
-        x += dx;
-        y += dy;
-        width -= dx;
-        height -= dy;
+        startX += dx;
+        startY += dy;
         break;
       case "ne":
-        y += dy;
-        width += dx;
-        height -= dy;
-        break;
-      case "sw":
-        x += dx;
-        width -= dx;
-        height += dy;
+        startY += dy;
+        endX += dx;
         break;
       case "se":
-        width += dx;
-        height += dy;
+        endX += dx;
+        endY += dy;
         break;
-      case "n":
-        y += dy;
-        height -= dy;
-        break;
-      case "s":
-        height += dy;
-        break;
-      case "w":
-        x += dx;
-        width -= dx;
-        break;
-      case "e":
-        width += dx;
+      case "sw":
+        endY += dy;
+        startX += dx;
         break;
     }
     return {
-      x,
-      y,
-      width,
-      height,
+      startX,
+      startY,
+      endX,
+      endY,
     };
   }
 
   public getResizeHandle(point: { x: number; y: number }, shape: Shape) {
-    const handleSize = 8;
     let handles: { x: number; y: number; type: string }[] = [];
     switch (shape.type) {
       case ToolType.Rectangle:
         handles = [
           {
-            x: shape.x - handleSize / 2,
-            y: shape.y - handleSize / 2,
+            x: shape.startX - HANDLE_SIZE,
+            y: shape.startY - HANDLE_SIZE,
             type: "nw",
           },
           {
-            x: shape.x + shape.width - handleSize / 2,
-            y: shape.y - handleSize / 2,
+            x: shape.endX,
+            y: shape.startY - HANDLE_SIZE,
             type: "ne",
           },
           {
-            x: shape.x - handleSize / 2,
-            y: shape.y + shape.height - handleSize / 2,
-            type: "sw",
-          },
-          {
-            x: shape.x + shape.width - handleSize / 2,
-            y: shape.y + shape.height - handleSize / 2,
+            x: shape.endX,
+            y: shape.endY,
             type: "se",
           },
           {
-            x: shape.x + shape.width / 2 - handleSize / 2,
-            y: shape.y - handleSize / 2,
-            type: "n",
-          },
-          {
-            x: shape.x + shape.width / 2 - handleSize / 2,
-            y: shape.y + shape.height - handleSize / 2,
-            type: "s",
-          },
-          {
-            x: shape.x - handleSize / 2,
-            y: shape.y + shape.height / 2 - handleSize / 2,
-            type: "w",
-          },
-          {
-            x: shape.x + shape.width - handleSize / 2,
-            y: shape.y + shape.height / 2 - handleSize / 2,
-            type: "e",
+            x: shape.startX - HANDLE_SIZE,
+            y: shape.endY,
+            type: "sw",
           },
         ];
         break;
@@ -200,9 +167,9 @@ export class CanvasEngine {
     for (const handle of handles) {
       if (
         point.x >= handle.x &&
-        point.x <= handle.x + handleSize &&
+        point.x <= handle.x + HANDLE_SIZE &&
         point.y >= handle.y &&
-        point.y <= handle.y + handleSize
+        point.y <= handle.y + HANDLE_SIZE
       ) {
         return handle.type;
       }
@@ -211,69 +178,122 @@ export class CanvasEngine {
   }
 
   public drawResizeHandles(shape: Shape) {
-    const handleSize = 8;
-    const ctx = this.canvas.getContext("2d");
     switch (shape.type) {
       case ToolType.Rectangle:
         const handles = [
           {
-            x: shape.x - handleSize / 2,
-            y: shape.y - handleSize / 2,
+            x: Math.min(shape.startX, shape.endX),
+            y: Math.min(shape.startY, shape.endY),
             cursor: "nw-resize",
             type: "nw",
           },
           {
-            x: shape.x + shape.width - handleSize / 2,
-            y: shape.y - handleSize / 2,
+            x: Math.max(shape.startX, shape.endX),
+            y: Math.min(shape.startY, shape.endY),
             cursor: "ne-resize",
             type: "ne",
           },
           {
-            x: shape.x - handleSize / 2,
-            y: shape.y + shape.height - handleSize / 2,
-            cursor: "sw-resize",
-            type: "sw",
-          },
-          {
-            x: shape.x + shape.width - handleSize / 2,
-            y: shape.y + shape.height - handleSize / 2,
+            x: Math.max(shape.startX, shape.endX),
+            y: Math.max(shape.startY, shape.endY),
             cursor: "se-resize",
             type: "se",
           },
           {
-            x: shape.x + shape.width / 2 - handleSize / 2,
-            y: shape.y - handleSize / 2,
-            cursor: "n-resize",
-            type: "n",
-          },
-          {
-            x: shape.x + shape.width / 2 - handleSize / 2,
-            y: shape.y + shape.height - handleSize / 2,
-            cursor: "s-resize",
-            type: "s",
-          },
-          {
-            x: shape.x - handleSize / 2,
-            y: shape.y + shape.height / 2 - handleSize / 2,
-            cursor: "w-resize",
-            type: "w",
-          },
-          {
-            x: shape.x + shape.width - handleSize / 2,
-            y: shape.y + shape.height / 2 - handleSize / 2,
-            cursor: "e-resize",
-            type: "e",
+            x: Math.min(shape.startX, shape.endX),
+            y: Math.max(shape.startY, shape.endY),
+            cursor: "sw-resize",
+            type: "sw",
           },
         ];
-        if (ctx) {
-          ctx.fillStyle = "#4f46e5";
-          ctx.strokeStyle = "#ffffff";
-          ctx.lineWidth = 1;
-        }
+        const options = {
+          fillStyle: "transparent",
+          stroke: "#a8a5ff",
+          strokeWidth: 2,
+          roughness: 0,
+        };
         handles.forEach((handle) => {
-          ctx?.fillRect(handle.x, handle.y, handleSize, handleSize);
-          ctx?.strokeRect(handle.x, handle.y, handleSize, handleSize);
+          switch (handle.type) {
+            case "nw":
+              this.roughCanvas.rectangle(
+                handle.x - HANDLE_SIZE,
+                handle.y - HANDLE_SIZE,
+                HANDLE_SIZE,
+                HANDLE_SIZE,
+                {
+                  ...options,
+                }
+              );
+              break;
+            case "ne":
+              this.roughCanvas.rectangle(
+                handle.x,
+                handle.y - HANDLE_SIZE,
+                HANDLE_SIZE,
+                HANDLE_SIZE,
+                {
+                  ...options,
+                }
+              );
+              break;
+            case "se":
+              this.roughCanvas.rectangle(
+                handle.x,
+                handle.y,
+                HANDLE_SIZE,
+                HANDLE_SIZE,
+                { ...options }
+              );
+              break;
+            case "sw":
+              this.roughCanvas.rectangle(
+                handle.x - HANDLE_SIZE,
+                handle.y,
+                HANDLE_SIZE,
+                HANDLE_SIZE,
+                { ...options }
+              );
+              break;
+            default:
+              break;
+          }
         });
+        this.roughCanvas.line(
+          handles[0].x,
+          handles[0].y - HANDLE_SIZE / 2,
+          handles[1].x,
+          handles[1].y - HANDLE_SIZE / 2,
+          {
+            ...options,
+          }
+        );
+        this.roughCanvas.line(
+          handles[1].x + HANDLE_SIZE / 2,
+          handles[1].y,
+          handles[2].x + HANDLE_SIZE / 2,
+          handles[2].y,
+          {
+            ...options,
+          }
+        );
+        this.roughCanvas.line(
+          handles[2].x,
+          handles[2].y + HANDLE_SIZE / 2,
+          handles[3].x,
+          handles[3].y + HANDLE_SIZE / 2,
+          {
+            ...options,
+          }
+        );
+        this.roughCanvas.line(
+          handles[3].x - HANDLE_SIZE / 2,
+          handles[3].y,
+          handles[0].x - HANDLE_SIZE / 2,
+          handles[0].y,
+          {
+            ...options,
+          }
+        );
         break;
       default:
         break;
@@ -302,10 +322,10 @@ export class CanvasEngine {
       switch (shape.type) {
         case ToolType.Rectangle:
           const path = this.roundedRectPath(
-            shape.x,
-            shape.y,
-            shape.width,
-            shape.height,
+            shape.startX,
+            shape.startY,
+            shape.endX - shape.startX,
+            shape.endY - shape.startY,
             shape.edgeType
           );
           this.roughCanvas.path(path, options);
@@ -482,10 +502,10 @@ export class CanvasEngine {
     switch (shape.type) {
       case ToolType.Rectangle:
         const path = this.roundedRectPath(
-          shape.x,
-          shape.y,
-          shape.width,
-          shape.height,
+          shape.startX,
+          shape.startY,
+          shape.endX - shape.startX,
+          shape.endY - shape.startY,
           shape.edgeType
         );
         this.roughCanvas.path(path, options);

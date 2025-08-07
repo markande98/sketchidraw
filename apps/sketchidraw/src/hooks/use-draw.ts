@@ -91,8 +91,8 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         switch (shape.type) {
           case ToolType.Rectangle:
             setDragStart({
-              x: pos.x - shape.x,
-              y: pos.y - shape.y,
+              x: pos.x,
+              y: pos.y,
             });
             break;
           default:
@@ -108,10 +108,10 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Rectangle:
           setCurrentShape({
             type: ToolType.Rectangle,
-            x: pos.x,
-            y: pos.y,
-            height: 0,
-            width: 0,
+            startX: pos.x,
+            startY: pos.y,
+            endX: pos.x,
+            endY: pos.y,
             edgeType: canvaEdge,
             ...options,
           });
@@ -181,20 +181,20 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       switch (shape.type) {
         case ToolType.Rectangle:
           const result = canvasEngine?.resizeRectShape(
-            shape.x,
-            shape.y,
-            shape.width,
-            shape.height,
+            shape.startX,
+            shape.startY,
+            shape.endX,
+            shape.endY,
             dx,
             dy,
             resizeHandle
           );
           if (!result) return;
-          const { x, y, width, height } = result;
-          shape.x = x;
-          shape.y = y;
-          shape.width = width;
-          shape.height = height;
+          const { startX, startY, endX, endY } = result;
+          shape.startX = startX;
+          shape.startY = startY;
+          shape.endX = endX;
+          shape.endY = endY;
           break;
         default:
           break;
@@ -205,27 +205,34 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       setDragStart(pos);
     } else if (isDragging && selectedShapeIndex != null) {
       const newShapes = [...canvaShapes];
+      const dx = pos.x - dragStart.x;
+      const dy = pos.y - dragStart.y;
       switch (newShapes[selectedShapeIndex].type) {
         case ToolType.Rectangle:
-          newShapes[selectedShapeIndex] = {
-            ...newShapes[selectedShapeIndex],
-            x: pos.x - dragStart.x,
-            y: pos.y - dragStart.y,
+          const shape = newShapes[selectedShapeIndex];
+          const updatedShape = {
+            ...shape,
+            startX: shape.startX + dx,
+            startY: shape.startY + dy,
+            endX: shape.endX + dx,
+            endY: shape.endY + dy,
           };
+          newShapes[selectedShapeIndex] = updatedShape;
           break;
         default:
           break;
       }
       onSetCanvaShapes(newShapes);
+      setDragStart(pos);
     } else if (isDrawing && currentShape) {
       switch (tooltype) {
         case ToolType.Rectangle:
           setCurrentShape({
             type: ToolType.Rectangle,
-            x: Math.min(pos.x, dragStart.x),
-            y: Math.min(pos.y, dragStart.y),
-            height: Math.abs(pos.y - dragStart.y),
-            width: Math.abs(pos.x - dragStart.x),
+            startX: Math.min(pos.x, dragStart.x),
+            startY: Math.min(pos.y, dragStart.y),
+            endX: Math.max(pos.x, dragStart.x),
+            endY: Math.max(pos.y, dragStart.y),
             edgeType: canvaEdge,
             ...options,
           });
@@ -288,9 +295,28 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   };
 
   const handlePointUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    // const pos = getMousePos(e);
     if (isDrawing && currentShape) {
       onSetCanvaShapes([...canvaShapes, currentShape]);
       setCurrentShape(null);
+    }
+    if (isResizing && selectedShapeIndex !== null) {
+      const shape = canvaShapes[selectedShapeIndex];
+      switch (shape.type) {
+        case ToolType.Rectangle:
+          const updatedShape = {
+            ...shape,
+            startX: Math.min(shape.startX, shape.endX),
+            endX: Math.max(shape.startX, shape.endX),
+            startY: Math.min(shape.startY, shape.endY),
+            endY: Math.max(shape.endY, shape.startY),
+          };
+          canvaShapes[selectedShapeIndex] = updatedShape;
+          onSetCanvaShapes(canvaShapes);
+          break;
+        default:
+          break;
+      }
     }
     setIsDrawing(false);
     setIsDragging(false);
