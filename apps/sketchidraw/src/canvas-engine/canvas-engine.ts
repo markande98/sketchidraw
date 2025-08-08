@@ -82,15 +82,41 @@ export class CanvasEngine {
     return options;
   }
 
+  private isPointInsidePolygon(x: number, y: number, polygon: number[][]) {
+    function crossProduct(
+      x1: number,
+      y1: number,
+      x2: number,
+      y2: number,
+      px: number,
+      py: number
+    ) {
+      return (x2 - x1) * (py - y1) - (y2 - y1) * (px - x1);
+    }
+    // Check if point is on the same side of all edges
+    const signs = [];
+    for (let i = 0; i < 4; i++) {
+      const [x1, y1] = polygon[i];
+      const [x2, y2] = polygon[(i + 1) % 4];
+      const cross = crossProduct(x1, y1, x2, y2, x, y);
+      signs.push(cross >= 0);
+    }
+    // All cross products should have the same sign for convex polygon
+    return (
+      signs.every((sign) => sign === true) ||
+      signs.every((sign) => sign === false)
+    );
+  }
+
   public isPointInshape(point: { x: number; y: number }, shape: Shape) {
     let isInside = false;
     switch (shape.type) {
       case ToolType.Rectangle:
         isInside =
-          point.x >= Math.min(shape.startX, shape.endX) &&
-          point.x <= Math.max(shape.startX, shape.endX) &&
-          point.y >= Math.min(shape.startY, shape.endY) &&
-          point.y <= Math.max(shape.startY, shape.endY);
+          point.x >= shape.startX &&
+          point.x <= shape.endX &&
+          point.y >= shape.startY &&
+          point.y <= shape.endY;
         break;
       case ToolType.Ellipse:
         const centerX = (shape.startX + shape.endX) / 2;
@@ -102,13 +128,20 @@ export class CanvasEngine {
               Math.pow((shape.endY - shape.startY) / 2, 2) <=
           1;
         break;
+      case ToolType.Diamond:
+        const p1 = [(shape.startX + shape.endX) / 2, shape.endY];
+        const p2 = [shape.endX, (shape.startY + shape.endY) / 2];
+        const p3 = [(shape.startX + shape.endX) / 2, shape.startY];
+        const p4 = [shape.startX, (shape.startY + shape.endY) / 2];
+        return this.isPointInsidePolygon(point.x, point.y, [p1, p2, p3, p4]);
+        break;
       default:
         break;
     }
     return isInside;
   }
 
-  public resizeRectShape(
+  public resizeShape(
     startX: number,
     startY: number,
     endX: number,
@@ -148,6 +181,7 @@ export class CanvasEngine {
     switch (shape.type) {
       case ToolType.Rectangle:
       case ToolType.Ellipse:
+      case ToolType.Diamond:
         handles = [
           {
             x: shape.startX - HANDLE_SIZE,
@@ -192,6 +226,7 @@ export class CanvasEngine {
     switch (shape.type) {
       case ToolType.Rectangle:
       case ToolType.Ellipse:
+      case ToolType.Diamond:
         const handles = [
           {
             x: Math.min(shape.startX, shape.endX),

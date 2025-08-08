@@ -98,7 +98,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           break;
         }
       }
-      console.log(clickedShape);
+      // console.log(clickedShape);
       if (clickedShape != null) {
         setSelectedShapeIndex(clickedShape);
         setIsDragging(true);
@@ -189,7 +189,8 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       switch (shape.type) {
         case ToolType.Rectangle:
         case ToolType.Ellipse:
-          const result = canvasEngine?.resizeRectShape(
+        case ToolType.Diamond:
+          const result = canvasEngine?.resizeShape(
             shape.startX,
             shape.startY,
             shape.endX,
@@ -219,6 +220,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       switch (newShapes[selectedShapeIndex].type) {
         case ToolType.Rectangle:
         case ToolType.Ellipse:
+        case ToolType.Diamond:
           const shape = newShapes[selectedShapeIndex];
           const updatedShape = {
             ...shape,
@@ -316,6 +318,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       switch (shape.type) {
         case ToolType.Rectangle:
         case ToolType.Ellipse:
+        case ToolType.Diamond:
           const updatedShape = {
             ...shape,
             startX: Math.min(shape.startX, shape.endX),
