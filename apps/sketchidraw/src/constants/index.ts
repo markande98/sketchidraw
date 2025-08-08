@@ -59,4 +59,5 @@ export enum CursorType {
   Crossmove = "move",
   NWSEResize = "nwse-resize",
   NESWResize = "nesw-resize",
+  Pointer = "pointer",
 }

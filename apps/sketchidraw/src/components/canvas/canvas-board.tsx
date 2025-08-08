@@ -37,7 +37,6 @@ export const CanvasBoard = () => {
     };
   }, [onSetCanva, onSetRoughCanvas]);
 
-  console.log(canvaCursorType);
   return (
     <canvas
       onPointerDown={handlePointDown}

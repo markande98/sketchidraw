@@ -112,6 +112,7 @@ export class CanvasEngine {
     let isInside = false;
     switch (shape.type) {
       case ToolType.Rectangle:
+      case ToolType.Line:
         isInside =
           point.x >= shape.startX &&
           point.x <= shape.endX &&
@@ -134,7 +135,6 @@ export class CanvasEngine {
         const p3 = [(shape.startX + shape.endX) / 2, shape.startY];
         const p4 = [shape.startX, (shape.startY + shape.endY) / 2];
         return this.isPointInsidePolygon(point.x, point.y, [p1, p2, p3, p4]);
-        break;
       default:
         break;
     }
@@ -142,37 +142,95 @@ export class CanvasEngine {
   }
 
   public resizeShape(
+    type: ToolType,
     startX: number,
     startY: number,
     endX: number,
     endY: number,
     dx: number,
     dy: number,
-    resizeHandle: string | null
-  ): { startX: number; startY: number; endX: number; endY: number } {
-    switch (resizeHandle) {
-      case "nw":
-        startX += dx;
-        startY += dy;
-        break;
-      case "ne":
-        startY += dy;
-        endX += dx;
-        break;
-      case "se":
-        endX += dx;
-        endY += dy;
-        break;
-      case "sw":
-        endY += dy;
-        startX += dx;
-        break;
-    }
+    resizeHandle: string | null,
+    sX: number,
+    sY: number,
+    mX: number,
+    mY: number,
+    eX: number,
+    eY: number
+  ): {
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    sX: number;
+    sY: number;
+    mX: number;
+    mY: number;
+    eX: number;
+    eY: number;
+  } {
+    if (type === ToolType.Line) {
+      switch (resizeHandle) {
+        case "nw":
+          startX += dx;
+          startY += dy;
+          break;
+        case "ne":
+          startY += dy;
+          endX += dx;
+          break;
+        case "se":
+          endX += dx;
+          endY += dy;
+          break;
+        case "sw":
+          endY += dy;
+          startX += dx;
+          break;
+        case "start":
+          sX += dx;
+          sY += dy;
+          break;
+        case "mid":
+          mX += dx;
+          mY += dy;
+          break;
+        case "end":
+          eX += dx;
+          eY += dy;
+          break;
+        default:
+          break;
+      }
+    } else
+      switch (resizeHandle) {
+        case "nw":
+          startX += dx;
+          startY += dy;
+          break;
+        case "ne":
+          startY += dy;
+          endX += dx;
+          break;
+        case "se":
+          endX += dx;
+          endY += dy;
+          break;
+        case "sw":
+          endY += dy;
+          startX += dx;
+          break;
+      }
     return {
       startX,
       startY,
       endX,
       endY,
+      sX,
+      sY,
+      mX,
+      mY,
+      eX,
+      eY,
     };
   }
 
@@ -205,10 +263,59 @@ export class CanvasEngine {
           },
         ];
         break;
+      case ToolType.Line:
+        handles = [
+          {
+            x: shape.sX,
+            y: shape.sY,
+            type: "start",
+          },
+          {
+            x: shape.mX,
+            y: shape.mY,
+            type: "mid",
+          },
+          {
+            x: shape.eX,
+            y: shape.eY,
+            type: "end",
+          },
+        ];
+        break;
       default:
         break;
     }
-
+    if (shape.type === ToolType.Line) {
+      for (const handle of handles) {
+        const isInside =
+          Math.pow(point.x - handle.x, 2) / Math.pow(HANDLE_SIZE / 2, 2) +
+            Math.pow(point.y - handle.y, 2) / Math.pow(HANDLE_SIZE / 2, 2) <=
+          1;
+        if (isInside) return handle.type;
+      }
+      handles = [
+        {
+          x: shape.startX - HANDLE_SIZE,
+          y: shape.startY - HANDLE_SIZE,
+          type: "nw",
+        },
+        {
+          x: shape.endX,
+          y: shape.startY - HANDLE_SIZE,
+          type: "ne",
+        },
+        {
+          x: shape.endX,
+          y: shape.endY,
+          type: "se",
+        },
+        {
+          x: shape.startX - HANDLE_SIZE,
+          y: shape.endY,
+          type: "sw",
+        },
+      ];
+    }
     for (const handle of handles) {
       if (
         point.x >= handle.x &&
@@ -223,11 +330,18 @@ export class CanvasEngine {
   }
 
   public drawResizeHandles(shape: Shape) {
+    let handles;
+    const options = {
+      fillStyle: "transparent",
+      stroke: "#a8a5ff",
+      strokeWidth: 2,
+      roughness: 0,
+    };
     switch (shape.type) {
       case ToolType.Rectangle:
       case ToolType.Ellipse:
       case ToolType.Diamond:
-        const handles = [
+        handles = [
           {
             x: Math.min(shape.startX, shape.endX),
             y: Math.min(shape.startY, shape.endY),
@@ -253,12 +367,6 @@ export class CanvasEngine {
             type: "sw",
           },
         ];
-        const options = {
-          fillStyle: "transparent",
-          stroke: "#a8a5ff",
-          strokeWidth: 2,
-          roughness: 0,
-        };
         handles.forEach((handle) => {
           switch (handle.type) {
             case "nw":
@@ -267,9 +375,7 @@ export class CanvasEngine {
                 handle.y - HANDLE_SIZE,
                 HANDLE_SIZE,
                 HANDLE_SIZE,
-                {
-                  ...options,
-                }
+                options
               );
               break;
             case "ne":
@@ -278,9 +384,7 @@ export class CanvasEngine {
                 handle.y - HANDLE_SIZE,
                 HANDLE_SIZE,
                 HANDLE_SIZE,
-                {
-                  ...options,
-                }
+                options
               );
               break;
             case "se":
@@ -289,7 +393,7 @@ export class CanvasEngine {
                 handle.y,
                 HANDLE_SIZE,
                 HANDLE_SIZE,
-                { ...options }
+                options
               );
               break;
             case "sw":
@@ -298,7 +402,7 @@ export class CanvasEngine {
                 handle.y,
                 HANDLE_SIZE,
                 HANDLE_SIZE,
-                { ...options }
+                options
               );
               break;
             default:
@@ -310,36 +414,153 @@ export class CanvasEngine {
           handles[0].y - HANDLE_SIZE / 2,
           handles[1].x,
           handles[1].y - HANDLE_SIZE / 2,
-          {
-            ...options,
-          }
+          options
         );
         this.roughCanvas.line(
           handles[1].x + HANDLE_SIZE / 2,
           handles[1].y,
           handles[2].x + HANDLE_SIZE / 2,
           handles[2].y,
-          {
-            ...options,
-          }
+          options
         );
         this.roughCanvas.line(
           handles[2].x,
           handles[2].y + HANDLE_SIZE / 2,
           handles[3].x,
           handles[3].y + HANDLE_SIZE / 2,
-          {
-            ...options,
-          }
+          options
         );
         this.roughCanvas.line(
           handles[3].x - HANDLE_SIZE / 2,
           handles[3].y,
           handles[0].x - HANDLE_SIZE / 2,
           handles[0].y,
+          options
+        );
+        break;
+      case ToolType.Line:
+        handles = [
           {
-            ...options,
+            x: shape.sX,
+            y: shape.sY,
+            type: "start",
+          },
+          {
+            x: shape.mX,
+            y: shape.mY,
+            type: "mid",
+          },
+          {
+            x: shape.eX,
+            y: shape.eY,
+            type: "end",
+          },
+        ];
+        handles.forEach((handle) => {
+          this.roughCanvas.ellipse(
+            handle.x,
+            handle.y,
+            HANDLE_SIZE,
+            HANDLE_SIZE,
+            {
+              fillStyle: "transparent",
+              stroke: "#a8a5ff",
+              strokeWidth: 2,
+              roughness: 0,
+            }
+          );
+        });
+        handles = [
+          {
+            x: Math.min(shape.startX, shape.endX),
+            y: Math.min(shape.startY, shape.endY),
+            type: "nw",
+          },
+          {
+            x: Math.max(shape.startX, shape.endX),
+            y: Math.min(shape.startY, shape.endY),
+            type: "ne",
+          },
+          {
+            x: Math.max(shape.startX, shape.endX),
+            y: Math.max(shape.startY, shape.endY),
+            type: "se",
+          },
+          {
+            x: Math.min(shape.startX, shape.endX),
+            y: Math.max(shape.startY, shape.endY),
+            type: "sw",
+          },
+        ];
+        handles.forEach((handle) => {
+          switch (handle.type) {
+            case "nw":
+              this.roughCanvas.rectangle(
+                handle.x - HANDLE_SIZE,
+                handle.y - HANDLE_SIZE,
+                HANDLE_SIZE,
+                HANDLE_SIZE,
+                options
+              );
+              break;
+            case "ne":
+              this.roughCanvas.rectangle(
+                handle.x,
+                handle.y - HANDLE_SIZE,
+                HANDLE_SIZE,
+                HANDLE_SIZE,
+                options
+              );
+              break;
+            case "se":
+              this.roughCanvas.rectangle(
+                handle.x,
+                handle.y,
+                HANDLE_SIZE,
+                HANDLE_SIZE,
+                options
+              );
+              break;
+            case "sw":
+              this.roughCanvas.rectangle(
+                handle.x - HANDLE_SIZE,
+                handle.y,
+                HANDLE_SIZE,
+                HANDLE_SIZE,
+                options
+              );
+              break;
+            default:
+              break;
           }
+        });
+        this.roughCanvas.line(
+          handles[0].x,
+          handles[0].y - HANDLE_SIZE / 2,
+          handles[1].x,
+          handles[1].y - HANDLE_SIZE / 2,
+          options
+        );
+        this.roughCanvas.line(
+          handles[1].x + HANDLE_SIZE / 2,
+          handles[1].y,
+          handles[2].x + HANDLE_SIZE / 2,
+          handles[2].y,
+          options
+        );
+        this.roughCanvas.line(
+          handles[2].x,
+          handles[2].y + HANDLE_SIZE / 2,
+          handles[3].x,
+          handles[3].y + HANDLE_SIZE / 2,
+          options
+        );
+        this.roughCanvas.line(
+          handles[3].x - HANDLE_SIZE / 2,
+          handles[3].y,
+          handles[0].x - HANDLE_SIZE / 2,
+          handles[0].y,
+          options
         );
         break;
       default:
@@ -397,10 +618,17 @@ export class CanvasEngine {
           break;
         case ToolType.Line:
           this.roughCanvas.line(
-            shape.startX,
-            shape.startY,
-            shape.endX,
-            shape.endY,
+            shape.sX,
+            shape.sY,
+            shape.mX,
+            shape.mY,
+            options
+          );
+          this.roughCanvas.line(
+            shape.mX,
+            shape.mY,
+            shape.eX,
+            shape.eY,
             options
           );
           break;
@@ -576,13 +804,8 @@ export class CanvasEngine {
         this.roughCanvas.polygon(points, options);
         break;
       case ToolType.Line:
-        this.roughCanvas.line(
-          shape.startX,
-          shape.startY,
-          shape.endX,
-          shape.endY,
-          options
-        );
+        this.roughCanvas.line(shape.sX, shape.sY, shape.mX, shape.mY, options);
+        this.roughCanvas.line(shape.mX, shape.mY, shape.eX, shape.eY, options);
         break;
       case ToolType.Arrow:
         this.drawLineWithArrow(
