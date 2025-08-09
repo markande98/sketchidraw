@@ -232,29 +232,71 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           );
           if (!result) return;
           const { startX, startY, endX, endY, sX, sY, mX, mY, eX, eY } = result;
-          shape.startX = startX;
-          shape.startY = startY;
-          shape.endX = endX;
-          shape.endY = endY;
           if (shape.type === ToolType.Line) {
-            shape.sX = sX;
-            shape.sY = sY;
-            shape.eX = eX;
-            shape.eY = eY;
-            shape.mX = mX;
-            shape.mY = mY;
             switch (resizeHandle) {
               case "start":
               case "mid":
               case "end":
+                shape.sX = sX;
+                shape.sY = sY;
+                shape.mX = mX;
+                shape.mY = mY;
+                shape.eX = eX;
+                shape.eY = eY;
                 shape.startX = Math.min(sX, eX, mX);
                 shape.startY = Math.min(sY, mY, eY);
                 shape.endX = Math.max(sX, mX, eX);
                 shape.endY = Math.max(sY, mY, eY);
                 break;
               default:
+                const newShape = shape;
+                let relEndX, relEndY;
+                const relStartX =
+                  (shape.sX - shape.startX) /
+                  Math.abs(shape.startX - shape.endX);
+                const relStartY =
+                  (shape.sY - shape.startY) /
+                  Math.abs(shape.startY - shape.endY);
+                relEndX =
+                  (shape.mX - shape.startX) /
+                  Math.abs(shape.startX - shape.endX);
+                relEndY =
+                  (shape.mY - shape.startY) /
+                  Math.abs(shape.startY - shape.endY);
+
+                newShape.sX = startX + relStartX * Math.abs(startX - endX);
+                newShape.sY = startY + relStartY * Math.abs(startY - endY);
+                newShape.mX = startX + relEndX * Math.abs(startX - endX);
+                newShape.mY = startY + relEndY * Math.abs(startY - endY);
+
+                relEndX =
+                  (shape.eX - shape.startX) /
+                  Math.abs(shape.startX - shape.endX);
+                relEndY =
+                  (shape.eY - shape.startY) /
+                  Math.abs(shape.startY - shape.endY);
+
+                newShape.eX = startX + relEndX * Math.abs(startX - endX);
+                newShape.eY = startY + relEndY * Math.abs(startY - endY);
+
+                shape.startX = startX;
+                shape.startY = startY;
+                shape.endX = endX;
+                shape.endY = endY;
+                shape.sX = newShape.sX;
+                shape.sY = newShape.sY;
+                shape.mX = newShape.mX;
+                shape.mY = newShape.mY;
+                shape.eX = newShape.eX;
+                shape.eY = newShape.eY;
+
                 break;
             }
+          } else {
+            shape.startX = startX;
+            shape.startY = startY;
+            shape.endX = endX;
+            shape.endY = endY;
           }
           break;
         default:
