@@ -249,35 +249,34 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
                 shape.endY = Math.max(sY, mY, eY);
                 break;
               default:
-                const newShape = shape;
-                let relEndX, relEndY;
-                const relStartX =
-                  (shape.sX - shape.startX) /
-                  Math.abs(shape.startX - shape.endX);
-                const relStartY =
-                  (shape.sY - shape.startY) /
-                  Math.abs(shape.startY - shape.endY);
-                relEndX =
-                  (shape.mX - shape.startX) /
-                  Math.abs(shape.startX - shape.endX);
-                relEndY =
-                  (shape.mY - shape.startY) /
-                  Math.abs(shape.startY - shape.endY);
+                const newShape = { ...shape };
+                const originalWidth = shape.endX - shape.startX;
+                const originalHeight = shape.endY - shape.startY;
+                const newWidth = endX - startX;
+                const newHeight = endY - startY;
 
-                newShape.sX = startX + relStartX * Math.abs(startX - endX);
-                newShape.sY = startY + relStartY * Math.abs(startY - endY);
-                newShape.mX = startX + relEndX * Math.abs(startX - endX);
-                newShape.mY = startY + relEndY * Math.abs(startY - endY);
+                if (originalWidth === 0 || originalHeight === 0) {
+                  newShape.sX = startX;
+                  newShape.sY = startY;
+                  newShape.mX = startX;
+                  newShape.mY = startY;
+                  newShape.eX = startX;
+                  newShape.eY = startY;
+                } else {
+                  const relStartX = (shape.sX - shape.startX) / originalWidth;
+                  const relStartY = (shape.sY - shape.startY) / originalHeight;
+                  const relMidX = (shape.mX - shape.startX) / originalWidth;
+                  const relMidY = (shape.mY - shape.startY) / originalHeight;
+                  const relEndXPos = (shape.eX - shape.startX) / originalWidth;
+                  const relEndYPos = (shape.eY - shape.startY) / originalHeight;
 
-                relEndX =
-                  (shape.eX - shape.startX) /
-                  Math.abs(shape.startX - shape.endX);
-                relEndY =
-                  (shape.eY - shape.startY) /
-                  Math.abs(shape.startY - shape.endY);
-
-                newShape.eX = startX + relEndX * Math.abs(startX - endX);
-                newShape.eY = startY + relEndY * Math.abs(startY - endY);
+                  newShape.sX = startX + relStartX * newWidth;
+                  newShape.sY = startY + relStartY * newHeight;
+                  newShape.mX = startX + relMidX * newWidth;
+                  newShape.mY = startY + relMidY * newHeight;
+                  newShape.eX = startX + relEndXPos * newWidth;
+                  newShape.eY = startY + relEndYPos * newHeight;
+                }
 
                 shape.startX = startX;
                 shape.startY = startY;
@@ -289,7 +288,6 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
                 shape.mY = newShape.mY;
                 shape.eX = newShape.eX;
                 shape.eY = newShape.eY;
-
                 break;
             }
           } else {
