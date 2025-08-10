@@ -60,6 +60,12 @@ type Arrow = ShapeOptions & {
   startY: number;
   endX: number;
   endY: number;
+  sX: number;
+  sY: number;
+  mX: number;
+  mY: number;
+  eX: number;
+  eY: number;
   arrowType: ArrowTypes;
 };
 

@@ -113,6 +113,7 @@ export class CanvasEngine {
     switch (shape.type) {
       case ToolType.Rectangle:
       case ToolType.Line:
+      case ToolType.Arrow:
         isInside =
           point.x >= shape.startX &&
           point.x <= shape.endX &&
@@ -168,7 +169,7 @@ export class CanvasEngine {
     eX: number;
     eY: number;
   } {
-    if (type === ToolType.Line) {
+    if (type === ToolType.Line || type === ToolType.Arrow) {
       switch (resizeHandle) {
         case "nw":
           startX += dx;
@@ -264,6 +265,7 @@ export class CanvasEngine {
         ];
         break;
       case ToolType.Line:
+      case ToolType.Arrow:
         handles = [
           {
             x: shape.sX,
@@ -285,7 +287,7 @@ export class CanvasEngine {
       default:
         break;
     }
-    if (shape.type === ToolType.Line) {
+    if (shape.type === ToolType.Line || shape.type === ToolType.Arrow) {
       for (const handle of handles) {
         const isInside =
           Math.pow(point.x - handle.x, 2) / Math.pow(HANDLE_SIZE / 2, 2) +
@@ -439,6 +441,7 @@ export class CanvasEngine {
         );
         break;
       case ToolType.Line:
+      case ToolType.Arrow:
         handles = [
           {
             x: shape.sX,
@@ -633,11 +636,18 @@ export class CanvasEngine {
           );
           break;
         case ToolType.Arrow:
+          this.roughCanvas.line(
+            shape.sX,
+            shape.sY,
+            shape.mX,
+            shape.mY,
+            options
+          );
           this.drawLineWithArrow(
-            shape.startX,
-            shape.startY,
-            shape.endX,
-            shape.endY,
+            shape.mX,
+            shape.mY,
+            shape.eX,
+            shape.eY,
             shape.arrowType,
             options,
             shape.stroke
@@ -808,11 +818,12 @@ export class CanvasEngine {
         this.roughCanvas.line(shape.mX, shape.mY, shape.eX, shape.eY, options);
         break;
       case ToolType.Arrow:
+        this.roughCanvas.line(shape.sX, shape.sY, shape.mX, shape.mY, options);
         this.drawLineWithArrow(
-          shape.startX,
-          shape.startY,
-          shape.endX,
-          shape.endY,
+          shape.mX,
+          shape.mY,
+          shape.eX,
+          shape.eY,
           shape.arrowType,
           options,
           shape.stroke

@@ -185,6 +185,12 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           startY: pos.y,
           endX: pos.x,
           endY: pos.y,
+          sX: pos.x,
+          sY: pos.y,
+          mX: pos.x,
+          mY: pos.y,
+          eX: pos.x,
+          eY: pos.y,
           arrowType: canvaArrowType,
           ...options,
         });
@@ -214,6 +220,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Ellipse:
         case ToolType.Diamond:
         case ToolType.Line:
+        case ToolType.Arrow:
           const result = canvasEngine?.resizeShape(
             shape.type,
             shape.startX,
@@ -223,16 +230,28 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             dx,
             dy,
             resizeHandle,
-            shape.type === ToolType.Line ? shape.sX : 0,
-            shape.type === ToolType.Line ? shape.sY : 0,
-            shape.type === ToolType.Line ? shape.mX : 0,
-            shape.type === ToolType.Line ? shape.mY : 0,
-            shape.type === ToolType.Line ? shape.eX : 0,
-            shape.type === ToolType.Line ? shape.eY : 0
+            shape.type === ToolType.Line || shape.type === ToolType.Arrow
+              ? shape.sX
+              : 0,
+            shape.type === ToolType.Line || shape.type === ToolType.Arrow
+              ? shape.sY
+              : 0,
+            shape.type === ToolType.Line || shape.type === ToolType.Arrow
+              ? shape.mX
+              : 0,
+            shape.type === ToolType.Line || shape.type === ToolType.Arrow
+              ? shape.mY
+              : 0,
+            shape.type === ToolType.Line || shape.type === ToolType.Arrow
+              ? shape.eX
+              : 0,
+            shape.type === ToolType.Line || shape.type === ToolType.Arrow
+              ? shape.eY
+              : 0
           );
           if (!result) return;
           const { startX, startY, endX, endY, sX, sY, mX, mY, eX, eY } = result;
-          if (shape.type === ToolType.Line) {
+          if (shape.type === ToolType.Line || shape.type === ToolType.Arrow) {
             switch (resizeHandle) {
               case "start":
               case "mid":
@@ -313,6 +332,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Ellipse:
         case ToolType.Diamond:
         case ToolType.Line:
+        case ToolType.Arrow:
           const shape = newShapes[selectedShapeIndex];
           let updatedShape = {
             ...shape,
@@ -321,7 +341,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             endX: shape.endX + dx,
             endY: shape.endY + dy,
           };
-          if (shape.type === ToolType.Line) {
+          if (shape.type === ToolType.Line || shape.type === ToolType.Arrow) {
             updatedShape = {
               ...shape,
               startX: shape.startX + dx,
@@ -396,10 +416,16 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Arrow:
           setCurrentShape({
             type: ToolType.Arrow,
-            startX: dragStart.x,
-            startY: dragStart.y,
-            endX: pos.x,
-            endY: pos.y,
+            sX: dragStart.x,
+            sY: dragStart.y,
+            mX: (pos.x + dragStart.x) / 2,
+            mY: (pos.y + dragStart.y) / 2,
+            eX: pos.x,
+            eY: pos.y,
+            startX: Math.min(pos.x, dragStart.x),
+            startY: Math.min(pos.y, dragStart.y),
+            endX: Math.max(pos.x, dragStart.x),
+            endY: Math.max(pos.y, dragStart.y),
             arrowType: canvaArrowType,
             ...options,
           });
@@ -444,6 +470,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           canvaShapes[selectedShapeIndex] = updatedShape;
           break;
         case ToolType.Line:
+        case ToolType.Arrow:
           const updatedLine = {
             ...shape,
             startX: Math.min(shape.sX, shape.mX, shape.eX),
@@ -452,6 +479,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             endY: Math.max(shape.sY, shape.mY, shape.eY),
           };
           canvaShapes[selectedShapeIndex] = updatedLine;
+          break;
         default:
           break;
       }
