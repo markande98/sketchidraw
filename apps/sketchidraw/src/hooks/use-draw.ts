@@ -72,6 +72,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     if (selectedShapeIndex !== null) {
       const shape = canvaShapes[selectedShapeIndex];
       const handle = canvasEngine?.getResizeHandle(pos, shape);
+      console.log(handle);
       if (handle) {
         setIsResizing(true);
         setResizehandle(handle);
@@ -198,6 +199,10 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       case ToolType.Pencil:
         setCurrentShape({
           type: ToolType.Pencil,
+          startX: pos.x,
+          startY: pos.y,
+          endX: pos.x,
+          endY: pos.y,
           points: [[pos.x, pos.y]],
           ...options,
         });
@@ -208,7 +213,6 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     setDragStart(pos);
     (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
   };
-
   const handlePointMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const pos = getMousePos(e);
     if (isResizing && selectedShapeIndex !== null) {
@@ -221,6 +225,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Diamond:
         case ToolType.Line:
         case ToolType.Arrow:
+        case ToolType.Pencil:
           const result = canvasEngine?.resizeShape(
             shape.type,
             shape.startX,
@@ -309,6 +314,27 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
                 shape.eY = newShape.eY;
                 break;
             }
+          } else if (shape.type === ToolType.Pencil) {
+            const originalWidth = shape.endX - shape.startX;
+            const originalHeight = shape.endY - shape.startY;
+            const newWidth = endX - startX;
+            const newHeight = endY - startY;
+
+            const updatedPoints = shape.points.map((point) => {
+              if (originalWidth === 0 || originalHeight === 0) {
+                return [startX, startY];
+              } else {
+                const relX = (point[0] - shape.startX) / originalWidth;
+                const relY = (point[1] - shape.startY) / originalHeight;
+
+                return [startX + relX * newWidth, startY + relY * newHeight];
+              }
+            }) as [x: number, y: number][];
+            shape.startX = startX;
+            shape.startY = startY;
+            shape.endX = endX;
+            shape.endY = endY;
+            shape.points = updatedPoints;
           } else {
             shape.startX = startX;
             shape.startY = startY;
@@ -333,6 +359,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Diamond:
         case ToolType.Line:
         case ToolType.Arrow:
+        case ToolType.Pencil:
           const shape = newShapes[selectedShapeIndex];
           let updatedShape = {
             ...shape,
@@ -354,6 +381,20 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
               mY: shape.mY + dy,
               eX: shape.eX + dx,
               eY: shape.eY + dy,
+            };
+          }
+          if (shape.type === ToolType.Pencil) {
+            const updatedPoints = shape.points.map((point) => [
+              point[0] + dx,
+              point[1] + dy,
+            ]) as [x: number, y: number][];
+            updatedShape = {
+              ...shape,
+              startX: shape.startX + dx,
+              startY: shape.startY + dy,
+              endX: shape.endX + dx,
+              endY: shape.endY + dy,
+              points: updatedPoints,
             };
           }
           newShapes[selectedShapeIndex] = updatedShape;
@@ -433,8 +474,22 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Pencil:
           setCurrentShape((prev) => {
             if (!prev || prev.type !== ToolType.Pencil) return prev;
+            let startX = prev.startX;
+            let startY = prev.startY;
+            let endX = prev.endX;
+            let endY = prev.endY;
+            prev.points.forEach((point) => {
+              startX = Math.min(startX, point[0]);
+              startY = Math.min(startY, point[1]);
+              endX = Math.max(endX, point[0]);
+              endY = Math.max(endY, point[1]);
+            });
             return {
               ...prev,
+              startX,
+              startY,
+              endX,
+              endY,
               points: [...prev.points, [pos.x, pos.y]],
               ...options,
             };
@@ -460,6 +515,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Rectangle:
         case ToolType.Ellipse:
         case ToolType.Diamond:
+        case ToolType.Pencil:
           const updatedShape = {
             ...shape,
             startX: Math.min(shape.startX, shape.endX),

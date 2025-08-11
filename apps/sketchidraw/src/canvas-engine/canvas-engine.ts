@@ -114,6 +114,7 @@ export class CanvasEngine {
       case ToolType.Rectangle:
       case ToolType.Line:
       case ToolType.Arrow:
+      case ToolType.Pencil:
         isInside =
           point.x >= shape.startX &&
           point.x <= shape.endX &&
@@ -241,6 +242,7 @@ export class CanvasEngine {
       case ToolType.Rectangle:
       case ToolType.Ellipse:
       case ToolType.Diamond:
+      case ToolType.Pencil:
         handles = [
           {
             x: shape.startX - HANDLE_SIZE,
@@ -343,6 +345,7 @@ export class CanvasEngine {
       case ToolType.Rectangle:
       case ToolType.Ellipse:
       case ToolType.Diamond:
+      case ToolType.Pencil:
         handles = [
           {
             x: Math.min(shape.startX, shape.endX),
@@ -766,7 +769,6 @@ export class CanvasEngine {
       streamline: 0.5,
     });
 
-    console.log(stroke);
     if (stroke.length === 0) return;
 
     ctx.fillStyle = options.stroke;

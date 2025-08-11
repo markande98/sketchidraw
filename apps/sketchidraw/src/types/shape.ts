@@ -71,6 +71,10 @@ type Arrow = ShapeOptions & {
 
 type Pencil = ShapeOptions & {
   type: ToolType.Pencil;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
   points: [x: number, y: number][];
 };
 
