@@ -21,8 +21,6 @@ export class CanvasEngine {
   private stDashOffset: number | null;
   private fillStyle: FillStyle;
   private sloppiness: Sloppiness;
-  private edgeType: Edges;
-  private arrowType: ArrowTypes;
   private unsubscribe: () => void;
 
   constructor(canvas: HTMLCanvasElement, roughCanvas: RoughCanvas) {
@@ -35,8 +33,6 @@ export class CanvasEngine {
     this.roughCanvas = roughCanvas;
     this.fillStyle = FillStyle.CrossHatch;
     this.sloppiness = Sloppiness.Architect;
-    this.edgeType = Edges.Sharp;
-    this.arrowType = ArrowTypes.Arrow;
     this.unsubscribe = useCanva.subscribe((state) => {
       this.shapes = state.canvaShapes;
       this.bgColor = state.canvaBgColor;
@@ -45,8 +41,6 @@ export class CanvasEngine {
       this.stDashOffset = state.canvaStrokeDashOffset;
       this.fillStyle = state.canvaFillstyle;
       this.sloppiness = state.canvaSloppiness;
-      this.edgeType = state.canvaEdge;
-      this.arrowType = state.canvaArrowType;
     });
   }
 

@@ -64,7 +64,7 @@ export const Tool = ({
           {Icon && (
             <Icon size={13} fill={isSelected ? "white" : "transparent"} />
           )}
-          <span className="absolute right-[5px] bottom-[1px] text-[10px]">
+          <span className="absolute opacity-50 right-[5px] bottom-[1px] text-[10px]">
             {index}
           </span>
         </div>

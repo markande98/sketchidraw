@@ -3,13 +3,7 @@
 import { useCanva } from "@/hooks/use-canva-store";
 import { Tool } from "./tool";
 import { tools, ToolType } from "@/types/tools";
-import { Gochi_Hand } from "next/font/google";
 import { cn } from "@/lib/utils";
-
-const gochi = Gochi_Hand({
-  subsets: ["latin"],
-  weight: ["400"],
-});
 
 export const ToolsMenu = () => {
   const { tooltype } = useCanva();
@@ -25,8 +19,7 @@ export const ToolsMenu = () => {
   return (
     <div
       className={cn(
-        "z-[100] flex items-center bg-surface-high/50 p-1 gap-6 rounded-md transition duration-200",
-        gochi.className
+        "z-[100] flex items-center bg-surface-high/50 p-1 gap-6 rounded-md transition duration-200"
       )}
     >
       {tools.map((tool, index) => (
