@@ -78,4 +78,20 @@ type Pencil = ShapeOptions & {
   points: [x: number, y: number][];
 };
 
-export type Shape = Rectangle | Ellipse | Diamond | Line | Arrow | Pencil;
+export type Text = ShapeOptions & {
+  type: ToolType.Text;
+  texts: Array<{
+    x: number;
+    y: number;
+    text: string;
+  }>;
+};
+
+export type Shape =
+  | Rectangle
+  | Ellipse
+  | Diamond
+  | Line
+  | Arrow
+  | Pencil
+  | Text;

@@ -7,6 +7,7 @@ export const tools = [
   { iconName: "Minus" as const, label: "Line" },
   { iconName: "MoveRight" as const, label: "Arrow" },
   { iconName: "Pencil" as const, label: "Pencil" },
+  { iconName: "TextSvg" as const, label: "Text" },
   { iconName: "Eraser" as const, label: "Eraser" },
 ] as const;
 
@@ -20,4 +21,5 @@ export enum ToolType {
   Line = "line",
   Arrow = "arrow",
   Eraser = "eraser",
+  Text = "text",
 }

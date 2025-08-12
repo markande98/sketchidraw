@@ -16,6 +16,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useCanva } from "@/hooks/use-canva-store";
 import { ToolType } from "@/types/tools";
+import { TextSvg } from "@/constants/svg";
 
 const iconMap = {
   MousePointer,
@@ -26,6 +27,7 @@ const iconMap = {
   MoveRight,
   Minus,
   Pencil,
+  TextSvg,
   Eraser,
 };
 
@@ -61,9 +63,12 @@ export const Tool = ({
             !isSelected && "hover:rounded-md hover:bg-surface-high"
           )}
         >
-          {Icon && (
-            <Icon size={13} fill={isSelected ? "white" : "transparent"} />
-          )}
+          {Icon &&
+            (toolType === ToolType.Text ? (
+              <TextSvg />
+            ) : (
+              <Icon size={13} fill={isSelected ? "white" : "transparent"} />
+            ))}
           <span className="absolute opacity-50 right-[5px] bottom-[1px] text-[10px]">
             {index}
           </span>

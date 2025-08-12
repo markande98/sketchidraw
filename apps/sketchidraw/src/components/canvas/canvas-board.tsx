@@ -7,6 +7,7 @@ import { useDraw } from "@/hooks/use-draw";
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { useCanva } from "@/hooks/use-canva-store";
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { useText } from "@/hooks/use-text";
 
 export const CanvasBoard = () => {
   const { onSetCanva, onSetRoughCanvas, themeColor, canvaCursorType } =
@@ -17,6 +18,10 @@ export const CanvasBoard = () => {
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const roughCanvas = useRef<RoughCanvas>(null);
+  const { handleCanvasClick } = useText({
+    canvasEngine,
+    canvasRef,
+  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -39,15 +44,18 @@ export const CanvasBoard = () => {
 
   return (
     <canvas
+      ref={canvasRef}
+      onClick={handleCanvasClick}
       onPointerDown={handlePointDown}
       onPointerMove={handlePointMove}
       onPointerUp={handlePointUp}
-      ref={canvasRef}
+      tabIndex={0}
       className="absolute inset-0"
       style={{
         backgroundColor: themeColor,
         cursor: canvaCursorType,
         touchAction: "none",
+        outline: "none",
       }}
     />
   );

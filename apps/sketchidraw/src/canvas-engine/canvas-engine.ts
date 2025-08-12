@@ -778,6 +778,19 @@ export class CanvasEngine {
     ctx.fill();
   }
 
+  private renderText(shape: Shape) {
+    if (shape.type !== ToolType.Text) return;
+    const ctx = this.canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "40px Arial";
+
+    shape.texts.forEach(({ text, x, y }) => {
+      ctx.fillText(text, x, y);
+    });
+  }
+
   public drawShape(shape: Shape): void {
     const options = this.getCanvaOptions();
     switch (shape.type) {
@@ -828,6 +841,8 @@ export class CanvasEngine {
       case ToolType.Pencil:
         this.drawWithPencil(shape.points, options);
         break;
+      case ToolType.Text:
+        this.renderText(shape);
       default:
         break;
     }

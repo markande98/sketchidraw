@@ -49,14 +49,14 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   };
 
   useEffect(() => {
-    if (canvas && canvasEngine) {
+    if (canvasEngine) {
       canvasEngine.redrawShapes(selectedShapeIndex);
 
       if (currentShape) {
         canvasEngine.drawShape(currentShape);
       }
     }
-  }, [canvaShapes, currentShape, canvas, canvasEngine, selectedShapeIndex]);
+  }, [canvaShapes, currentShape, canvasEngine, selectedShapeIndex]);
 
   const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvas) return { x: 0, y: 0 };
@@ -68,6 +68,8 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   };
 
   const handlePointDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    e.preventDefault();
+    if (tooltype === ToolType.Text) return;
     const pos = getMousePos(e);
     if (selectedShapeIndex !== null) {
       const shape = canvaShapes[selectedShapeIndex];
