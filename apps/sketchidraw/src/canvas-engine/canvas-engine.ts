@@ -813,7 +813,7 @@ export class CanvasEngine {
         const start = Math.min(selectionStart, selectionEnd);
         const end = Math.max(selectionStart, selectionEnd);
 
-        ctx.fillStyle = "rgba(0, 123, 255, 0.3)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
 
         let currentIndex = 0;
         for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
@@ -848,7 +848,7 @@ export class CanvasEngine {
         const cursorCoords = getCursorCoordinates(txt, cursorPosition!);
 
         ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(cursorCoords.x, cursorCoords.y);
         ctx.lineTo(

@@ -5,6 +5,7 @@ import { ToolType } from "@/types/tools";
 import { RefObject, useCallback, useEffect, useState } from "react";
 import { useCanva } from "./use-canva-store";
 import { Text } from "@/types/shape";
+import { KeyTypes } from "@/constants";
 
 type TextProps = {
   canvasEngine: CanvasEngine | null;
@@ -17,7 +18,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
   const [showCursor, setShowCursor] = useState(false);
   const [textObjects, setTextObjects] = useState<Text[]>([]);
   const [activeTextId, setActiveTextId] = useState<string | null>(null);
-  const [cursorPosition, setCursorPosition] = useState<number | undefined>(0);
+  const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [selectionStart, setSelectionStart] = useState<number | null>(null);
   const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
 
@@ -176,7 +177,6 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
           break;
         }
       }
-
       if (clickedText) {
         setActiveTextId(clickedText.id);
         setIsEditing(true);
@@ -185,7 +185,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
           pos.x,
           pos.y
         );
-        setCursorPosition(textIndex);
+        setCursorPosition(textIndex ?? 0);
       } else {
         const newText = createTextObject(pos.x, pos.y, "");
         setTextObjects((prev) => [...prev, newText]);
@@ -223,7 +223,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       const activeText = textObjects.find((t) => t.id === activeTextId);
       if (activeText) {
         const textIndex = getTextIndexFromCoordinates(activeText, pos.x, pos.y);
-        setCursorPosition(textIndex);
+        setCursorPosition(textIndex ?? 0);
         setSelectionStart(textIndex ?? null);
         setSelectionEnd(textIndex ?? null);
       }
@@ -305,6 +305,199 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
         selectionStart !== selectionEnd;
 
       switch (e.key) {
+        case KeyTypes.ArrowLeft:
+          if (e.shiftKey) {
+            if (selectionStart === null) {
+              setSelectionStart(cursorPosition);
+              setSelectionEnd(Math.max(0, cursorPosition - 1));
+            } else {
+              setSelectionEnd(Math.max(0, (selectionEnd ?? 0) - 1));
+            }
+            setCursorPosition(Math.max(0, cursorPosition - 1));
+          } else {
+            if (hasSelection) {
+              newCursor = Math.min(selectionStart, selectionEnd);
+            } else {
+              newCursor = Math.max(0, cursorPosition - 1);
+            }
+            setCursorPosition(newCursor);
+            setSelectionStart(null);
+            setSelectionEnd(null);
+          }
+          break;
+        case KeyTypes.ArrowRight:
+          if (e.shiftKey) {
+            if (selectionStart === null) {
+              setSelectionStart(cursorPosition);
+              setSelectionEnd(Math.min(newText.length, cursorPosition + 1));
+            } else {
+              setSelectionEnd(
+                Math.min(newText.length, (selectionEnd ?? 0) + 1)
+              );
+            }
+            setCursorPosition(Math.min(newText.length, cursorPosition + 1));
+          } else {
+            if (hasSelection) {
+              newCursor = Math.max(selectionStart, selectionEnd);
+            } else {
+              newCursor = Math.min(newText.length, cursorPosition + 1);
+            }
+            setCursorPosition(newCursor);
+            setSelectionStart(null);
+            setSelectionEnd(null);
+          }
+          break;
+        case KeyTypes.ArrowUp:
+        case KeyTypes.ArrowDown:
+          const lines = newText.split("\n");
+          let currentLine = 0;
+          let currentColumn = 0;
+          let index = 0;
+
+          for (let i = 0; i < lines.length; i++) {
+            if (index + lines[i].length >= cursorPosition) {
+              currentLine = i;
+              currentColumn = cursorPosition - index;
+              break;
+            }
+            index += lines[i].length + 1;
+          }
+
+          const targetLine =
+            e.key === KeyTypes.ArrowUp
+              ? Math.max(0, currentLine - 1)
+              : Math.min(lines.length - 1, currentLine + 1);
+
+          if (targetLine !== currentLine) {
+            let targetIndex = 0;
+            for (let i = 0; i < targetLine; i++) {
+              targetIndex += lines[i].length + 1;
+            }
+            targetIndex += Math.min(currentColumn, lines[targetLine].length);
+
+            if (e.shiftKey) {
+              if (selectionStart === null) {
+                setSelectionStart(cursorPosition);
+              }
+              setSelectionEnd(targetIndex);
+            } else {
+              setSelectionStart(null);
+              setSelectionEnd(null);
+            }
+            setCursorPosition(targetIndex);
+          }
+          break;
+        case KeyTypes.Home:
+          const lines2 = newText.split("\n");
+          let currentLine2 = 0;
+          let index2 = 0;
+
+          for (let i = 0; i < lines2.length; i++) {
+            if (index2 + lines2[i].length >= cursorPosition) {
+              currentLine2 = i;
+              break;
+            }
+            index2 += lines2[i].length + 1;
+          }
+
+          let lineStartIndex = 0;
+          for (let i = 0; i < currentLine2; i++) {
+            lineStartIndex += lines2[i].length + 1;
+          }
+
+          if (e.shiftKey) {
+            if (selectionStart === null) {
+              setSelectionStart(cursorPosition);
+            }
+            setSelectionEnd(lineStartIndex);
+          } else {
+            setSelectionStart(null);
+            setSelectionEnd(null);
+          }
+          setCursorPosition(lineStartIndex);
+          break;
+        case KeyTypes.End:
+          const lines3 = newText.split("\n");
+          let currentLine3 = 0;
+          let index3 = 0;
+
+          for (let i = 0; i < lines3.length; i++) {
+            if (index3 + lines3[i].length >= cursorPosition) {
+              currentLine3 = i;
+              break;
+            }
+            index3 += lines3[i].length + 1;
+          }
+
+          let lineEndIndex = 0;
+          for (let i = 0; i <= currentLine3; i++) {
+            lineEndIndex += lines3[i].length + (i < lines3.length - 1 ? 1 : 0);
+          }
+
+          if (e.shiftKey) {
+            if (selectionStart === null) {
+              setSelectionStart(cursorPosition);
+            }
+            setSelectionEnd(lineEndIndex);
+          } else {
+            setSelectionStart(null);
+            setSelectionEnd(null);
+          }
+          setCursorPosition(lineEndIndex);
+          break;
+        case KeyTypes.Delete:
+          if (hasSelection) {
+            const start = Math.min(selectionStart, selectionEnd);
+            const end = Math.max(selectionStart, selectionEnd);
+            newText = newText.substring(0, start) + newText.substring(end);
+            newCursor = start;
+            newSelectStart = null;
+            newSelectEnd = null;
+          } else if (cursorPosition < newText.length) {
+            newText =
+              newText.substring(0, cursorPosition) +
+              newText.substring(cursorPosition + 1);
+          }
+          break;
+          break;
+        case KeyTypes.Enter:
+          if (hasSelection) {
+            const start = Math.min(selectionStart, selectionEnd);
+            const end = Math.max(selectionStart, selectionEnd);
+            newText =
+              newText.substring(0, start) + "\n" + newText.substring(end);
+            newCursor = start + 1;
+            newSelectStart = null;
+            newSelectEnd = null;
+          } else {
+            newText =
+              newText.substring(0, cursorPosition) +
+              "\n" +
+              newText.substring(cursorPosition);
+            newCursor = cursorPosition + 1;
+          }
+          break;
+        case KeyTypes.Backspace:
+          if (hasSelection) {
+            const start = Math.min(selectionEnd, selectionStart);
+            const end = Math.max(selectionStart, selectionEnd);
+            newText = newText.substring(0, start) + newText.substring(end);
+            newCursor = start;
+            newSelectStart = null;
+            newSelectEnd = null;
+          } else if (cursorPosition > 0) {
+            newText =
+              newText.substring(0, cursorPosition - 1) +
+              newText.substring(cursorPosition);
+            newCursor = cursorPosition - 1;
+          }
+          break;
+        case KeyTypes.Escape:
+          setIsEditing(false);
+          setActiveTextId(null);
+          setSelectionStart(null);
+          setSelectionEnd(null);
+          return;
         default:
           if (e.key.length === 1 && !e.metaKey && !e.ctrlKey) {
             if (hasSelection) {
@@ -339,6 +532,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
         setSelectionStart(newSelectStart);
         setSelectionEnd(newSelectEnd);
       }
+      setShowCursor(true);
     },
     [
       activeTextId,
@@ -381,29 +575,43 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
   ]);
 
   useEffect(() => {
-    if (!isEditing || tooltype !== ToolType.Text) return;
-
-    const interval = setInterval(() => {
-      setShowCursor((prev) => !prev);
-    }, 500);
     const hiddenInput = document.createElement("input");
     hiddenInput.style.position = "absolute";
     hiddenInput.style.left = "-9999px";
     hiddenInput.style.opacity = "0";
     hiddenInput.style.pointerEvents = "none";
     hiddenInput.setAttribute("data-vimium-disable", "true");
+    hiddenInput.id = "text-tool-hidden-input";
 
     document.body.appendChild(hiddenInput);
-    hiddenInput.focus();
 
-    hiddenInput.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.removeChild(hiddenInput);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isEditing || tooltype !== ToolType.Text) return;
+
+    const interval = setInterval(() => {
+      setShowCursor((prev) => !prev);
+    }, 500);
+
+    const hiddenInput = document.getElementById("text-tool-hidden-input");
+    if (hiddenInput) {
+      hiddenInput.focus();
+      hiddenInput.addEventListener("keydown", handleKeyDown);
+    }
+
     document.addEventListener("keydown", handleKeyDown, {
       capture: true,
       passive: false,
     });
 
     return () => {
-      document.body.removeChild(hiddenInput);
+      if (hiddenInput) {
+        hiddenInput.removeEventListener("keydown", handleKeyDown);
+      }
       document.removeEventListener("keydown", handleKeyDown, { capture: true });
       clearInterval(interval);
     };

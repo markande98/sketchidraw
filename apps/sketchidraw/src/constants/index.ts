@@ -62,4 +62,15 @@ export enum CursorType {
   Pointer = "pointer",
 }
 
-export enum KeyTypes {}
+export enum KeyTypes {
+  Backspace = "Backspace",
+  Enter = "Enter",
+  Delete = "Delete",
+  Escape = "Escape",
+  Home = "Home",
+  End = "End",
+  ArrowUp = "ArrowUp",
+  ArrowDown = "ArrowDown",
+  ArrowLeft = "ArrowLeft",
+  ArrowRight = "ArrowRight",
+}
