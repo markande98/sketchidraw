@@ -13,7 +13,7 @@ type TextProps = {
 };
 
 export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
-  const { canvas, tooltype } = useCanva();
+  const { canvas, tooltype, canvaFontSize } = useCanva();
   const [isEditing, setIsEditing] = useState(false);
   const [showCursor, setShowCursor] = useState(false);
   const [textObjects, setTextObjects] = useState<Text[]>([]);
@@ -29,12 +29,12 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       x,
       y,
       text,
-      fontSize: 25,
+      fontSize: canvaFontSize,
       fontFamily: "Arial",
       color: "#ffffff",
       lineHeight: 1.2,
     }),
-    []
+    [canvaFontSize]
   );
 
   const getMousePos = useCallback(

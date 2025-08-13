@@ -9,6 +9,7 @@ import {
   CursorType,
   Edges,
   FillStyle,
+  FontSize,
   Sloppiness,
   STROKE_COLORS,
   STROKE_DASH_OFFSET,
@@ -31,6 +32,7 @@ interface CanvaStore {
   canvaSloppiness: Sloppiness;
   canvaEdge: Edges;
   canvaArrowType: ArrowTypes;
+  canvaFontSize: FontSize;
 
   onSetCanva: (canvas: HTMLCanvasElement) => void;
   onSetThemeColor: (color: string) => void;
@@ -46,6 +48,7 @@ interface CanvaStore {
   onSetCanvaSloppiness: (sloppiness: Sloppiness) => void;
   onSetCanvaEdge: (edge: Edges) => void;
   onsetCanvaArrowType: (type: ArrowTypes) => void;
+  onSetCanvaFontSize: (type: FontSize) => void;
 }
 
 export const useCanva = create<CanvaStore>((set) => ({
@@ -63,6 +66,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   canvaSloppiness: Sloppiness.Architect,
   canvaEdge: Edges.Sharp,
   canvaArrowType: ArrowTypes.Arrow,
+  canvaFontSize: FontSize.Small,
 
   onSetCanva: (canvas: HTMLCanvasElement) => set({ canvas }),
   onSetThemeColor: (color: string) => set({ themeColor: color }),
@@ -81,4 +85,5 @@ export const useCanva = create<CanvaStore>((set) => ({
     set({ canvaSloppiness: sloppiness }),
   onSetCanvaEdge: (edge: Edges) => set({ canvaEdge: edge }),
   onsetCanvaArrowType: (type: ArrowTypes) => set({ canvaArrowType: type }),
+  onSetCanvaFontSize: (type: FontSize) => set({ canvaFontSize: type }),
 }));

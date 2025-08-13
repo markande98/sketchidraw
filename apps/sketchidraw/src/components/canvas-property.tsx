@@ -11,6 +11,7 @@ import { StrokeWidth } from "./stroke-width";
 import { ScrollArea } from "./ui/scroll-area";
 import { ToolType } from "@/types/tools";
 import { ArrowHeads } from "./arrow-heads";
+import { FontSize } from "./font-size";
 
 export const CanvasProperty = () => {
   const { tooltype } = useCanva();
@@ -20,19 +21,23 @@ export const CanvasProperty = () => {
   const isPencilTool = tooltype === ToolType.Pencil;
   const isSelectAndGrab =
     tooltype === ToolType.Grab || tooltype === ToolType.Select;
+  const isTextTool = tooltype === ToolType.Text;
 
   if (isSelectAndGrab) return null;
   return (
     <ScrollArea className="z-[100] absolute top-22 bg-surface-high/50 rounded-md left-6 w-[200px] max-h-[calc(100vh-250px)] overflow-y-auto">
       <div className="p-3 space-y-6 text-neutral-800">
         <StrokeOptions />
-        <BackgroundOptions />
-        <FillStyle />
-        <StrokeWidth />
-        {!isPencilTool && <StrokeStyle />}
-        {!isPencilTool && <Sloppiness />}
-        {!isEllipseTool && !isArrowTool && !isPencilTool && <EdgeStyle />}
+        {!isTextTool && <BackgroundOptions />}
+        {!isTextTool && <FillStyle />}
+        {!isTextTool && <StrokeWidth />}
+        {!isPencilTool && !isTextTool && <StrokeStyle />}
+        {!isPencilTool && !isTextTool && <Sloppiness />}
+        {!isEllipseTool && !isArrowTool && !isPencilTool && !isTextTool && (
+          <EdgeStyle />
+        )}
         {isArrowTool && !isPencilTool && <ArrowHeads />}
+        {isTextTool && <FontSize />}
       </div>
     </ScrollArea>
   );

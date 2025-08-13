@@ -48,6 +48,13 @@ export enum Edges {
   Round = 20,
 }
 
+export enum FontSize {
+  Small = 15,
+  Medium = 25,
+  Large = 35,
+  Extralarge = 45,
+}
+
 export enum ArrowTypes {
   Arrow = "arrow",
   Triangle = "triangle",
