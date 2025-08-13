@@ -29,7 +29,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       x,
       y,
       text,
-      fontSize: 16,
+      fontSize: 25,
       fontFamily: "Arial",
       color: "#ffffff",
       lineHeight: 1.2,
@@ -98,7 +98,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       );
 
       const line = lines[lineIndex];
-      const relativeX = mouseX - textObj.y;
+      const relativeX = mouseX - textObj.x;
 
       let charIndex = 0;
 
@@ -255,7 +255,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       if (activeText) {
         const textIndex = getTextIndexFromCoordinates(activeText, pos.x, pos.y);
         setSelectionEnd(textIndex ?? null);
-        setCursorPosition(textIndex);
+        setCursorPosition(textIndex ?? 0);
       }
     },
     [
@@ -374,7 +374,6 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
               targetIndex += lines[i].length + 1;
             }
             targetIndex += Math.min(currentColumn, lines[targetLine].length);
-
             if (e.shiftKey) {
               if (selectionStart === null) {
                 setSelectionStart(cursorPosition);

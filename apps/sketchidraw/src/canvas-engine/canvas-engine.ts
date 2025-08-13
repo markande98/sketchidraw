@@ -10,6 +10,7 @@ import { useCanva } from "@/hooks/use-canva-store";
 import { Shape, ShapeOptions, Text } from "@/types/shape";
 import { ToolType } from "@/types/tools";
 import { RoughCanvas } from "roughjs/bin/canvas";
+import { hexToRgba } from "@/lib/utils";
 
 export class CanvasEngine {
   private canvas: HTMLCanvasElement;
@@ -796,7 +797,7 @@ export class CanvasEngine {
     if (!ctx) return;
 
     ctx.font = `${txt.fontSize}px ${txt.fontFamily}`;
-    ctx.fillStyle = txt.color;
+    ctx.fillStyle = hexToRgba(txt.color);
 
     const lines = txt.text.split("\n");
     const lineHeight = txt.fontSize * txt.lineHeight;
@@ -813,8 +814,6 @@ export class CanvasEngine {
         const start = Math.min(selectionStart, selectionEnd);
         const end = Math.max(selectionStart, selectionEnd);
 
-        ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
-
         let currentIndex = 0;
         for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
           const line = lines[lineIndex];
@@ -824,15 +823,19 @@ export class CanvasEngine {
           if (start <= lineEnd && end >= lineStart) {
             const selStart = Math.max(start - lineStart, 0);
             const selEnd = Math.min(end - lineStart, line.length);
+            if (selStart < selEnd) {
+              const beforeSelection = line.substring(0, selStart);
+              const selection = line.substring(selStart, selEnd);
 
-            const beforeSelection = line.substring(0, selStart);
-            const selection = line.substring(selStart, selEnd);
+              const x1 = txt.x + ctx.measureText(beforeSelection).width;
+              const y1 = txt.y + lineIndex * lineHeight;
+              const width = ctx.measureText(selection).width;
 
-            const x1 = txt.x + ctx.measureText(beforeSelection).width;
-            const y1 = txt.y + lineIndex * lineHeight;
-            const width = ctx.measureText(selection).width;
-
-            ctx.fillRect(x1, y1, width, lineHeight);
+              ctx.save();
+              ctx.fillStyle = hexToRgba(txt.color, 0.2);
+              ctx.fillRect(x1, y1, width, lineHeight);
+              ctx.restore();
+            }
           }
 
           currentIndex += line.length + 1;
@@ -847,7 +850,7 @@ export class CanvasEngine {
       ) {
         const cursorCoords = getCursorCoordinates(txt, cursorPosition!);
 
-        ctx.strokeStyle = "#ffffff";
+        ctx.strokeStyle = txt.color;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(cursorCoords.x, cursorCoords.y);
