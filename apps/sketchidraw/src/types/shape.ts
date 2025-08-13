@@ -80,11 +80,14 @@ type Pencil = ShapeOptions & {
 
 export type Text = ShapeOptions & {
   type: ToolType.Text;
-  texts: Array<{
-    x: number;
-    y: number;
-    text: string;
-  }>;
+  id: string;
+  x: number;
+  y: number;
+  text: string;
+  fontSize: number;
+  fontFamily: string;
+  color: string;
+  lineHeight: number;
 };
 
 export type Shape =

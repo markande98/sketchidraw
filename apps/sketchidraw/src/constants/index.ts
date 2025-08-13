@@ -61,3 +61,5 @@ export enum CursorType {
   NESWResize = "nesw-resize",
   Pointer = "pointer",
 }
+
+export enum KeyTypes {}

@@ -18,7 +18,7 @@ export const CanvasBoard = () => {
   });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const roughCanvas = useRef<RoughCanvas>(null);
-  const { handleCanvasClick } = useText({
+  const { handleMouseDown, handleMouseUp, handleMouseMove } = useText({
     canvasEngine,
     canvasRef,
   });
@@ -45,10 +45,12 @@ export const CanvasBoard = () => {
   return (
     <canvas
       ref={canvasRef}
-      onClick={handleCanvasClick}
       onPointerDown={handlePointDown}
       onPointerMove={handlePointMove}
       onPointerUp={handlePointUp}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseMove={handleMouseMove}
       tabIndex={0}
       className="absolute inset-0"
       style={{

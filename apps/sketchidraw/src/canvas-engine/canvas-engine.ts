@@ -7,7 +7,7 @@ import {
   Sloppiness,
 } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
-import { Shape, ShapeOptions } from "@/types/shape";
+import { Shape, ShapeOptions, Text } from "@/types/shape";
 import { ToolType } from "@/types/tools";
 import { RoughCanvas } from "roughjs/bin/canvas";
 
@@ -778,16 +778,85 @@ export class CanvasEngine {
     ctx.fill();
   }
 
-  private renderText(shape: Shape) {
-    if (shape.type !== ToolType.Text) return;
+  public renderText(
+    txt: Text,
+    activeTextId: string | null,
+    selectionStart: number | null,
+    selectionEnd: number | null,
+    isEditing: boolean,
+    cursorPosition: number | undefined,
+    showCursor: boolean,
+    getCursorCoordinates: (
+      txt: Text,
+      textIndex: number
+    ) => { x: number; y: number }
+  ) {
+    if (!this.canvas) return;
     const ctx = this.canvas.getContext("2d");
     if (!ctx) return;
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "40px Arial";
+    ctx.font = `${txt.fontSize}px ${txt.fontFamily}`;
+    ctx.fillStyle = txt.color;
 
-    shape.texts.forEach(({ text, x, y }) => {
-      ctx.fillText(text, x, y);
+    const lines = txt.text.split("\n");
+    const lineHeight = txt.fontSize * txt.lineHeight;
+
+    lines.forEach((line, index) => {
+      const y = txt.y + index * lineHeight + txt.fontSize;
+      ctx.fillText(line, txt.x, y);
+
+      if (
+        txt.id === activeTextId &&
+        selectionStart !== null &&
+        selectionEnd !== null
+      ) {
+        const start = Math.min(selectionStart, selectionEnd);
+        const end = Math.max(selectionStart, selectionEnd);
+
+        ctx.fillStyle = "rgba(0, 123, 255, 0.3)";
+
+        let currentIndex = 0;
+        for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+          const line = lines[lineIndex];
+          const lineStart = currentIndex;
+          const lineEnd = currentIndex + line.length;
+
+          if (start <= lineEnd && end >= lineStart) {
+            const selStart = Math.max(start - lineStart, 0);
+            const selEnd = Math.min(end - lineStart, line.length);
+
+            const beforeSelection = line.substring(0, selStart);
+            const selection = line.substring(selStart, selEnd);
+
+            const x1 = txt.x + ctx.measureText(beforeSelection).width;
+            const y1 = txt.y + lineIndex * lineHeight;
+            const width = ctx.measureText(selection).width;
+
+            ctx.fillRect(x1, y1, width, lineHeight);
+          }
+
+          currentIndex += line.length + 1;
+        }
+      }
+
+      if (
+        txt.id === activeTextId &&
+        isEditing &&
+        selectionStart === null &&
+        showCursor
+      ) {
+        const cursorCoords = getCursorCoordinates(txt, cursorPosition!);
+
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(cursorCoords.x, cursorCoords.y);
+        ctx.lineTo(
+          cursorCoords.x,
+          cursorCoords.y + txt.fontSize * txt.lineHeight
+        );
+        ctx.stroke();
+      }
     });
   }
 
@@ -841,8 +910,6 @@ export class CanvasEngine {
       case ToolType.Pencil:
         this.drawWithPencil(shape.points, options);
         break;
-      case ToolType.Text:
-        this.renderText(shape);
       default:
         break;
     }

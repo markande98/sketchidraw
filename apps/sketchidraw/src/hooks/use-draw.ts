@@ -7,6 +7,7 @@ import { useCanva } from "./use-canva-store";
 import { ToolType } from "@/types/tools";
 import { ShapeOptions } from "@/types/shape";
 import { CursorType } from "@/constants";
+import { useText } from "./use-text";
 
 type DrawProps = {
   canvasEngine: CanvasEngine | null;
@@ -29,6 +30,9 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     onSetCanvaCursorType,
     onSelectTooltype,
   } = useCanva();
+  const { handleMouseDown, handleMouseMove, handleMouseUp } = useText({
+    canvasEngine,
+  });
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
@@ -68,13 +72,14 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   };
 
   const handlePointDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
-    if (tooltype === ToolType.Text) return;
+    if (tooltype === ToolType.Text) {
+      handleMouseDown(e);
+      return;
+    }
     const pos = getMousePos(e);
     if (selectedShapeIndex !== null) {
       const shape = canvaShapes[selectedShapeIndex];
       const handle = canvasEngine?.getResizeHandle(pos, shape);
-      console.log(handle);
       if (handle) {
         setIsResizing(true);
         setResizehandle(handle);
@@ -216,6 +221,10 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
   };
   const handlePointMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (tooltype === ToolType.Text) {
+      handleMouseMove(e);
+      return;
+    }
     const pos = getMousePos(e);
     if (isResizing && selectedShapeIndex !== null) {
       const shape = { ...canvaShapes[selectedShapeIndex] };
@@ -504,7 +513,10 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   };
 
   const handlePointUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    // const pos = getMousePos(e);
+    if (tooltype === ToolType.Text) {
+      handleMouseUp();
+      return;
+    }
     if (isDrawing && currentShape) {
       onSelectTooltype(ToolType.Select);
       setSelectedShapeIndex(canvaShapes.length);
