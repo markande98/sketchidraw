@@ -30,17 +30,26 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     onSetCanvaCursorType,
     onSelectTooltype,
   } = useCanva();
-  const { handleMouseDown, handleMouseMove, handleMouseUp } = useText({
-    canvasEngine,
-  });
+  const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
+    null
+  );
+  const {
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    activeTextId,
+    selectionStart,
+    selectionEnd,
+    isEditing,
+    cursorPosition,
+    showCursor,
+    getCursorCoordinates,
+  } = useText({});
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
-  const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
-    null
-  );
   const [resizeHandle, setResizehandle] = useState<string | null>(null);
 
   const options: ShapeOptions = {
@@ -51,23 +60,62 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     strokeDashOffset: canvaStrokeDashOffset,
     sloppiness: canvaSloppiness,
   };
-
   useEffect(() => {
     if (canvasEngine) {
       canvasEngine.redrawShapes(selectedShapeIndex);
+      const text = canvaShapes.find(
+        (shape) => shape.type === ToolType.Text && shape.id === activeTextId
+      );
+      if (text && isEditing && tooltype === ToolType.Text) {
+        canvasEngine.renderText(
+          text,
+          activeTextId,
+          selectionStart,
+          selectionEnd,
+          isEditing,
+          cursorPosition,
+          showCursor, // This will now have the correct value when editing
+          getCursorCoordinates
+        );
+      } else if (text) {
+        // Render text without cursor when not editing
+        canvasEngine.renderText(
+          text,
+          activeTextId,
+          selectionStart,
+          selectionEnd,
+          false, // Not editing
+          cursorPosition,
+          false, // No cursor
+          getCursorCoordinates
+        );
+      }
 
       if (currentShape) {
         canvasEngine.drawShape(currentShape);
       }
     }
-  }, [canvaShapes, currentShape, canvasEngine, selectedShapeIndex]);
+  }, [
+    canvaShapes,
+    currentShape,
+    canvasEngine,
+    selectedShapeIndex,
+    activeTextId,
+    selectionStart,
+    selectionEnd,
+    isEditing,
+    cursorPosition,
+    showCursor,
+    getCursorCoordinates,
+    tooltype,
+  ]);
 
   const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     return {
-      x: e.clientX - rect.top,
-      y: e.clientY - rect.left,
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
     };
   };
 
@@ -371,6 +419,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Line:
         case ToolType.Arrow:
         case ToolType.Pencil:
+        case ToolType.Text:
           const shape = newShapes[selectedShapeIndex];
           let updatedShape = {
             ...shape,
@@ -406,6 +455,17 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
               endX: shape.endX + dx,
               endY: shape.endY + dy,
               points: updatedPoints,
+            };
+          }
+          if (shape.type === ToolType.Text) {
+            updatedShape = {
+              ...shape,
+              x: shape.x + dx,
+              y: shape.y + dy,
+              startX: shape.startX + dx,
+              startY: shape.startY + dy,
+              endX: shape.endX + dx,
+              endY: shape.endY + dy,
             };
           }
           newShapes[selectedShapeIndex] = updatedShape;
@@ -567,5 +627,6 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     handlePointDown,
     handlePointMove,
     handlePointUp,
+    selectedShapeIndex,
   };
 };

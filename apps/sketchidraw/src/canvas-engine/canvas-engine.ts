@@ -16,7 +16,6 @@ export class CanvasEngine {
   private canvas: HTMLCanvasElement;
   private roughCanvas: RoughCanvas;
   private shapes: Shape[];
-  private texts: Text[];
   private stColor: string | null;
   private bgColor: string | null;
   private stWidth: number | null;
@@ -27,7 +26,6 @@ export class CanvasEngine {
 
   constructor(canvas: HTMLCanvasElement, roughCanvas: RoughCanvas) {
     this.shapes = [];
-    this.texts = [];
     this.canvas = canvas;
     this.stColor = "";
     this.bgColor = "";
@@ -38,7 +36,6 @@ export class CanvasEngine {
     this.sloppiness = Sloppiness.Architect;
     this.unsubscribe = useCanva.subscribe((state) => {
       this.shapes = state.canvaShapes;
-      this.texts = state.canvaTexts;
       this.bgColor = state.canvaBgColor;
       this.stColor = state.canvaStrokeColor;
       this.stWidth = state.canvaStrokeWidth;
@@ -113,6 +110,7 @@ export class CanvasEngine {
       case ToolType.Line:
       case ToolType.Arrow:
       case ToolType.Pencil:
+      case ToolType.Text:
         isInside =
           point.x >= shape.startX &&
           point.x <= shape.endX &&
@@ -344,6 +342,7 @@ export class CanvasEngine {
       case ToolType.Ellipse:
       case ToolType.Diamond:
       case ToolType.Pencil:
+      case ToolType.Text:
         handles = [
           {
             x: Math.min(shape.startX, shape.endX),
@@ -657,6 +656,9 @@ export class CanvasEngine {
         case ToolType.Pencil:
           this.drawWithPencil(shape.points, options);
           break;
+        case ToolType.Text:
+          this.renderText2(shape);
+          break;
         default:
           break;
       }
@@ -664,10 +666,6 @@ export class CanvasEngine {
       if (isSelected) {
         this.drawResizeHandles(shape);
       }
-    });
-
-    this.texts.forEach((text) => {
-      this.renderText2(text);
     });
   }
   private roundedRectPath(
@@ -804,7 +802,7 @@ export class CanvasEngine {
   }
 
   public renderText(
-    txt: Text,
+    txt: Shape,
     activeTextId: string | null,
     selectionStart: number | null,
     selectionEnd: number | null,
@@ -816,7 +814,7 @@ export class CanvasEngine {
       textIndex: number
     ) => { x: number; y: number }
   ) {
-    if (!this.canvas) return;
+    if (!this.canvas || txt.type !== ToolType.Text) return;
     const ctx = this.canvas.getContext("2d");
     if (!ctx) return;
 
@@ -865,7 +863,6 @@ export class CanvasEngine {
           currentIndex += line.length + 1;
         }
       }
-
       if (
         txt.id === activeTextId &&
         isEditing &&

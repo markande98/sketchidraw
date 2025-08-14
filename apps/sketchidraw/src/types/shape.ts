@@ -78,11 +78,15 @@ type Pencil = ShapeOptions & {
   points: [x: number, y: number][];
 };
 
-export type Text = {
+export type Text = ShapeOptions & {
   type: ToolType.Text;
   id: string;
   x: number;
   y: number;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
   text: string;
   fontSize: number;
   fontFamily: string;
@@ -90,4 +94,11 @@ export type Text = {
   lineHeight: number;
 };
 
-export type Shape = Rectangle | Ellipse | Diamond | Line | Arrow | Pencil;
+export type Shape =
+  | Rectangle
+  | Ellipse
+  | Diamond
+  | Line
+  | Arrow
+  | Pencil
+  | Text;

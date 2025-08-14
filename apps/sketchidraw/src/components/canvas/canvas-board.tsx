@@ -19,7 +19,6 @@ export const CanvasBoard = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const roughCanvas = useRef<RoughCanvas>(null);
   const { handleMouseDown, handleMouseUp, handleMouseMove } = useText({
-    canvasEngine,
     canvasRef,
   });
 

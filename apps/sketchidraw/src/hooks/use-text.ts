@@ -1,6 +1,5 @@
 "use client";
 
-import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { KeyTypes } from "@/constants";
 import { Text } from "@/types/shape";
 import { ToolType } from "@/types/tools";
@@ -9,19 +8,18 @@ import { useCanva } from "./use-canva-store";
 import { getFontCSS } from "@/lib/utils";
 
 type TextProps = {
-  canvasEngine: CanvasEngine | null;
   canvasRef?: RefObject<HTMLCanvasElement | null>;
 };
 
-export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
+export const useText = ({ canvasRef }: TextProps) => {
   const {
     canvas,
     tooltype,
     canvaFontSize,
     canvaStrokeColor,
     canvaFontFamily,
-    canvaTexts,
-    onSetCanvaTexts,
+    canvaShapes,
+    onSetCanvaShapes,
   } = useCanva();
   const [isEditing, setIsEditing] = useState(false);
   const [showCursor, setShowCursor] = useState(false);
@@ -30,12 +28,21 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
   const [selectionStart, setSelectionStart] = useState<number | null>(null);
   const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
 
+  const textObjects = canvaShapes.filter(
+    (shape) => shape.type === ToolType.Text
+  );
+  const shapes = canvaShapes.filter((shape) => shape.type !== ToolType.Text);
+
   const createTextObject = useCallback(
     (x: number, y: number, text: string = ""): Text => ({
       type: ToolType.Text,
       id: (Date.now() + Math.random()).toString(),
       x,
       y,
+      startX: x,
+      startY: y,
+      endX: x,
+      endY: y,
       text,
       fontSize: canvaFontSize,
       fontFamily: getFontCSS(canvaFontFamily),
@@ -50,8 +57,8 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       if (!canvas) return { x: 0, y: 0 };
       const rect = canvas.getBoundingClientRect();
       return {
-        x: e.clientX - rect.top,
-        y: e.clientY - rect.left,
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
       };
     },
     [canvas]
@@ -63,7 +70,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       if (!canvas) return { lines: [], width: 0, height: 0 };
 
       const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+      if (!ctx) return { lines: [], width: 0, height: 0 };
       ctx.font = `${textObj.fontSize}px ${textObj.fontFamily}`;
       const lines = textObj.text.split("\n");
       const lineHeight = textObj.fontSize * textObj.lineHeight;
@@ -91,7 +98,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       const canvas = canvasRef?.current;
       if (!canvas) return 0;
       const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+      if (!ctx) return 0;
       ctx.font = `${textObj.fontSize}px ${textObj.fontFamily}`;
 
       const lines = textObj.text.split("\n");
@@ -110,7 +117,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
 
       let charIndex = 0;
 
-      for (let i = 0; i < line.length; i++) {
+      for (let i = 0; i <= line.length; i++) {
         const nextWidth = ctx.measureText(line.substring(0, i)).width;
         if (nextWidth > relativeX) {
           charIndex = i - 1;
@@ -165,14 +172,17 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
 
   const handleCanvasClick = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (tooltype !== ToolType.Text) {
+        return;
+      }
       const canvas = canvasRef?.current;
       if (!canvas) return;
       const pos = getMousePos(e);
 
       let clickedText = null;
 
-      for (let i = canvaTexts.length - 1; i >= 0; i--) {
-        const textObj = canvaTexts[i];
+      for (let i = textObjects.length - 1; i >= 0; i--) {
+        const textObj = textObjects[i];
         const metrics = getTextMetrics(textObj);
 
         if (
@@ -193,14 +203,14 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
           pos.x,
           pos.y
         );
-        setCursorPosition(textIndex ?? 0);
+        setCursorPosition(textIndex);
       } else {
         const newText = createTextObject(pos.x, pos.y, "");
-        onSetCanvaTexts([...canvaTexts, newText]);
+        onSetCanvaShapes([...shapes, ...textObjects, newText]);
         setActiveTextId(newText.id);
+        setIsEditing(true);
         setCursorPosition(0);
       }
-      setIsEditing(true);
       setShowCursor(true);
       setSelectionStart(null);
       setSelectionEnd(null);
@@ -208,11 +218,13 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
     [
       canvasRef,
       getMousePos,
-      canvaTexts,
+      textObjects,
       getTextMetrics,
       getTextIndexFromCoordinates,
       createTextObject,
-      onSetCanvaTexts,
+      onSetCanvaShapes,
+      shapes,
+      tooltype,
     ]
   );
   const handleMouseDown = useCallback(
@@ -227,7 +239,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
 
       const pos = getMousePos(e);
 
-      const isInsideAnyText = canvaTexts.find((textObj) => {
+      const isInsideAnyText = textObjects.find((textObj) => {
         const metrics = getTextMetrics(textObj);
         if (
           pos.x >= textObj.x &&
@@ -258,7 +270,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       activeTextId,
       canvasRef,
       getMousePos,
-      canvaTexts,
+      textObjects,
       getTextIndexFromCoordinates,
       handleCanvasClick,
       getTextMetrics,
@@ -276,7 +288,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
 
       const pos = getMousePos(e);
 
-      const activeText = canvaTexts.find((t) => t.id === activeTextId);
+      const activeText = textObjects.find((t) => t.id === activeTextId);
       if (activeText) {
         const textIndex = getTextIndexFromCoordinates(activeText, pos.x, pos.y);
         setSelectionEnd(textIndex ?? null);
@@ -290,7 +302,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       selectionStart,
       canvasRef,
       getMousePos,
-      canvaTexts,
+      textObjects,
       getTextIndexFromCoordinates,
     ]
   );
@@ -310,13 +322,13 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      if (!isEditing || activeTextId === null || tooltype !== ToolType.Text)
+        return;
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
-      if (!isEditing || activeTextId === null || tooltype !== ToolType.Text)
-        return;
 
-      const activeText = canvaTexts.find((t) => t.id === activeTextId);
+      const activeText = textObjects.find((t) => t.id === activeTextId);
       if (!activeText) return;
       let newText = activeText.text;
       let newCursor = cursorPosition;
@@ -547,10 +559,21 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
         newSelectStart !== selectionStart ||
         newSelectEnd !== selectionEnd
       ) {
-        const updatedTextObjects = canvaTexts.map((t) =>
-          t.id === activeTextId ? { ...t, text: newText } : t
-        );
-        onSetCanvaTexts(updatedTextObjects);
+        const updatedTextObjects = textObjects.map((t) => {
+          if (t.id === activeTextId) {
+            const metrics = getTextMetrics(t);
+            const endX = t.startX + (metrics?.width ?? 0);
+            const endY = t.startY + (metrics?.height ?? 0);
+            return {
+              ...t,
+              text: newText,
+              endX,
+              endY,
+            };
+          }
+          return t;
+        });
+        onSetCanvaShapes([...shapes, ...updatedTextObjects]);
         setCursorPosition(newCursor);
         setSelectionStart(newSelectStart);
         setSelectionEnd(newSelectEnd);
@@ -559,43 +582,17 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
     },
     [
       activeTextId,
-      canvaTexts,
       cursorPosition,
+      getTextMetrics,
       isEditing,
-      onSetCanvaTexts,
+      onSetCanvaShapes,
       selectionEnd,
       selectionStart,
+      shapes,
+      textObjects,
       tooltype,
     ]
   );
-
-  useEffect(() => {
-    if (canvasEngine) {
-      canvasEngine.redrawShapes(null);
-      canvaTexts.forEach((txt) => {
-        canvasEngine.renderText(
-          txt,
-          activeTextId,
-          selectionStart,
-          selectionEnd,
-          isEditing,
-          cursorPosition,
-          showCursor,
-          getCursorCoordinates
-        );
-      });
-    }
-  }, [
-    canvasEngine,
-    activeTextId,
-    selectionStart,
-    selectionEnd,
-    isEditing,
-    cursorPosition,
-    showCursor,
-    getCursorCoordinates,
-    canvaTexts,
-  ]);
 
   useEffect(() => {
     const hiddenInput = document.createElement("input");
@@ -621,28 +618,42 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
     }, 500);
 
     const hiddenInput = document.getElementById("text-tool-hidden-input");
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (isEditing && tooltype === ToolType.Text && activeTextId) {
+        handleKeyDown(e);
+      }
+    };
     if (hiddenInput) {
       hiddenInput.focus();
-      hiddenInput.addEventListener("keydown", handleKeyDown);
+      hiddenInput.addEventListener("keydown", handleGlobalKeyDown);
     }
 
-    document.addEventListener("keydown", handleKeyDown, {
+    document.addEventListener("keydown", handleGlobalKeyDown, {
       capture: true,
       passive: false,
     });
 
     return () => {
       if (hiddenInput) {
-        hiddenInput.removeEventListener("keydown", handleKeyDown);
+        hiddenInput.removeEventListener("keydown", handleGlobalKeyDown);
       }
-      document.removeEventListener("keydown", handleKeyDown, { capture: true });
+      document.removeEventListener("keydown", handleGlobalKeyDown, {
+        capture: true,
+      });
       clearInterval(interval);
     };
-  }, [isEditing, tooltype, handleKeyDown]);
+  }, [isEditing, tooltype, handleKeyDown, activeTextId]);
 
   return {
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
+    activeTextId,
+    selectionStart,
+    selectionEnd,
+    isEditing,
+    cursorPosition,
+    showCursor,
+    getCursorCoordinates,
   };
 };
