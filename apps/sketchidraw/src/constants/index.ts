@@ -55,6 +55,12 @@ export enum FontSize {
   Extralarge = 45,
 }
 
+export enum FontFamily {
+  SketchiFont = "Excalifont",
+  Comicshanns = "Comic Shanns",
+  Nunito = "Nunito",
+}
+
 export enum ArrowTypes {
   Arrow = "arrow",
   Triangle = "triangle",

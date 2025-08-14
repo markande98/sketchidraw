@@ -12,6 +12,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { ToolType } from "@/types/tools";
 import { ArrowHeads } from "./arrow-heads";
 import { FontSize } from "./font-size";
+import { FontFamily } from "./font-family";
 
 export const CanvasProperty = () => {
   const { tooltype } = useCanva();
@@ -37,6 +38,7 @@ export const CanvasProperty = () => {
           <EdgeStyle />
         )}
         {isArrowTool && !isPencilTool && <ArrowHeads />}
+        {isTextTool && <FontFamily />}
         {isTextTool && <FontSize />}
       </div>
     </ScrollArea>

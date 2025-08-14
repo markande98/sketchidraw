@@ -615,3 +615,83 @@ export const FontExtraLargeSvg = () => {
     </svg>
   );
 };
+
+export const SketchiFontSvg = () => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      role="img"
+      viewBox="0 0 20 20"
+      className="h-4 w-4 text-white"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <g strokeWidth="1.25">
+        <path
+          clipRule="evenodd"
+          d="m7.643 15.69 7.774-7.773a2.357 2.357 0 1 0-3.334-3.334L4.31 12.357a3.333 3.333 0 0 0-.977 2.357v1.953h1.953c.884 0 1.732-.352 2.357-.977Z"
+        ></path>
+        <path d="m11.25 5.417 3.333 3.333"></path>
+      </g>
+    </svg>
+  );
+};
+
+export const ComicShannsFontSvg = () => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      role="img"
+      viewBox="0 0 20 20"
+      className="h-4 w-4 text-white"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <g
+        clipPath="url(#a)"
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M5.833 6.667 2.5 10l3.333 3.333M14.167 6.667 17.5 10l-3.333 3.333M11.667 3.333 8.333 16.667"></path>
+      </g>
+      <defs>
+        <clipPath id="a">
+          <path fill="#fff" d="M0 0h20v20H0z"></path>
+        </clipPath>
+      </defs>
+    </svg>
+  );
+};
+
+export const NunitoFontSvg = () => {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      role="img"
+      viewBox="0 0 20 20"
+      className="h-4 w-4 text-white"
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <g
+        stroke="currentColor"
+        strokeWidth="1.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M5.833 16.667v-10a3.333 3.333 0 0 1 3.334-3.334h1.666a3.333 3.333 0 0 1 3.334 3.334v10M5.833 10.833h8.334"></path>
+      </g>
+    </svg>
+  );
+};

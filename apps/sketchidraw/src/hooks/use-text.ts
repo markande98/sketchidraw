@@ -1,11 +1,12 @@
 "use client";
 
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
+import { KeyTypes } from "@/constants";
+import { Text } from "@/types/shape";
 import { ToolType } from "@/types/tools";
 import { RefObject, useCallback, useEffect, useState } from "react";
 import { useCanva } from "./use-canva-store";
-import { Text } from "@/types/shape";
-import { KeyTypes } from "@/constants";
+import { getFontCSS } from "@/lib/utils";
 
 type TextProps = {
   canvasEngine: CanvasEngine | null;
@@ -13,7 +14,8 @@ type TextProps = {
 };
 
 export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
-  const { canvas, tooltype, canvaFontSize } = useCanva();
+  const { canvas, tooltype, canvaFontSize, canvaStrokeColor, canvaFontFamily } =
+    useCanva();
   const [isEditing, setIsEditing] = useState(false);
   const [showCursor, setShowCursor] = useState(false);
   const [textObjects, setTextObjects] = useState<Text[]>([]);
@@ -30,11 +32,11 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       y,
       text,
       fontSize: canvaFontSize,
-      fontFamily: "Arial",
-      color: "#ffffff",
+      fontFamily: getFontCSS(canvaFontFamily),
+      color: canvaStrokeColor,
       lineHeight: 1.2,
     }),
-    [canvaFontSize]
+    [canvaFontSize, canvaStrokeColor, canvaFontFamily]
   );
 
   const getMousePos = useCallback(

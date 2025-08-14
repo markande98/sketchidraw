@@ -9,6 +9,7 @@ import {
   CursorType,
   Edges,
   FillStyle,
+  FontFamily,
   FontSize,
   Sloppiness,
   STROKE_COLORS,
@@ -33,6 +34,7 @@ interface CanvaStore {
   canvaEdge: Edges;
   canvaArrowType: ArrowTypes;
   canvaFontSize: FontSize;
+  canvaFontFamily: FontFamily;
 
   onSetCanva: (canvas: HTMLCanvasElement) => void;
   onSetThemeColor: (color: string) => void;
@@ -49,6 +51,7 @@ interface CanvaStore {
   onSetCanvaEdge: (edge: Edges) => void;
   onsetCanvaArrowType: (type: ArrowTypes) => void;
   onSetCanvaFontSize: (type: FontSize) => void;
+  onSetCanvaFontFamily: (font: FontFamily) => void;
 }
 
 export const useCanva = create<CanvaStore>((set) => ({
@@ -67,6 +70,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   canvaEdge: Edges.Sharp,
   canvaArrowType: ArrowTypes.Arrow,
   canvaFontSize: FontSize.Small,
+  canvaFontFamily: FontFamily.SketchiFont,
 
   onSetCanva: (canvas: HTMLCanvasElement) => set({ canvas }),
   onSetThemeColor: (color: string) => set({ themeColor: color }),
@@ -86,4 +90,5 @@ export const useCanva = create<CanvaStore>((set) => ({
   onSetCanvaEdge: (edge: Edges) => set({ canvaEdge: edge }),
   onsetCanvaArrowType: (type: ArrowTypes) => set({ canvaArrowType: type }),
   onSetCanvaFontSize: (type: FontSize) => set({ canvaFontSize: type }),
+  onSetCanvaFontFamily: (font: FontFamily) => set({ canvaFontFamily: font }),
 }));

@@ -1,3 +1,4 @@
+import { FontFamily } from "@/constants";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -36,3 +37,14 @@ export function hexToRgba(hex: string, alpha: number = 1): string {
 
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
+export const getFontCSS = (fontFamily: FontFamily) => {
+  const cssFontMap: { [key in FontFamily]: string } = {
+    [FontFamily.SketchiFont]:
+      '"Sketchifont", "Virgil", "Comic Sans MS", cursive',
+    [FontFamily.Nunito]: '"Nunito", "Virgil", cursive',
+    [FontFamily.Comicshanns]: '"Comic Shanns", "Virgil", cursive',
+  };
+
+  return cssFontMap[fontFamily];
+};
