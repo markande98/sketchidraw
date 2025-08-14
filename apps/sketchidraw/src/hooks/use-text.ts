@@ -14,11 +14,17 @@ type TextProps = {
 };
 
 export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
-  const { canvas, tooltype, canvaFontSize, canvaStrokeColor, canvaFontFamily } =
-    useCanva();
+  const {
+    canvas,
+    tooltype,
+    canvaFontSize,
+    canvaStrokeColor,
+    canvaFontFamily,
+    canvaTexts,
+    onSetCanvaTexts,
+  } = useCanva();
   const [isEditing, setIsEditing] = useState(false);
   const [showCursor, setShowCursor] = useState(false);
-  const [textObjects, setTextObjects] = useState<Text[]>([]);
   const [activeTextId, setActiveTextId] = useState<string | null>(null);
   const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [selectionStart, setSelectionStart] = useState<number | null>(null);
@@ -165,8 +171,8 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
 
       let clickedText = null;
 
-      for (let i = textObjects.length - 1; i >= 0; i--) {
-        const textObj = textObjects[i];
+      for (let i = canvaTexts.length - 1; i >= 0; i--) {
+        const textObj = canvaTexts[i];
         const metrics = getTextMetrics(textObj);
 
         if (
@@ -190,7 +196,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
         setCursorPosition(textIndex ?? 0);
       } else {
         const newText = createTextObject(pos.x, pos.y, "");
-        setTextObjects((prev) => [...prev, newText]);
+        onSetCanvaTexts([...canvaTexts, newText]);
         setActiveTextId(newText.id);
         setCursorPosition(0);
       }
@@ -202,13 +208,13 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
     [
       canvasRef,
       getMousePos,
+      canvaTexts,
       getTextMetrics,
       getTextIndexFromCoordinates,
       createTextObject,
-      textObjects,
+      onSetCanvaTexts,
     ]
   );
-
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
       if (tooltype !== ToolType.Text) return;
@@ -216,29 +222,46 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
         handleCanvasClick(e);
         return;
       }
-
       const canvas = canvasRef?.current;
       if (!canvas) return;
 
       const pos = getMousePos(e);
 
-      const activeText = textObjects.find((t) => t.id === activeTextId);
-      if (activeText) {
-        const textIndex = getTextIndexFromCoordinates(activeText, pos.x, pos.y);
-        setCursorPosition(textIndex ?? 0);
-        setSelectionStart(textIndex ?? null);
-        setSelectionEnd(textIndex ?? null);
+      const isInsideAnyText = canvaTexts.find((textObj) => {
+        const metrics = getTextMetrics(textObj);
+        if (
+          pos.x >= textObj.x &&
+          pos.x <= textObj.x + (metrics?.width ?? 0) &&
+          pos.y >= textObj.y &&
+          pos.y <= textObj.y + (metrics?.height ?? 0)
+        )
+          return textObj;
+      });
+
+      if (!isInsideAnyText) {
+        handleCanvasClick(e);
+        return;
       }
+      const textIndex = getTextIndexFromCoordinates(
+        isInsideAnyText,
+        pos.x,
+        pos.y
+      );
+      setActiveTextId(isInsideAnyText.id);
+      setCursorPosition(textIndex ?? 0);
+      setSelectionStart(textIndex ?? null);
+      setSelectionEnd(textIndex ?? null);
     },
     [
       tooltype,
-      handleCanvasClick,
-      activeTextId,
       isEditing,
+      activeTextId,
       canvasRef,
       getMousePos,
+      canvaTexts,
       getTextIndexFromCoordinates,
-      textObjects,
+      handleCanvasClick,
+      getTextMetrics,
     ]
   );
 
@@ -253,7 +276,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
 
       const pos = getMousePos(e);
 
-      const activeText = textObjects.find((t) => t.id === activeTextId);
+      const activeText = canvaTexts.find((t) => t.id === activeTextId);
       if (activeText) {
         const textIndex = getTextIndexFromCoordinates(activeText, pos.x, pos.y);
         setSelectionEnd(textIndex ?? null);
@@ -262,14 +285,13 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
     },
     [
       tooltype,
-      activeTextId,
-      textObjects,
-      getTextIndexFromCoordinates,
       isEditing,
-      canvasRef,
-      setSelectionEnd,
-      getMousePos,
+      activeTextId,
       selectionStart,
+      canvasRef,
+      getMousePos,
+      canvaTexts,
+      getTextIndexFromCoordinates,
     ]
   );
 
@@ -294,7 +316,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
       if (!isEditing || activeTextId === null || tooltype !== ToolType.Text)
         return;
 
-      const activeText = textObjects.find((t) => t.id === activeTextId);
+      const activeText = canvaTexts.find((t) => t.id === activeTextId);
       if (!activeText) return;
       let newText = activeText.text;
       let newCursor = cursorPosition;
@@ -460,7 +482,6 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
               newText.substring(cursorPosition + 1);
           }
           break;
-          break;
         case KeyTypes.Enter:
           if (hasSelection) {
             const start = Math.min(selectionStart, selectionEnd);
@@ -526,9 +547,10 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
         newSelectStart !== selectionStart ||
         newSelectEnd !== selectionEnd
       ) {
-        setTextObjects((prev) =>
-          prev.map((t) => (t.id === activeTextId ? { ...t, text: newText } : t))
+        const updatedTextObjects = canvaTexts.map((t) =>
+          t.id === activeTextId ? { ...t, text: newText } : t
         );
+        onSetCanvaTexts(updatedTextObjects);
         setCursorPosition(newCursor);
         setSelectionStart(newSelectStart);
         setSelectionEnd(newSelectEnd);
@@ -537,11 +559,12 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
     },
     [
       activeTextId,
+      canvaTexts,
       cursorPosition,
       isEditing,
+      onSetCanvaTexts,
       selectionEnd,
       selectionStart,
-      textObjects,
       tooltype,
     ]
   );
@@ -549,8 +572,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
   useEffect(() => {
     if (canvasEngine) {
       canvasEngine.redrawShapes(null);
-      const texts = textObjects.filter((t) => t.type === ToolType.Text);
-      texts.forEach((txt) => {
+      canvaTexts.forEach((txt) => {
         canvasEngine.renderText(
           txt,
           activeTextId,
@@ -565,7 +587,6 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
     }
   }, [
     canvasEngine,
-    textObjects,
     activeTextId,
     selectionStart,
     selectionEnd,
@@ -573,6 +594,7 @@ export const useText = ({ canvasEngine, canvasRef }: TextProps) => {
     cursorPosition,
     showCursor,
     getCursorCoordinates,
+    canvaTexts,
   ]);
 
   useEffect(() => {

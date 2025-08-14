@@ -20,7 +20,7 @@ export const FontSize = () => {
   return (
     <div className="flex flex-col space-y-2">
       <h3 className="text-white text-[11px] font-normal tracking-tigher">
-        Arrowheads
+        Font size
       </h3>
       <div className="flex items-center">
         <div className="flex items-center gap-2">

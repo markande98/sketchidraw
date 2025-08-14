@@ -42,8 +42,10 @@ export const getFontCSS = (fontFamily: FontFamily) => {
   const cssFontMap: { [key in FontFamily]: string } = {
     [FontFamily.SketchiFont]:
       '"Sketchifont", "Virgil", "Comic Sans MS", cursive',
-    [FontFamily.Nunito]: '"Nunito", "Virgil", cursive',
-    [FontFamily.Comicshanns]: '"Comic Shanns", "Virgil", cursive',
+    [FontFamily.Nunito]:
+      '"Nunito", "Helvetica Neue", Helvetica, Arial, sans-serif',
+    [FontFamily.Comicshanns]:
+      '"Comic Shanns", "Comic Sans MS", "Marker Felt", cursive',
   };
 
   return cssFontMap[fontFamily];

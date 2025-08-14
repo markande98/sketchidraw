@@ -358,7 +358,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       }
       const newShapes = [...canvaShapes];
       newShapes[selectedShapeIndex] = shape;
-      onSetCanvaShapes(newShapes);
+      onSetCanvaShapes([...newShapes]);
       setDragStart(pos);
     } else if (isDragging && selectedShapeIndex != null) {
       const newShapes = [...canvaShapes];
@@ -414,7 +414,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           break;
       }
       onSetCanvaCursorType(CursorType.Crossmove);
-      onSetCanvaShapes(newShapes);
+      onSetCanvaShapes([...newShapes]);
       setDragStart(pos);
     } else if (isDrawing && currentShape) {
       switch (tooltype) {
@@ -515,6 +515,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   const handlePointUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (tooltype === ToolType.Text) {
       handleMouseUp();
+      setCurrentShape(null);
       return;
     }
     if (isDrawing && currentShape) {
@@ -553,7 +554,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         default:
           break;
       }
-      onSetCanvaShapes(canvaShapes);
+      onSetCanvaShapes([...canvaShapes]);
     }
     onSetCanvaCursorType(CursorType.Crosshair);
     setIsDrawing(false);

@@ -16,6 +16,7 @@ export class CanvasEngine {
   private canvas: HTMLCanvasElement;
   private roughCanvas: RoughCanvas;
   private shapes: Shape[];
+  private texts: Text[];
   private stColor: string | null;
   private bgColor: string | null;
   private stWidth: number | null;
@@ -26,6 +27,7 @@ export class CanvasEngine {
 
   constructor(canvas: HTMLCanvasElement, roughCanvas: RoughCanvas) {
     this.shapes = [];
+    this.texts = [];
     this.canvas = canvas;
     this.stColor = "";
     this.bgColor = "";
@@ -36,6 +38,7 @@ export class CanvasEngine {
     this.sloppiness = Sloppiness.Architect;
     this.unsubscribe = useCanva.subscribe((state) => {
       this.shapes = state.canvaShapes;
+      this.texts = state.canvaTexts;
       this.bgColor = state.canvaBgColor;
       this.stColor = state.canvaStrokeColor;
       this.stWidth = state.canvaStrokeWidth;
@@ -662,6 +665,10 @@ export class CanvasEngine {
         this.drawResizeHandles(shape);
       }
     });
+
+    this.texts.forEach((text) => {
+      this.renderText2(text);
+    });
   }
   private roundedRectPath(
     x: number,
@@ -777,6 +784,23 @@ export class CanvasEngine {
 
     ctx.closePath();
     ctx.fill();
+  }
+
+  private renderText2(txt: Text) {
+    if (!this.canvas) return;
+    const ctx = this.canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.font = `${txt.fontSize}px ${txt.fontFamily}`;
+    ctx.fillStyle = hexToRgba(txt.color);
+
+    const lines = txt.text.split("\n");
+    const lineHeight = txt.fontSize * txt.lineHeight;
+
+    lines.forEach((line, index) => {
+      const y = txt.y + index * lineHeight + txt.fontSize;
+      ctx.fillText(line, txt.x, y);
+    });
   }
 
   public renderText(
