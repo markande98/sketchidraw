@@ -70,6 +70,33 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     };
   };
 
+  const measureText = (text: string, fontSize: number, fontFamily: string) => {
+    if (typeof document !== "undefined") {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.font = `${fontSize}px ${fontFamily}`;
+        const lines = text.split("\n");
+        let maxWidth = 0;
+        lines.forEach((line) => {
+          const metrics = ctx.measureText(line);
+          maxWidth = Math.max(maxWidth, metrics.width);
+        });
+        return {
+          width: maxWidth,
+          height: lines.length * fontSize * 1.2,
+        };
+      }
+    }
+    const avgCharWidth = fontSize * 0.6;
+    const lines = text.split("\n");
+    const maxLineLength = Math.max(...lines.map((line) => line.length));
+    return {
+      width: maxLineLength * avgCharWidth,
+      height: lines.length * fontSize * 1.2,
+    };
+  };
+
   const handlePointDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (tooltype === ToolType.Text) {
       handleMouseDown(e);
@@ -236,7 +263,6 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Line:
         case ToolType.Arrow:
         case ToolType.Pencil:
-        case ToolType.Text:
           const result = canvasEngine?.resizeShape(
             shape.type,
             shape.startX,
@@ -346,85 +372,132 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             shape.endX = endX;
             shape.endY = endY;
             shape.points = updatedPoints;
-          } else if (shape.type === ToolType.Text) {
-            const originalWidth = shape.endX - shape.startX;
-            const originalHeight = shape.endY - shape.startY;
-            const newWidth = endX - startX;
-            const newHeight = endY - startY;
-
-            const widthChanged = Math.abs(newWidth - originalWidth) > 0;
-            const heightChanged = Math.abs(newHeight - originalHeight) > 0;
-
-            if (!widthChanged || !heightChanged) {
-              break;
-            }
-
-            const MIN_FONT_SIZE = 8;
-            const MAX_FONT_SIZE = 200;
-
-            const availableWidth = newWidth;
-            const availableHeight = newHeight;
-
-            const calculateTextDimensions = (fontSize: number) => {
-              const avgCharWidth = fontSize * 0.6;
-              const textLines = shape.text.split("\n");
-
-              let maxLineWidth = 0;
-              textLines.forEach((line) => {
-                const lineWidth = line.length * avgCharWidth;
-                if (lineWidth > maxLineWidth) {
-                  maxLineWidth = lineWidth;
-                }
-              });
-
-              const textWidth = maxLineWidth;
-              const textHeight = textLines.length * shape.lineHeight;
-
-              return { textWidth, textHeight };
-            };
-
-            const calculateOptimalFontSize = () => {
-              let optimalFontSize = MIN_FONT_SIZE;
-              let maxFontSize = MAX_FONT_SIZE;
-              let minFontSize = MIN_FONT_SIZE;
-
-              while (minFontSize <= maxFontSize) {
-                const testFontSize = Math.floor(
-                  (minFontSize + maxFontSize) / 2
-                );
-                const { textWidth, textHeight } =
-                  calculateTextDimensions(testFontSize);
-
-                if (
-                  textWidth <= availableWidth &&
-                  textHeight <= availableHeight
-                ) {
-                  optimalFontSize = testFontSize;
-                  minFontSize = testFontSize + 1;
-                } else {
-                  maxFontSize = testFontSize - 1;
-                }
-              }
-
-              return optimalFontSize;
-            };
-
-            const newFontSize = calculateOptimalFontSize();
-
-            shape.startX = startX;
-            shape.startY = startY;
-            shape.endX = endX;
-            shape.endY = endY;
-            shape.fontSize = newFontSize;
-
-            shape.x = startX;
-            shape.y = startY;
           } else {
             shape.startX = startX;
             shape.startY = startY;
             shape.endX = endX;
             shape.endY = endY;
           }
+          break;
+        case ToolType.Text:
+          const resultText = canvasEngine?.resizeShape(
+            shape.type,
+            shape.startX,
+            shape.startY,
+            shape.endX,
+            shape.endY,
+            dx,
+            dy,
+            resizeHandle,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          );
+          if (!resultText) return;
+          const {
+            startX: nStartX,
+            startY: nStartY,
+            endX: nEndX,
+            endY: nEndY,
+          } = resultText;
+
+          // Calculate new dimensions of the bounding box
+          const newWidth = Math.abs(nEndX - nStartX);
+          const newHeight = Math.abs(nEndY - nStartY);
+
+          // Calculate font size to fit within the bounding box with uniform padding
+          const PADDING = 8;
+          let newFontSize = shape.fontSize;
+          let textDimensions = measureText(
+            shape.text,
+            newFontSize,
+            shape.fontFamily
+          );
+
+          // Adjust font size to fit within bounding box, scaling with width
+          const targetWidth = newWidth - PADDING * 2;
+          const targetHeight = newHeight - PADDING * 2;
+          if (
+            textDimensions.width > targetWidth ||
+            textDimensions.height > targetHeight
+          ) {
+            // Scale down font size to fit
+            const scaleX = targetWidth / textDimensions.width;
+            const scaleY = targetHeight / textDimensions.height;
+            const scale = Math.min(scaleX, scaleY);
+            newFontSize = Math.max(8, Math.round(newFontSize * scale));
+            textDimensions = measureText(
+              shape.text,
+              newFontSize,
+              shape.fontFamily
+            );
+          } else {
+            // Scale font size proportional to width (relative to initial size)
+            const scaleX = targetWidth / textDimensions.width;
+            newFontSize = Math.min(200, Math.round(newFontSize * scaleX)); // Use 80% to avoid overfilling
+            textDimensions = measureText(
+              shape.text,
+              newFontSize,
+              shape.fontFamily
+            );
+            // Ensure text still fits vertically
+            if (textDimensions.height > targetHeight) {
+              const scaleY = targetHeight / textDimensions.height;
+              newFontSize = Math.max(8, Math.round(newFontSize * scaleY));
+              textDimensions = measureText(
+                shape.text,
+                newFontSize,
+                shape.fontFamily
+              );
+            }
+          }
+
+          // Update bounding box coordinates based on resize handle
+          let finalStartX = nStartX;
+          let finalStartY = nStartY;
+          let finalEndX = nEndX;
+          let finalEndY = nEndY;
+
+          switch (resizeHandle) {
+            case "nw":
+              finalStartX = shape.endX - newWidth;
+              finalStartY = shape.endY - newHeight;
+              break;
+            case "ne":
+              finalEndX = shape.startX + newWidth;
+              finalStartY = shape.endY - newHeight;
+              break;
+            case "sw":
+              finalStartX = shape.endX - newWidth;
+              finalEndY = shape.startY + newHeight;
+              break;
+            case "se":
+              finalEndX = shape.startX + newWidth;
+              finalEndY = shape.startY + newHeight;
+              break;
+            default:
+              const centerX = (shape.startX + shape.endX) / 2;
+              const centerY = (shape.startY + shape.endY) / 2;
+              finalStartX = centerX - newWidth / 2;
+              finalStartY = centerY - newHeight / 2;
+              finalEndX = centerX + newWidth / 2;
+              finalEndY = centerY + newHeight / 2;
+              break;
+          }
+
+          // Center text within bounding box for uniform padding
+          // const textWidth = textDimensions.width;
+          // const textHeight = textDimensions.height;
+          shape.startX = finalStartX;
+          shape.startY = finalStartY;
+          shape.endX = finalEndX;
+          shape.endY = finalEndY;
+          shape.fontSize = newFontSize;
+          shape.x = finalStartX + PADDING; // Center horizontally
+          shape.y = finalStartY + PADDING; // Center vertically, offset by fontSize
           break;
         default:
           break;
