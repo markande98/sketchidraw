@@ -404,11 +404,14 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             endY: nEndY,
           } = resultText;
 
-          // Calculate new dimensions of the bounding box
-          const newWidth = Math.abs(nEndX - nStartX);
-          const newHeight = Math.abs(nEndY - nStartY);
+          let newWidth = Math.abs(nEndX - nStartX);
+          let newHeight = Math.abs(nEndY - nStartY);
 
-          // Calculate font size to fit within the bounding box with uniform padding
+          newWidth = Math.max(newWidth, newHeight);
+          newHeight = Math.max(newHeight, newWidth);
+
+          if (newWidth < 100 || newHeight < 100) break;
+
           const PADDING = 8;
           let newFontSize = shape.fontSize;
           let textDimensions = measureText(
@@ -417,14 +420,12 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             shape.fontFamily
           );
 
-          // Adjust font size to fit within bounding box, scaling with width
           const targetWidth = newWidth - PADDING * 2;
           const targetHeight = newHeight - PADDING * 2;
           if (
             textDimensions.width > targetWidth ||
             textDimensions.height > targetHeight
           ) {
-            // Scale down font size to fit
             const scaleX = targetWidth / textDimensions.width;
             const scaleY = targetHeight / textDimensions.height;
             const scale = Math.min(scaleX, scaleY);
@@ -435,15 +436,13 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
               shape.fontFamily
             );
           } else {
-            // Scale font size proportional to width (relative to initial size)
             const scaleX = targetWidth / textDimensions.width;
-            newFontSize = Math.min(200, Math.round(newFontSize * scaleX)); // Use 80% to avoid overfilling
+            newFontSize = Math.min(200, Math.round(newFontSize * scaleX));
             textDimensions = measureText(
               shape.text,
               newFontSize,
               shape.fontFamily
             );
-            // Ensure text still fits vertically
             if (textDimensions.height > targetHeight) {
               const scaleY = targetHeight / textDimensions.height;
               newFontSize = Math.max(8, Math.round(newFontSize * scaleY));
@@ -455,7 +454,6 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             }
           }
 
-          // Update bounding box coordinates based on resize handle
           let finalStartX = nStartX;
           let finalStartY = nStartY;
           let finalEndX = nEndX;
@@ -488,16 +486,13 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
               break;
           }
 
-          // Center text within bounding box for uniform padding
-          // const textWidth = textDimensions.width;
-          // const textHeight = textDimensions.height;
           shape.startX = finalStartX;
           shape.startY = finalStartY;
           shape.endX = finalEndX;
           shape.endY = finalEndY;
           shape.fontSize = newFontSize;
-          shape.x = finalStartX + PADDING; // Center horizontally
-          shape.y = finalStartY + PADDING; // Center vertically, offset by fontSize
+          shape.x = finalStartX + PADDING;
+          shape.y = finalStartY + PADDING;
           break;
         default:
           break;
