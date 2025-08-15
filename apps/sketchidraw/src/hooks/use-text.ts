@@ -6,12 +6,14 @@ import { ToolType } from "@/types/tools";
 import { RefObject, useCallback, useEffect, useState } from "react";
 import { useCanva } from "./use-canva-store";
 import { getFontCSS } from "@/lib/utils";
+import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 
 type TextProps = {
+  canvasEngine: CanvasEngine | null;
   canvasRef?: RefObject<HTMLCanvasElement | null>;
 };
 
-export const useText = ({ canvasRef }: TextProps) => {
+export const useText = ({ canvasRef, canvasEngine }: TextProps) => {
   const {
     canvas,
     tooltype,
@@ -595,6 +597,63 @@ export const useText = ({ canvasRef }: TextProps) => {
   );
 
   useEffect(() => {
+    if (
+      !isEditing ||
+      tooltype !== ToolType.Text ||
+      activeTextId === null ||
+      !canvasEngine
+    )
+      return;
+    canvasEngine.redrawShapes(null);
+    const text = canvaShapes.find(
+      (shape) => shape.type === ToolType.Text && shape.id === activeTextId
+    );
+    if (text) {
+      canvasEngine.renderText(
+        text,
+        activeTextId,
+        selectionStart,
+        selectionEnd,
+        isEditing,
+        cursorPosition,
+        showCursor, // This will trigger re-render when showCursor changes
+        getCursorCoordinates
+      );
+    }
+  }, [
+    showCursor, // Add this dependency
+    isEditing,
+    tooltype,
+    activeTextId,
+    canvasEngine,
+    canvaShapes,
+    selectionStart,
+    selectionEnd,
+    cursorPosition,
+    getCursorCoordinates,
+  ]);
+
+  useEffect(() => {
+    if (!isEditing || tooltype !== ToolType.Text || activeTextId === null) {
+      return;
+    }
+    // Start with cursor visible
+    setShowCursor(true);
+
+    const interval = setInterval(() => {
+      setShowCursor((prev) => !prev);
+    }, 500);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isEditing, tooltype, activeTextId]);
+
+  useEffect(() => {
+    if (!isEditing || tooltype !== ToolType.Text || activeTextId === null) {
+      return;
+    }
+
     const hiddenInput = document.createElement("input");
     hiddenInput.style.position = "absolute";
     hiddenInput.style.left = "-9999px";
@@ -603,57 +662,36 @@ export const useText = ({ canvasRef }: TextProps) => {
     hiddenInput.setAttribute("data-vimium-disable", "true");
     hiddenInput.id = "text-tool-hidden-input";
 
-    document.body.appendChild(hiddenInput);
-
-    return () => {
-      document.body.removeChild(hiddenInput);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isEditing || tooltype !== ToolType.Text) return;
-
-    const interval = setInterval(() => {
-      setShowCursor((prev) => !prev);
-    }, 500);
-
-    const hiddenInput = document.getElementById("text-tool-hidden-input");
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (isEditing && tooltype === ToolType.Text && activeTextId) {
         handleKeyDown(e);
+        // Reset cursor visibility on keypress
+        setShowCursor(true);
       }
     };
-    if (hiddenInput) {
-      hiddenInput.focus();
-      hiddenInput.addEventListener("keydown", handleGlobalKeyDown);
-    }
 
+    document.body.appendChild(hiddenInput);
+    hiddenInput.focus();
+    hiddenInput.addEventListener("keydown", handleGlobalKeyDown);
     document.addEventListener("keydown", handleGlobalKeyDown, {
       capture: true,
       passive: false,
     });
 
     return () => {
-      if (hiddenInput) {
-        hiddenInput.removeEventListener("keydown", handleGlobalKeyDown);
+      if (document.body.contains(hiddenInput)) {
+        document.body.removeChild(hiddenInput);
       }
+      hiddenInput.removeEventListener("keydown", handleGlobalKeyDown);
       document.removeEventListener("keydown", handleGlobalKeyDown, {
         capture: true,
       });
-      clearInterval(interval);
     };
-  }, [isEditing, tooltype, handleKeyDown, activeTextId]);
+  }, [isEditing, tooltype, activeTextId, handleKeyDown]);
 
   return {
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
-    activeTextId,
-    selectionStart,
-    selectionEnd,
-    isEditing,
-    cursorPosition,
-    showCursor,
-    getCursorCoordinates,
   };
 };

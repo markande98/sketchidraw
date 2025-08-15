@@ -49,10 +49,10 @@ export enum Edges {
 }
 
 export enum FontSize {
-  Small = 15,
-  Medium = 25,
-  Large = 35,
-  Extralarge = 45,
+  Small = 25,
+  Medium = 35,
+  Large = 45,
+  Extralarge = 55,
 }
 
 export enum FontFamily {

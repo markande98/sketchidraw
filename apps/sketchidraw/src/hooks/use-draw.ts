@@ -33,18 +33,9 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
     null
   );
-  const {
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    activeTextId,
-    selectionStart,
-    selectionEnd,
-    isEditing,
-    cursorPosition,
-    showCursor,
-    getCursorCoordinates,
-  } = useText({});
+  const { handleMouseDown, handleMouseMove, handleMouseUp } = useText({
+    canvasEngine,
+  });
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
@@ -63,52 +54,12 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   useEffect(() => {
     if (canvasEngine) {
       canvasEngine.redrawShapes(selectedShapeIndex);
-      const text = canvaShapes.find(
-        (shape) => shape.type === ToolType.Text && shape.id === activeTextId
-      );
-      if (text && isEditing && tooltype === ToolType.Text) {
-        canvasEngine.renderText(
-          text,
-          activeTextId,
-          selectionStart,
-          selectionEnd,
-          isEditing,
-          cursorPosition,
-          showCursor, // This will now have the correct value when editing
-          getCursorCoordinates
-        );
-      } else if (text) {
-        // Render text without cursor when not editing
-        canvasEngine.renderText(
-          text,
-          activeTextId,
-          selectionStart,
-          selectionEnd,
-          false, // Not editing
-          cursorPosition,
-          false, // No cursor
-          getCursorCoordinates
-        );
-      }
 
       if (currentShape) {
         canvasEngine.drawShape(currentShape);
       }
     }
-  }, [
-    canvaShapes,
-    currentShape,
-    canvasEngine,
-    selectedShapeIndex,
-    activeTextId,
-    selectionStart,
-    selectionEnd,
-    isEditing,
-    cursorPosition,
-    showCursor,
-    getCursorCoordinates,
-    tooltype,
-  ]);
+  }, [canvaShapes, currentShape, canvasEngine, selectedShapeIndex]);
 
   const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvas) return { x: 0, y: 0 };
@@ -285,6 +236,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         case ToolType.Line:
         case ToolType.Arrow:
         case ToolType.Pencil:
+        case ToolType.Text:
           const result = canvasEngine?.resizeShape(
             shape.type,
             shape.startX,
@@ -394,6 +346,79 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
             shape.endX = endX;
             shape.endY = endY;
             shape.points = updatedPoints;
+          } else if (shape.type === ToolType.Text) {
+            const originalWidth = shape.endX - shape.startX;
+            const originalHeight = shape.endY - shape.startY;
+            const newWidth = endX - startX;
+            const newHeight = endY - startY;
+
+            const widthChanged = Math.abs(newWidth - originalWidth) > 0;
+            const heightChanged = Math.abs(newHeight - originalHeight) > 0;
+
+            if (!widthChanged || !heightChanged) {
+              break;
+            }
+
+            const MIN_FONT_SIZE = 8;
+            const MAX_FONT_SIZE = 200;
+
+            const availableWidth = newWidth;
+            const availableHeight = newHeight;
+
+            const calculateTextDimensions = (fontSize: number) => {
+              const avgCharWidth = fontSize * 0.6;
+              const textLines = shape.text.split("\n");
+
+              let maxLineWidth = 0;
+              textLines.forEach((line) => {
+                const lineWidth = line.length * avgCharWidth;
+                if (lineWidth > maxLineWidth) {
+                  maxLineWidth = lineWidth;
+                }
+              });
+
+              const textWidth = maxLineWidth;
+              const textHeight = textLines.length * shape.lineHeight;
+
+              return { textWidth, textHeight };
+            };
+
+            const calculateOptimalFontSize = () => {
+              let optimalFontSize = MIN_FONT_SIZE;
+              let maxFontSize = MAX_FONT_SIZE;
+              let minFontSize = MIN_FONT_SIZE;
+
+              while (minFontSize <= maxFontSize) {
+                const testFontSize = Math.floor(
+                  (minFontSize + maxFontSize) / 2
+                );
+                const { textWidth, textHeight } =
+                  calculateTextDimensions(testFontSize);
+
+                if (
+                  textWidth <= availableWidth &&
+                  textHeight <= availableHeight
+                ) {
+                  optimalFontSize = testFontSize;
+                  minFontSize = testFontSize + 1;
+                } else {
+                  maxFontSize = testFontSize - 1;
+                }
+              }
+
+              return optimalFontSize;
+            };
+
+            const newFontSize = calculateOptimalFontSize();
+
+            shape.startX = startX;
+            shape.startY = startY;
+            shape.endX = endX;
+            shape.endY = endY;
+            shape.fontSize = newFontSize;
+
+            shape.x = startX;
+            shape.y = startY;
           } else {
             shape.startX = startX;
             shape.startY = startY;

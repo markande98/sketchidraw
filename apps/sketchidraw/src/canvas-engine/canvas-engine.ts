@@ -239,6 +239,7 @@ export class CanvasEngine {
       case ToolType.Ellipse:
       case ToolType.Diamond:
       case ToolType.Pencil:
+      case ToolType.Text:
         handles = [
           {
             x: shape.startX - HANDLE_SIZE,
@@ -854,7 +855,7 @@ export class CanvasEngine {
               const width = ctx.measureText(selection).width;
 
               ctx.save();
-              ctx.fillStyle = hexToRgba(txt.color, 0.2);
+              ctx.fillStyle = hexToRgba("#E3E3E8", 0.1);
               ctx.fillRect(x1, y1, width, lineHeight);
               ctx.restore();
             }
