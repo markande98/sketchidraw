@@ -7,12 +7,12 @@ export const CanvasView = () => {
   return (
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
       <CanvasProperty />
-      <div className="absolute top-0 left-0 right-0 px-6 py-4 flex justify-between">
+      <div className="absolute z-[100] top-0 left-0 right-0 px-6 py-4 flex justify-between">
         <CanvasMenu />
         <ToolsMenu />
         <button
           type="button"
-          className="z-[100] text-xs bg-[#a8a5ff]/95 hover:bg-[#a8a5ff] shadow-md p-3 rounded-md cursor-pointer font-normal text-black"
+          className="text-xs bg-[#a8a5ff]/95 hover:bg-[#a8a5ff] shadow-md p-3 rounded-md cursor-pointer font-normal text-black"
         >
           Share
         </button>

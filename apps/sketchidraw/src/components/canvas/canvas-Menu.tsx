@@ -12,7 +12,7 @@ export const CanvasMenu = () => {
       </PopoverTrigger>
       <PopoverContent
         align="start"
-        className="z-[100] h-[calc(100vh-100px)] w-60 px-4 py-6 mt-2 bg-surface-low max-h-[75vh] overflow-y-auto"
+        className="z-[200] h-[calc(100vh-100px)] w-60 px-4 py-6 mt-2 bg-surface-low max-h-[75vh] overflow-y-auto"
       >
         <CanvasMenuOptions />
       </PopoverContent>
