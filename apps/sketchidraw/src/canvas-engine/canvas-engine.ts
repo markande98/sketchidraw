@@ -63,6 +63,7 @@ export class CanvasEngine {
 
   private getCanvaOptions() {
     const options = {
+      isDeleted: true,
       stroke: this.stColor ?? undefined,
       strokeWidth: this.stWidth ?? 0,
       roughness: this.sloppiness,
@@ -580,10 +581,18 @@ export class CanvasEngine {
     this.shapes.forEach((shape, index) => {
       const isSelected = selectedShapeIndex === index;
       const options = {
-        stroke: shape.stroke,
+        isDeleted: false,
+        stroke: shape.isDeleted
+          ? hexToRgba(shape.stroke ?? "#ffffff", 0.3)
+          : shape.stroke,
         strokeWidth: shape.strokeWidth,
         roughness: shape.sloppiness,
-        fill: shape.fill,
+        fill:
+          shape.fill === "transparent"
+            ? shape.fill
+            : shape.isDeleted
+              ? hexToRgba(shape.fill ?? "#ffffff", 0.3)
+              : shape.fill,
         fillStyle: shape.fillStyle,
         strokeLineDash: [shape.strokeDashOffset ?? 0],
         hachureAngle: 120,
@@ -791,7 +800,7 @@ export class CanvasEngine {
     if (!ctx) return;
 
     ctx.font = `${txt.fontSize}px ${txt.fontFamily}`;
-    ctx.fillStyle = hexToRgba(txt.color);
+    ctx.fillStyle = hexToRgba(txt.color, txt.isDeleted ? 0.3 : 1);
 
     const lines = txt.text.split("\n");
     const lineHeight = txt.fontSize * txt.lineHeight;

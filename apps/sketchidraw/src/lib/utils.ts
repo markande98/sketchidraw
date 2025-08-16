@@ -17,7 +17,6 @@ export function hexToRgba(hex: string, alpha: number = 1): string {
       .map((char) => char + char)
       .join("");
   }
-
   // Validate hex format
   if (hex.length !== 6 || !/^[0-9A-Fa-f]{6}$/.test(hex)) {
     throw new Error(

@@ -3,6 +3,7 @@ import { Sloppiness } from "@/constants";
 import { ToolType } from "./tools";
 
 export type ShapeOptions = {
+  isDeleted: boolean;
   fill?: string;
   fillStyle?: FillStyle;
   sloppiness?: Sloppiness;

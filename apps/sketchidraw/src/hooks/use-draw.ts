@@ -46,6 +46,7 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   const [resizeHandle, setResizehandle] = useState<string | null>(null);
 
   const options: ShapeOptions = {
+    isDeleted: false,
     fill: canvaBgColor,
     fillStyle: canvaFillstyle,
     stroke: canvaStrokeColor,
@@ -697,15 +698,24 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
       }
     } else if (isDeleting) {
       let updatedCanvas = canvaShapes;
-      updatedCanvas = updatedCanvas.filter(
-        (shape) => !canvasEngine?.isPointInshape(cursorPos, shape)
-      );
+      updatedCanvas = updatedCanvas.map((shape) => {
+        let updatedShape = shape;
+        if (canvasEngine?.isPointInshape(cursorPos, shape)) {
+          updatedShape = {
+            ...shape,
+            isDeleted: true,
+          };
+        }
+        return updatedShape;
+      });
       onSetCanvaShapes(updatedCanvas);
     }
   };
 
   const handlePointUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (tooltype === ToolType.Eraser) {
+      const updatedShapes = canvaShapes.filter((shape) => !shape.isDeleted);
+      onSetCanvaShapes(updatedShapes);
       setIsDeleting(false);
       return;
     }
