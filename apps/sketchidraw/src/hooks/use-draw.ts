@@ -38,9 +38,11 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   });
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [resizeHandle, setResizehandle] = useState<string | null>(null);
 
   const options: ShapeOptions = {
@@ -70,6 +72,33 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
     };
   };
 
+  useEffect(() => {
+    if (tooltype !== ToolType.Eraser) return;
+    const cursor = document.createElement("div");
+    cursor.id = "cursor";
+    document.body.appendChild(cursor);
+
+    const handleCursorMove = (e: any) => {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const pos = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+      cursor.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+      setCursorPos(pos);
+    };
+
+    document.addEventListener("mousemove", handleCursorMove);
+
+    return () => {
+      if (cursor && cursor.parentNode) {
+        cursor.parentNode.removeChild(cursor);
+      }
+      document.removeEventListener("mousemove", handleCursorMove);
+    };
+  }, [tooltype, canvas]);
+
   const measureText = (text: string, fontSize: number, fontFamily: string) => {
     if (typeof document !== "undefined") {
       const canvas = document.createElement("canvas");
@@ -98,6 +127,11 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   };
 
   const handlePointDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (tooltype === ToolType.Eraser) {
+      setIsDeleting(true);
+      setSelectedShapeIndex(null);
+      return;
+    }
     if (tooltype === ToolType.Text) {
       handleMouseDown(e);
       return;
@@ -407,10 +441,9 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
           let newWidth = Math.abs(nEndX - nStartX);
           let newHeight = Math.abs(nEndY - nStartY);
 
+          if (newWidth < 100 || newHeight < 100) break;
           newWidth = Math.max(newWidth, newHeight);
           newHeight = Math.max(newHeight, newWidth);
-
-          if (newWidth < 100 || newHeight < 100) break;
 
           const PADDING = 8;
           let newFontSize = shape.fontSize;
@@ -662,10 +695,20 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
         default:
           break;
       }
+    } else if (isDeleting) {
+      let updatedCanvas = canvaShapes;
+      updatedCanvas = updatedCanvas.filter(
+        (shape) => !canvasEngine?.isPointInshape(cursorPos, shape)
+      );
+      onSetCanvaShapes(updatedCanvas);
     }
   };
 
   const handlePointUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (tooltype === ToolType.Eraser) {
+      setIsDeleting(false);
+      return;
+    }
     if (tooltype === ToolType.Text) {
       handleMouseUp();
       setCurrentShape(null);

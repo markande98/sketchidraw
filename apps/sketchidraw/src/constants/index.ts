@@ -73,6 +73,7 @@ export enum CursorType {
   NWSEResize = "nwse-resize",
   NESWResize = "nesw-resize",
   Pointer = "pointer",
+  None = "none",
 }
 
 export enum KeyTypes {

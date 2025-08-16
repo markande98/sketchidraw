@@ -153,3 +153,15 @@ body,
 .animate-float {
   animation: 2s ease-in-out 0s infinite alternate both running float;
 }
+
+#cursor {
+  position: fixed;
+  top: -5px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99;
+}

@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useCanva } from "@/hooks/use-canva-store";
 import { ToolType } from "@/types/tools";
 import { TextSvg } from "@/constants/svg";
+import { CursorType } from "@/constants";
 
 const iconMap = {
   MousePointer,
@@ -46,11 +47,16 @@ export const Tool = ({
   isSelected,
   toolType,
 }: ToolProps) => {
-  const { onSelectTooltype } = useCanva();
+  const { onSelectTooltype, onSetCanvaCursorType } = useCanva();
   const Icon = iconMap[iconName];
 
   const handleClick = (toolType: ToolType) => {
     onSelectTooltype(toolType);
+    if (toolType === ToolType.Eraser) {
+      onSetCanvaCursorType(CursorType.None);
+    } else {
+      onSetCanvaCursorType(CursorType.Crosshair);
+    }
   };
 
   return (

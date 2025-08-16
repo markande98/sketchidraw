@@ -23,8 +23,9 @@ export const CanvasProperty = () => {
   const isSelectAndGrab =
     tooltype === ToolType.Grab || tooltype === ToolType.Select;
   const isTextTool = tooltype === ToolType.Text;
+  const isEraserTool = tooltype === ToolType.Eraser;
 
-  if (isSelectAndGrab) return null;
+  if (isSelectAndGrab || isEraserTool) return null;
   return (
     <ScrollArea className="z-[100] absolute top-22 bg-surface-high/50 rounded-md left-6 w-[200px] max-h-[calc(100vh-250px)] overflow-y-auto">
       <div className="p-3 space-y-6 text-neutral-800">
