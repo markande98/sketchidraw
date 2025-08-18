@@ -51,8 +51,8 @@ export const useDraw = ({
     panY,
   });
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [dragStart, setDragStart] = useState({ x: panX, y: panY });
+  const [cursorPos, setCursorPos] = useState({ x: panX, y: panY });
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -97,8 +97,8 @@ export const useDraw = ({
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
       const pos = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: e.clientX - rect.left - panX,
+        y: e.clientY - rect.top - panY,
       };
       cursor.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
       setCursorPos(pos);
@@ -112,7 +112,7 @@ export const useDraw = ({
       }
       document.removeEventListener("mousemove", handleCursorMove);
     };
-  }, [tooltype, canvas]);
+  }, [tooltype, canvas, panX, panY]);
 
   const measureText = (text: string, fontSize: number, fontFamily: string) => {
     if (typeof document !== "undefined") {
