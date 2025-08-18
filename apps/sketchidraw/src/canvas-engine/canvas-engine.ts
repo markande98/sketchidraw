@@ -331,7 +331,7 @@ export class CanvasEngine {
     return null;
   }
 
-  public drawResizeHandles(shape: Shape) {
+  public drawResizeHandles(shape: Shape, panX: number, panY: number) {
     let handles;
     const options = {
       fillStyle: "transparent",
@@ -347,26 +347,26 @@ export class CanvasEngine {
       case ToolType.Text:
         handles = [
           {
-            x: Math.min(shape.startX, shape.endX),
-            y: Math.min(shape.startY, shape.endY),
+            x: Math.min(shape.startX, shape.endX) + panX,
+            y: Math.min(shape.startY, shape.endY) + panY,
             cursor: "nw-resize",
             type: "nw",
           },
           {
-            x: Math.max(shape.startX, shape.endX),
-            y: Math.min(shape.startY, shape.endY),
+            x: Math.max(shape.startX, shape.endX) + panX,
+            y: Math.min(shape.startY, shape.endY) + panY,
             cursor: "ne-resize",
             type: "ne",
           },
           {
-            x: Math.max(shape.startX, shape.endX),
-            y: Math.max(shape.startY, shape.endY),
+            x: Math.max(shape.startX, shape.endX) + panX,
+            y: Math.max(shape.startY, shape.endY) + panY,
             cursor: "se-resize",
             type: "se",
           },
           {
-            x: Math.min(shape.startX, shape.endX),
-            y: Math.max(shape.startY, shape.endY),
+            x: Math.min(shape.startX, shape.endX) + panX,
+            y: Math.max(shape.startY, shape.endY) + panY,
             cursor: "sw-resize",
             type: "sw",
           },
@@ -446,18 +446,18 @@ export class CanvasEngine {
       case ToolType.Arrow:
         handles = [
           {
-            x: shape.sX,
-            y: shape.sY,
+            x: shape.sX + panX,
+            y: shape.sY + panY,
             type: "start",
           },
           {
-            x: shape.mX,
-            y: shape.mY,
+            x: shape.mX + panX,
+            y: shape.mY + panY,
             type: "mid",
           },
           {
-            x: shape.eX,
-            y: shape.eY,
+            x: shape.eX + panX,
+            y: shape.eY + panY,
             type: "end",
           },
         ];
@@ -477,23 +477,23 @@ export class CanvasEngine {
         });
         handles = [
           {
-            x: Math.min(shape.startX, shape.endX),
-            y: Math.min(shape.startY, shape.endY),
+            x: Math.min(shape.startX, shape.endX) + panX,
+            y: Math.min(shape.startY, shape.endY) + panY,
             type: "nw",
           },
           {
-            x: Math.max(shape.startX, shape.endX),
-            y: Math.min(shape.startY, shape.endY),
+            x: Math.max(shape.startX, shape.endX) + panX,
+            y: Math.min(shape.startY, shape.endY) + panY,
             type: "ne",
           },
           {
-            x: Math.max(shape.startX, shape.endX),
-            y: Math.max(shape.startY, shape.endY),
+            x: Math.max(shape.startX, shape.endX) + panX,
+            y: Math.max(shape.startY, shape.endY) + panY,
             type: "se",
           },
           {
-            x: Math.min(shape.startX, shape.endX),
-            y: Math.max(shape.startY, shape.endY),
+            x: Math.min(shape.startX, shape.endX) + panX,
+            y: Math.max(shape.startY, shape.endY) + panY,
             type: "sw",
           },
         ];
@@ -568,12 +568,17 @@ export class CanvasEngine {
           options
         );
         break;
+        break;
       default:
         break;
     }
   }
 
-  public redrawShapes(selectedShapeIndex: number | null): void {
+  public redrawShapes(
+    selectedShapeIndex: number | null,
+    panX: number,
+    panY: number
+  ): void {
     const ctx = this.canvas.getContext("2d");
 
     ctx?.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -603,8 +608,8 @@ export class CanvasEngine {
       switch (shape.type) {
         case ToolType.Rectangle:
           const path = this.roundedRectPath(
-            shape.startX,
-            shape.startY,
+            shape.startX + panX,
+            shape.startY + panY,
             shape.endX - shape.startX,
             shape.endY - shape.startY,
             shape.edgeType
@@ -613,8 +618,8 @@ export class CanvasEngine {
           break;
         case ToolType.Ellipse:
           this.roughCanvas.ellipse(
-            (shape.startX + shape.endX) / 2,
-            (shape.startY + shape.endY) / 2,
+            (shape.startX + shape.endX + 2 * panX) / 2,
+            (shape.startY + shape.endY + 2 * panY) / 2,
             shape.endX - shape.startX,
             shape.endY - shape.startY,
             options
@@ -622,8 +627,8 @@ export class CanvasEngine {
           break;
         case ToolType.Diamond:
           const points = this.getDiamondPoints(
-            (shape.startX + shape.endX) / 2,
-            (shape.startY + shape.endY) / 2,
+            (shape.startX + shape.endX + 2 * panX) / 2,
+            (shape.startY + shape.endY + 2 * panY) / 2,
             (shape.endX - shape.startX) / 2,
             (shape.endY - shape.startY) / 2
           );
@@ -631,50 +636,50 @@ export class CanvasEngine {
           break;
         case ToolType.Line:
           this.roughCanvas.line(
-            shape.sX,
-            shape.sY,
-            shape.mX,
-            shape.mY,
+            shape.sX + panX,
+            shape.sY + panY,
+            shape.mX + panX,
+            shape.mY + panY,
             options
           );
           this.roughCanvas.line(
-            shape.mX,
-            shape.mY,
-            shape.eX,
-            shape.eY,
+            shape.mX + panX,
+            shape.mY + panY,
+            shape.eX + panX,
+            shape.eY + panY,
             options
           );
           break;
         case ToolType.Arrow:
           this.roughCanvas.line(
-            shape.sX,
-            shape.sY,
-            shape.mX,
-            shape.mY,
+            shape.sX + panX,
+            shape.sY + panY,
+            shape.mX + panX,
+            shape.mY + panY,
             options
           );
           this.drawLineWithArrow(
-            shape.mX,
-            shape.mY,
-            shape.eX,
-            shape.eY,
+            shape.mX + panX,
+            shape.mY + panY,
+            shape.eX + panX,
+            shape.eY + panY,
             shape.arrowType,
             options,
             shape.stroke
           );
           break;
         case ToolType.Pencil:
-          this.drawWithPencil(shape.points, options);
+          this.drawWithPencil(shape.points, panX, panY, options);
           break;
         case ToolType.Text:
-          this.renderText2(shape);
+          this.renderText2(shape, panX, panY);
           break;
         default:
           break;
       }
 
       if (isSelected) {
-        this.drawResizeHandles(shape);
+        this.drawResizeHandles(shape, panX, panY);
       }
     });
   }
@@ -766,12 +771,15 @@ export class CanvasEngine {
 
   private drawWithPencil(
     points: [x: number, y: number][],
+    panX: number,
+    panY: number,
     options: ShapeOptions
   ) {
     const ctx = this.canvas.getContext("2d");
     if (!ctx) return;
     if (points.length < 2) return;
 
+    points = points.map((point) => [point[0] + panX, point[1] + panY]);
     const stroke = getStroke(points, {
       size: options.strokeWidth ? options.strokeWidth * 5 : 4,
       thinning: 0.5,
@@ -794,11 +802,15 @@ export class CanvasEngine {
     ctx.fill();
   }
 
-  private renderText2(txt: Text) {
+  private renderText2(txt: Text, panX: number, panY: number) {
     if (!this.canvas) return;
     const ctx = this.canvas.getContext("2d");
     if (!ctx) return;
-
+    txt = {
+      ...txt,
+      x: txt.x + panX,
+      y: txt.y + panY,
+    };
     ctx.font = `${txt.fontSize}px ${txt.fontFamily}`;
     ctx.fillStyle = hexToRgba(txt.color, txt.isDeleted ? 0.3 : 1);
 
@@ -813,6 +825,8 @@ export class CanvasEngine {
 
   public renderText(
     txt: Shape,
+    panX: number,
+    panY: number,
     activeTextId: string | null,
     selectionStart: number | null,
     selectionEnd: number | null,
@@ -827,7 +841,11 @@ export class CanvasEngine {
     if (!this.canvas || txt.type !== ToolType.Text) return;
     const ctx = this.canvas.getContext("2d");
     if (!ctx) return;
-
+    txt = {
+      ...txt,
+      x: txt.x + panX,
+      y: txt.y + panY,
+    };
     ctx.font = `${txt.fontSize}px ${txt.fontFamily}`;
     ctx.fillStyle = hexToRgba(txt.color);
 
@@ -894,13 +912,13 @@ export class CanvasEngine {
     });
   }
 
-  public drawShape(shape: Shape): void {
+  public drawShape(shape: Shape, panX: number, panY: number): void {
     const options = this.getCanvaOptions();
     switch (shape.type) {
       case ToolType.Rectangle:
         const path = this.roundedRectPath(
-          shape.startX,
-          shape.startY,
+          shape.startX + panX,
+          shape.startY + panY,
           shape.endX - shape.startX,
           shape.endY - shape.startY,
           shape.edgeType
@@ -909,8 +927,8 @@ export class CanvasEngine {
         break;
       case ToolType.Ellipse:
         this.roughCanvas.ellipse(
-          (shape.startX + shape.endX) / 2,
-          (shape.startY + shape.endY) / 2,
+          (shape.startX + shape.endX + 2 * panX) / 2,
+          (shape.startY + shape.endY + 2 * panY) / 2,
           shape.endX - shape.startX,
           shape.endY - shape.startY,
           options
@@ -918,31 +936,49 @@ export class CanvasEngine {
         break;
       case ToolType.Diamond:
         const points = this.getDiamondPoints(
-          (shape.startX + shape.endX) / 2,
-          (shape.startY + shape.endY) / 2,
+          (shape.startX + shape.endX + 2 * panX) / 2,
+          (shape.startY + shape.endY + 2 * panY) / 2,
           (shape.endX - shape.startX) / 2,
           (shape.endY - shape.startY) / 2
         );
         this.roughCanvas.polygon(points, options);
         break;
       case ToolType.Line:
-        this.roughCanvas.line(shape.sX, shape.sY, shape.mX, shape.mY, options);
-        this.roughCanvas.line(shape.mX, shape.mY, shape.eX, shape.eY, options);
+        this.roughCanvas.line(
+          shape.sX + panX,
+          shape.sY + panY,
+          shape.mX + panX,
+          shape.mY + panY,
+          options
+        );
+        this.roughCanvas.line(
+          shape.mX + panX,
+          shape.mY + panY,
+          shape.eX + panX,
+          shape.eY + panY,
+          options
+        );
         break;
       case ToolType.Arrow:
-        this.roughCanvas.line(shape.sX, shape.sY, shape.mX, shape.mY, options);
+        this.roughCanvas.line(
+          shape.sX + panX,
+          shape.sY + panY,
+          shape.mX + panX,
+          shape.mY + panY,
+          options
+        );
         this.drawLineWithArrow(
-          shape.mX,
-          shape.mY,
-          shape.eX,
-          shape.eY,
+          shape.mX + panX,
+          shape.mY + panY,
+          shape.eX + panX,
+          shape.eY + panY,
           shape.arrowType,
           options,
           shape.stroke
         );
         break;
       case ToolType.Pencil:
-        this.drawWithPencil(shape.points, options);
+        this.drawWithPencil(shape.points, panX, panY, options);
         break;
       default:
         break;

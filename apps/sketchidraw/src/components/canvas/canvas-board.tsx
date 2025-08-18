@@ -3,26 +3,108 @@
 
 import rough from "roughjs";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDraw } from "@/hooks/use-draw";
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { useCanva } from "@/hooks/use-canva-store";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { useText } from "@/hooks/use-text";
+import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
 
 export const CanvasBoard = () => {
   const { onSetCanva, onSetRoughCanvas, themeColor, canvaCursorType } =
     useCanva();
-  const [canvasEngine, setCanvasEngine] = useState<CanvasEngine | null>(null);
-  const { handlePointDown, handlePointMove, handlePointUp } = useDraw({
-    canvasEngine,
-  });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const roughCanvas = useRef<RoughCanvas>(null);
-  const { handleMouseDown, handleMouseUp, handleMouseMove } = useText({
-    canvasRef,
+  const [canvasEngine, setCanvasEngine] = useState<CanvasEngine | null>(null);
+  const {
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    handleWheel,
+    scale,
+    panX,
+    panY,
+  } = useInfiniteCanvas({ canvasRef });
+
+  const { handlePointDown, handlePointMove, handlePointUp } = useDraw({
     canvasEngine,
+    canvasRef,
+    scale,
+    panX,
+    panY,
   });
+
+  const handleUnifiedPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (e.pointerType === "touch") {
+        handleTouchStart(
+          [
+            {
+              identifier: e.pointerId,
+              clientX: e.clientX,
+              clientY: e.clientY,
+            },
+          ],
+          () => e.preventDefault()
+        );
+
+        if (e.isPrimary) {
+          handlePointDown(e);
+        }
+      } else {
+        handlePointDown(e);
+      }
+    },
+    [handleTouchStart, handlePointDown]
+  );
+
+  const handleUnifiedPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (e.pointerType === "touch") {
+        handleTouchMove(
+          [
+            {
+              identifier: e.pointerId,
+              clientX: e.clientX,
+              clientY: e.clientY,
+            },
+          ],
+          () => e.preventDefault()
+        );
+
+        if (e.isPrimary) {
+          handlePointMove(e);
+        }
+      } else {
+        handlePointMove(e);
+      }
+    },
+    [handleTouchMove, handlePointMove]
+  );
+
+  const handleUnifiedPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLCanvasElement>) => {
+      if (e.pointerType === "touch") {
+        handleTouchEnd(
+          [
+            {
+              identifier: e.pointerId,
+              clientX: e.clientX,
+              clientY: e.clientY,
+            },
+          ],
+          () => e.preventDefault()
+        );
+
+        if (e.isPrimary) {
+          handlePointUp(e);
+        }
+      } else {
+        handlePointUp(e);
+      }
+    },
+    [handleTouchEnd, handlePointUp]
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -34,11 +116,14 @@ export const CanvasBoard = () => {
       onSetCanva(canvas);
       onSetRoughCanvas(rough.canvas(canvas));
       setCanvasEngine(canvasEngine);
+
+      canvas.addEventListener("wheel", handleWheel, { passive: false });
     }
 
     return () => {
       if (canvasEngine) {
         canvasEngine.destroy();
+        canvas?.removeEventListener("wheel", handleWheel);
       }
     };
   }, [onSetCanva, onSetRoughCanvas]);
@@ -78,12 +163,10 @@ export const CanvasBoard = () => {
   return (
     <canvas
       ref={canvasRef}
-      onPointerDown={handlePointDown}
-      onPointerMove={handlePointMove}
-      onPointerUp={handlePointUp}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
+      onPointerDown={handleUnifiedPointerDown}
+      onPointerMove={handleUnifiedPointerMove}
+      onPointerUp={handleUnifiedPointerUp}
+      onContextMenu={(e) => e.preventDefault()}
       tabIndex={0}
       className="absolute inset-0"
       style={{

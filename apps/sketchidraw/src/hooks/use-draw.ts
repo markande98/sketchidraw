@@ -2,7 +2,7 @@
 
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { Shape } from "@/types/shape";
-import { useEffect, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import { useCanva } from "./use-canva-store";
 import { ToolType } from "@/types/tools";
 import { ShapeOptions } from "@/types/shape";
@@ -11,9 +11,19 @@ import { useText } from "./use-text";
 
 type DrawProps = {
   canvasEngine: CanvasEngine | null;
+  canvasRef: RefObject<HTMLCanvasElement | null>;
+  scale: number;
+  panX: number;
+  panY: number;
 };
 
-export const useDraw = ({ canvasEngine }: DrawProps) => {
+export const useDraw = ({
+  canvasEngine,
+  canvasRef,
+  scale,
+  panX,
+  panY,
+}: DrawProps) => {
   const {
     canvas,
     canvaBgColor,
@@ -35,6 +45,10 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   );
   const { handleMouseDown, handleMouseMove, handleMouseUp } = useText({
     canvasEngine,
+    canvasRef,
+    scale,
+    panX,
+    panY,
   });
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -56,20 +70,20 @@ export const useDraw = ({ canvasEngine }: DrawProps) => {
   };
   useEffect(() => {
     if (canvasEngine) {
-      canvasEngine.redrawShapes(selectedShapeIndex);
+      canvasEngine.redrawShapes(selectedShapeIndex, panX, panY);
 
       if (currentShape) {
-        canvasEngine.drawShape(currentShape);
+        canvasEngine.drawShape(currentShape, panX, panY);
       }
     }
-  }, [canvaShapes, currentShape, canvasEngine, selectedShapeIndex]);
+  }, [canvaShapes, currentShape, canvasEngine, selectedShapeIndex, panX, panY]);
 
   const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: e.clientX - rect.left - panX,
+      y: e.clientY - rect.top - panY,
     };
   };
 

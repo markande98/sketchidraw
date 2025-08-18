@@ -10,10 +10,19 @@ import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 
 type TextProps = {
   canvasEngine: CanvasEngine | null;
-  canvasRef?: RefObject<HTMLCanvasElement | null>;
+  canvasRef: RefObject<HTMLCanvasElement | null>;
+  scale: number;
+  panX: number;
+  panY: number;
 };
 
-export const useText = ({ canvasRef, canvasEngine }: TextProps) => {
+export const useText = ({
+  canvasRef,
+  canvasEngine,
+  scale,
+  panX,
+  panY,
+}: TextProps) => {
   const {
     canvas,
     tooltype,
@@ -39,6 +48,7 @@ export const useText = ({ canvasRef, canvasEngine }: TextProps) => {
     (x: number, y: number, text: string = ""): Text => ({
       type: ToolType.Text,
       id: (Date.now() + Math.random()).toString(),
+      isDeleted: false,
       x,
       y,
       startX: x,
@@ -59,11 +69,11 @@ export const useText = ({ canvasRef, canvasEngine }: TextProps) => {
       if (!canvas) return { x: 0, y: 0 };
       const rect = canvas.getBoundingClientRect();
       return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: e.clientX - rect.left - panX,
+        y: e.clientY - rect.top - panY,
       };
     },
-    [canvas]
+    [canvas, panX, panY]
   );
 
   const getTextMetrics = useCallback(
@@ -604,13 +614,15 @@ export const useText = ({ canvasRef, canvasEngine }: TextProps) => {
       !canvasEngine
     )
       return;
-    canvasEngine.redrawShapes(null);
+    canvasEngine.redrawShapes(null, panX, panY);
     const text = canvaShapes.find(
       (shape) => shape.type === ToolType.Text && shape.id === activeTextId
     );
     if (text) {
       canvasEngine.renderText(
         text,
+        panX,
+        panY,
         activeTextId,
         selectionStart,
         selectionEnd,
@@ -621,7 +633,7 @@ export const useText = ({ canvasRef, canvasEngine }: TextProps) => {
       );
     }
   }, [
-    showCursor, // Add this dependency
+    showCursor,
     isEditing,
     tooltype,
     activeTextId,
@@ -631,6 +643,8 @@ export const useText = ({ canvasRef, canvasEngine }: TextProps) => {
     selectionEnd,
     cursorPosition,
     getCursorCoordinates,
+    panX,
+    panY,
   ]);
 
   useEffect(() => {
