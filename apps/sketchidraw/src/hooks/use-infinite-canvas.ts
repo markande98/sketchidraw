@@ -49,12 +49,12 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
 
   const { scale, panX, panY } = canvasState;
 
+  console.log(scale, panX, panY);
   const zoomAt = useCallback(
     (mouseX: number, mouseY: number, factor: number) => {
-      const minScale = 0.05;
-      const maxScale = 20;
-      const newScale = Math.max(minScale, Math.min(maxScale, scale * factor));
-
+      // const minScale = 0.05;
+      // const maxScale = 20;
+      const newScale = scale * factor;
       if (newScale !== scale) {
         const canvasX = (mouseX - panX) / scale;
         const canvasY = (mouseY - panY) / scale;
@@ -73,11 +73,27 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
     [panX, panY, scale]
   );
 
+  const zoomAtCenter = useCallback(
+    (centerX: number, centerY: number, factor: number) => {
+      if (!canvasRef.current) return;
+
+      const rect = canvasRef.current.getBoundingClientRect();
+      const canvasRelativeX = centerX - rect.left;
+      const canvasRelativeY = centerY - rect.top;
+
+      zoomAt(canvasRelativeX, canvasRelativeY, factor);
+    },
+    [canvasRef, zoomAt]
+  );
+
   const expandCanvasForPanning = useCallback(() => {
+    if (!canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
     const visibleLeft = -panX / scale;
     const visibleTop = -panY / scale;
-    const visibleRight = (window.innerWidth - panX) / scale;
-    const visibleBottom = (window.innerHeight - panY) / scale;
+    const visibleRight = (rect.width - panX) / scale;
+    const visibleBottom = (rect.height - panY) / scale;
 
     const expansionBuffer = 5000;
 
@@ -90,7 +106,7 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
         maxY: Math.max(prev.bounds.maxY, visibleBottom + expansionBuffer),
       },
     }));
-  }, [panX, panY, scale]);
+  }, [panX, panY, scale, canvasRef]);
 
   const updateTouchGesture = useCallback(() => {
     const touchArray = Array.from(touchesMap.current.values());
@@ -108,20 +124,19 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
       Math.pow(touch1.x - touch2.x, 2) + Math.pow(touch1.y - touch2.y, 2)
     );
 
-    if (lastTouchDistance.current > 0) {
+    if (
+      lastTouchDistance.current > 0 &&
+      Math.abs(distance - lastTouchDistance.current) > 1
+    ) {
       const zoomFactor = distance / lastTouchDistance.current;
-      if (canvasRef.current) {
-        const rect = canvasRef.current.getBoundingClientRect();
-        const centerX = center.x - rect.left;
-        const centerY = center.y - rect.top;
-        const smoothZoomFactor = 1 + (zoomFactor - 1) * 0.3;
-        zoomAt(centerX, centerY, smoothZoomFactor);
-      }
+      const smoothZoomFactor = 1 + (zoomFactor - 1) * 0.15;
+      zoomAtCenter(center.x, center.y, smoothZoomFactor);
+    }
+    if (lastTouchCenter.current.x !== 0 && lastTouchCenter.current.y !== 0) {
+      const panDeltaX = center.x - lastTouchCenter.current.x;
+      const panDeltaY = center.y - lastTouchCenter.current.y;
 
-      if (lastTouchCenter.current.x !== 0 && lastTouchCenter.current.y !== 0) {
-        const panDeltaX = center.x - lastTouchCenter.current.x;
-        const panDeltaY = center.y - lastTouchCenter.current.y;
-
+      if (Math.abs(panDeltaX) > 1 || Math.abs(panDeltaY) > 1) {
         setCanvasState((prev) => ({
           ...prev,
           panX: prev.panX + panDeltaX,
@@ -132,7 +147,7 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
     }
     lastTouchDistance.current = distance;
     lastTouchCenter.current = center;
-  }, [canvasRef, zoomAt, expandCanvasForPanning]);
+  }, [expandCanvasForPanning, zoomAtCenter]);
 
   const handleWheel = useCallback(
     (e: WheelEvent) => {
@@ -144,16 +159,14 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
-      const isTouchPad = Math.abs(e.deltaX) > 0 || Math.abs(e.deltaX) % 1 !== 0;
-      const isPinchZoom = e.ctrlKey && isTouchPad;
+      const isTrackpad = Math.abs(e.deltaX) > 0 || Math.abs(e.deltaY % 1) !== 0;
 
-      if (isPinchZoom) {
-        let zoomFactor = 1 - e.deltaY * 0.008;
-        zoomFactor = Math.max(0.98, Math.min(1.02, zoomFactor));
+      if (isTrackpad) {
+        const zoomDelta = -e.deltaY * 0.01;
 
-        zoomAt(mouseX, mouseY, zoomFactor);
-      } else if (isTouchPad && !e.ctrlKey) {
-        const panSensitivity = 1.2;
+        zoomAt(mouseX, mouseY, 1 + zoomDelta);
+      } else {
+        const panSensitivity = Math.max(0.5, 1.2 / scale);
 
         setCanvasState((prev) => ({
           ...prev,
@@ -164,7 +177,7 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
         expandCanvasForPanning();
       }
     },
-    [canvasRef, expandCanvasForPanning, zoomAt]
+    [canvasRef, expandCanvasForPanning, zoomAt, scale]
   );
 
   const handleTouchStart = useCallback(
@@ -185,6 +198,9 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
 
       if (touchesMap.current.size >= 2) {
         setIsMultitouch(true);
+        setIsPanning(false);
+        lastTouchDistance.current = 0;
+        lastTouchCenter.current = { x: 0, y: 0 };
         updateTouchGesture();
       } else {
         setIsMultitouch(false);
@@ -251,6 +267,7 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
       if (touchesMap.current.size < 2) {
         setIsMultitouch(false);
         lastTouchDistance.current = 0;
+        lastTouchCenter.current = { x: 0, y: 0 };
       }
 
       if (touchesMap.current.size === 1) {
@@ -260,7 +277,6 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
     []
   );
 
-  console.log(panX, panY);
   return {
     handleTouchStart,
     handleTouchMove,

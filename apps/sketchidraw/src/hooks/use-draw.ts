@@ -70,13 +70,21 @@ export const useDraw = ({
   };
   useEffect(() => {
     if (canvasEngine) {
-      canvasEngine.redrawShapes(selectedShapeIndex, panX, panY);
+      canvasEngine.redrawShapes(selectedShapeIndex, scale, panX, panY);
 
       if (currentShape) {
-        canvasEngine.drawShape(currentShape, panX, panY);
+        canvasEngine.drawShape(currentShape, scale, panX, panY);
       }
     }
-  }, [canvaShapes, currentShape, canvasEngine, selectedShapeIndex, panX, panY]);
+  }, [
+    canvaShapes,
+    currentShape,
+    canvasEngine,
+    selectedShapeIndex,
+    scale,
+    panX,
+    panY,
+  ]);
 
   const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvas) return { x: 0, y: 0 };
@@ -149,6 +157,18 @@ export const useDraw = ({
     if (tooltype === ToolType.Eraser) {
       setIsDeleting(true);
       setSelectedShapeIndex(null);
+      let updatedCanvas = canvaShapes;
+      updatedCanvas = updatedCanvas.map((shape) => {
+        let updatedShape = shape;
+        if (canvasEngine?.isPointInshape(cursorPos, shape)) {
+          updatedShape = {
+            ...shape,
+            isDeleted: true,
+          };
+        }
+        return updatedShape;
+      });
+      onSetCanvaShapes(updatedCanvas);
       return;
     }
     if (tooltype === ToolType.Text) {

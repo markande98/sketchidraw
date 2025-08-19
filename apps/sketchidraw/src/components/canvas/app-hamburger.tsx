@@ -7,7 +7,7 @@ export const AppHamburger = React.forwardRef<
   <button
     ref={ref}
     {...props}
-    className="flex h-10 w-10 items-center justify-center z-[100] dark:bg-surface-low px-3 rounded-lg cursor-pointer transition-colors hover:bg-surface-high/70 duration-200"
+    className="flex h-10 w-10 items-center justify-center z-[100] dark:bg-surface-low px-3 rounded-lg cursor-pointer transition-colors hover:bg-surface-high duration-200"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

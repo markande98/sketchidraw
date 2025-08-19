@@ -614,13 +614,14 @@ export const useText = ({
       !canvasEngine
     )
       return;
-    canvasEngine.redrawShapes(null, panX, panY);
+    canvasEngine.redrawShapes(null, scale, panX, panY);
     const text = canvaShapes.find(
       (shape) => shape.type === ToolType.Text && shape.id === activeTextId
     );
     if (text) {
       canvasEngine.renderText(
         text,
+        scale,
         panX,
         panY,
         activeTextId,
@@ -636,6 +637,7 @@ export const useText = ({
     showCursor,
     isEditing,
     tooltype,
+    scale,
     activeTextId,
     canvasEngine,
     canvaShapes,
