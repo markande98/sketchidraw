@@ -12,18 +12,11 @@ import { useText } from "./use-text";
 type DrawProps = {
   canvasEngine: CanvasEngine | null;
   canvasRef: RefObject<HTMLCanvasElement | null>;
-  scale: number;
   panX: number;
   panY: number;
 };
 
-export const useDraw = ({
-  canvasEngine,
-  canvasRef,
-  scale,
-  panX,
-  panY,
-}: DrawProps) => {
+export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
   const {
     canvas,
     canvaBgColor,
@@ -33,6 +26,7 @@ export const useDraw = ({
     canvaFillstyle,
     canvaSloppiness,
     canvaEdge,
+    canvasScale,
     canvaArrowType,
     tooltype,
     canvaShapes,
@@ -46,7 +40,6 @@ export const useDraw = ({
   const { handleMouseDown, handleMouseMove, handleMouseUp } = useText({
     canvasEngine,
     canvasRef,
-    scale,
     panX,
     panY,
   });
@@ -70,10 +63,10 @@ export const useDraw = ({
   };
   useEffect(() => {
     if (canvasEngine) {
-      canvasEngine.redrawShapes(selectedShapeIndex, scale, panX, panY);
+      canvasEngine.redrawShapes(selectedShapeIndex, canvasScale, panX, panY);
 
       if (currentShape) {
-        canvasEngine.drawShape(currentShape, scale, panX, panY);
+        canvasEngine.drawShape(currentShape, canvasScale, panX, panY);
       }
     }
   }, [
@@ -81,7 +74,7 @@ export const useDraw = ({
     currentShape,
     canvasEngine,
     selectedShapeIndex,
-    scale,
+    canvasScale,
     panX,
     panY,
   ]);
@@ -90,8 +83,8 @@ export const useDraw = ({
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
     return {
-      x: e.clientX - rect.left - panX,
-      y: e.clientY - rect.top - panY,
+      x: (e.clientX - rect.left - panX) / canvasScale,
+      y: (e.clientY - rect.top - panY) / canvasScale,
     };
   };
 
@@ -110,8 +103,8 @@ export const useDraw = ({
       };
       cursor.style.transform = `translate(${cursorPos.x}px, ${cursorPos.y}px)`;
       const pos = {
-        x: cursorPos.x - panX,
-        y: cursorPos.y - panY,
+        x: (cursorPos.x - panX) / canvasScale,
+        y: (cursorPos.y - panY) / canvasScale,
       };
       setCursorPos(pos);
     };
@@ -124,7 +117,7 @@ export const useDraw = ({
       }
       document.removeEventListener("mousemove", handleCursorMove);
     };
-  }, [tooltype, canvas, panX, panY]);
+  }, [tooltype, canvas, panX, panY, canvasScale]);
 
   const measureText = (text: string, fontSize: number, fontFamily: string) => {
     if (typeof document !== "undefined") {
@@ -179,7 +172,7 @@ export const useDraw = ({
     const pos = getMousePos(e);
     if (selectedShapeIndex !== null) {
       const shape = canvaShapes[selectedShapeIndex];
-      const handle = canvasEngine?.getResizeHandle(pos, shape);
+      const handle = canvasEngine?.getResizeHandle(pos, shape, canvasScale);
       if (handle) {
         setIsResizing(true);
         setResizehandle(handle);

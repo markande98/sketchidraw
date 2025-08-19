@@ -21,7 +21,6 @@ export const CanvasBoard = () => {
     handleTouchMove,
     handleTouchEnd,
     handleWheel,
-    scale,
     panX,
     panY,
   } = useInfiniteCanvas({ canvasRef });
@@ -29,7 +28,6 @@ export const CanvasBoard = () => {
   const { handlePointDown, handlePointMove, handlePointUp } = useDraw({
     canvasEngine,
     canvasRef,
-    scale,
     panX,
     panY,
   });

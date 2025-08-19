@@ -1,6 +1,7 @@
 "use client";
 
-import { RefObject, useCallback, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { useCanva } from "./use-canva-store";
 
 interface CanvasState {
   scale: number;
@@ -25,6 +26,7 @@ type InfiniteCanvasProps = {
 };
 
 export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
+  const { canvasScale, onSetCanvasScale } = useCanva();
   const [canvasState, setCanvasState] = useState<CanvasState>({
     scale: 1,
     panX: 0,
@@ -49,30 +51,41 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
 
   const { scale, panX, panY } = canvasState;
 
-  console.log(scale, panX, panY);
   const zoomAt = useCallback(
     (mouseX: number, mouseY: number, factor: number) => {
-      const minScale = 0.05; // 5%
-      const maxScale = 2.0; // 200%
-      const newScale = Math.max(minScale, Math.min(maxScale, scale * factor));
+      const minScale = 0.05;
+      const maxScale = 2.0;
 
-      if (newScale !== scale) {
-        const canvasX = (mouseX - panX) / scale;
-        const canvasY = (mouseY - panY) / scale;
+      setCanvasState((prev) => {
+        const newScale = Math.max(
+          minScale,
+          Math.min(maxScale, prev.scale * factor)
+        );
 
-        const newPanX = mouseX - canvasX * newScale;
-        const newPanY = mouseY - canvasY * newScale;
+        if (newScale !== prev.scale) {
+          const canvasX = (mouseX - prev.panX) / prev.scale;
+          const canvasY = (mouseY - prev.panY) / prev.scale;
 
-        setCanvasState((prev) => ({
-          ...prev,
-          scale: newScale,
-          panX: newPanX,
-          panY: newPanY,
-        }));
-      }
+          const newPanX = mouseX - canvasX * newScale;
+          const newPanY = mouseY - canvasY * newScale;
+
+          return {
+            ...prev,
+            scale: newScale,
+            panX: newPanX,
+            panY: newPanY,
+          };
+        }
+
+        return prev;
+      });
     },
-    [panX, panY, scale]
+    []
   );
+
+  useEffect(() => {
+    onSetCanvasScale(scale);
+  }, [onSetCanvasScale, scale]);
 
   const zoomAtCenter = useCallback(
     (centerX: number, centerY: number, factor: number) => {
@@ -91,10 +104,10 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
     if (!canvasRef.current) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
-    const visibleLeft = -panX / scale;
-    const visibleTop = -panY / scale;
-    const visibleRight = (rect.width - panX) / scale;
-    const visibleBottom = (rect.height - panY) / scale;
+    const visibleLeft = -panX / canvasScale;
+    const visibleTop = -panY / canvasScale;
+    const visibleRight = (rect.width - panX) / canvasScale;
+    const visibleBottom = (rect.height - panY) / canvasScale;
 
     const expansionBuffer = 5000;
 
@@ -107,7 +120,7 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
         maxY: Math.max(prev.bounds.maxY, visibleBottom + expansionBuffer),
       },
     }));
-  }, [panX, panY, scale, canvasRef]);
+  }, [panX, panY, canvasScale, canvasRef]);
 
   const updateTouchGesture = useCallback(() => {
     const touchArray = Array.from(touchesMap.current.values());
@@ -163,13 +176,23 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
       const isPinchZoom = e.ctrlKey || e.metaKey;
 
       if (isPinchZoom) {
+        const minScale = 0.05;
+        const maxScale = 2.0;
+
         let zoomDelta = -e.deltaY * 0.001;
         zoomDelta = Math.max(-0.1, Math.min(0.1, zoomDelta));
-        const zoomFactor = 1 + zoomDelta;
+
+        // Calculate the new scale
+        const newScale = Math.max(
+          minScale,
+          Math.min(maxScale, canvasScale * (1 + zoomDelta))
+        );
+
+        const zoomFactor = newScale / canvasScale;
 
         zoomAt(mouseX, mouseY, zoomFactor);
       } else {
-        const panSensitivity = Math.max(0.5, 1.2 / scale);
+        const panSensitivity = Math.max(0.5, 1.2 / canvasScale);
 
         setCanvasState((prev) => ({
           ...prev,
@@ -180,7 +203,7 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
         expandCanvasForPanning();
       }
     },
-    [canvasRef, expandCanvasForPanning, zoomAt, scale]
+    [canvasRef, expandCanvasForPanning, zoomAt, canvasScale]
   );
 
   const handleTouchStart = useCallback(
@@ -285,7 +308,6 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
     handleTouchMove,
     handleTouchEnd,
     handleWheel,
-    scale,
     panX,
     panY,
   };

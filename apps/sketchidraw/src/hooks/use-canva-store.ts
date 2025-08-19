@@ -23,6 +23,7 @@ interface CanvaStore {
   roughCanvas: RoughCanvas | null;
   themeColor: string;
   tooltype: ToolType;
+  canvasScale: number;
   canvaCursorType: CursorType;
   canvaShapes: Shape[];
   canvaBgColor: string | "transparent";
@@ -39,6 +40,7 @@ interface CanvaStore {
   onSetCanva: (canvas: HTMLCanvasElement) => void;
   onSetThemeColor: (color: string) => void;
   onSelectTooltype: (tooltype: ToolType) => void;
+  onSetCanvasScale: (scale: number) => void;
   onSetCanvaCursorType: (cursorType: CursorType) => void;
   onSetRoughCanvas: (roughCanvas: RoughCanvas) => void;
   onSetCanvaShapes: (shapes: Shape[]) => void;
@@ -59,6 +61,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   themeColor: CANVAS_BG_COLOR[0],
   roughCanvas: null,
   tooltype: ToolType.Rectangle,
+  canvasScale: 1,
   canvaCursorType: CursorType.Crosshair,
   canvaShapes: [],
   canvaBgColor: BACKGROUND_COLOR[0],
@@ -75,6 +78,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   onSetCanva: (canvas: HTMLCanvasElement) => set({ canvas }),
   onSetThemeColor: (color: string) => set({ themeColor: color }),
   onSetRoughCanvas: (roughCanvas: RoughCanvas) => set({ roughCanvas }),
+  onSetCanvasScale: (scale: number) => set({ canvasScale: scale }),
   onSelectTooltype: (tooltype: ToolType) => set({ tooltype }),
   onSetCanvaCursorType: (cursorType: CursorType) =>
     set({ canvaCursorType: cursorType }),

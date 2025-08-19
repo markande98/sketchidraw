@@ -233,8 +233,13 @@ export class CanvasEngine {
     };
   }
 
-  public getResizeHandle(point: { x: number; y: number }, shape: Shape) {
+  public getResizeHandle(
+    point: { x: number; y: number },
+    shape: Shape,
+    scale: number
+  ) {
     let handles: { x: number; y: number; type: string }[] = [];
+    const handleSize = HANDLE_SIZE / scale;
     switch (shape.type) {
       case ToolType.Rectangle:
       case ToolType.Ellipse:
@@ -243,13 +248,13 @@ export class CanvasEngine {
       case ToolType.Text:
         handles = [
           {
-            x: shape.startX - HANDLE_SIZE,
-            y: shape.startY - HANDLE_SIZE,
+            x: shape.startX - handleSize,
+            y: shape.startY - handleSize,
             type: "nw",
           },
           {
             x: shape.endX,
-            y: shape.startY - HANDLE_SIZE,
+            y: shape.startY - handleSize,
             type: "ne",
           },
           {
@@ -258,7 +263,7 @@ export class CanvasEngine {
             type: "se",
           },
           {
-            x: shape.startX - HANDLE_SIZE,
+            x: shape.startX - handleSize,
             y: shape.endY,
             type: "sw",
           },
@@ -289,21 +294,22 @@ export class CanvasEngine {
     }
     if (shape.type === ToolType.Line || shape.type === ToolType.Arrow) {
       for (const handle of handles) {
-        const isInside =
-          Math.pow(point.x - handle.x, 2) / Math.pow(HANDLE_SIZE / 2, 2) +
-            Math.pow(point.y - handle.y, 2) / Math.pow(HANDLE_SIZE / 2, 2) <=
-          1;
-        if (isInside) return handle.type;
+        const distance = Math.sqrt(
+          Math.pow(point.x - handle.x, 2) + Math.pow(point.y - handle.y, 2)
+        );
+        if (distance <= handleSize / 2) {
+          return handle.type;
+        }
       }
       handles = [
         {
-          x: shape.startX - HANDLE_SIZE,
-          y: shape.startY - HANDLE_SIZE,
+          x: shape.startX - handleSize,
+          y: shape.startY - handleSize,
           type: "nw",
         },
         {
           x: shape.endX,
-          y: shape.startY - HANDLE_SIZE,
+          y: shape.startY - handleSize,
           type: "ne",
         },
         {
@@ -312,7 +318,7 @@ export class CanvasEngine {
           type: "se",
         },
         {
-          x: shape.startX - HANDLE_SIZE,
+          x: shape.startX - handleSize,
           y: shape.endY,
           type: "sw",
         },
@@ -321,9 +327,9 @@ export class CanvasEngine {
     for (const handle of handles) {
       if (
         point.x >= handle.x &&
-        point.x <= handle.x + HANDLE_SIZE &&
+        point.x <= handle.x + handleSize &&
         point.y >= handle.y &&
-        point.y <= handle.y + HANDLE_SIZE
+        point.y <= handle.y + handleSize
       ) {
         return handle.type;
       }
@@ -852,6 +858,11 @@ export class CanvasEngine {
       ...txt,
       x: txt.x * scale + panX,
       y: txt.y * scale + panY,
+      startX: txt.startX * scale + panX,
+      endX: txt.endX * scale + panX,
+      startY: txt.startY * scale + panY,
+      endY: txt.endY * scale + panY,
+      fontSize: txt.fontSize * scale,
     };
     ctx.font = `${txt.fontSize}px ${txt.fontFamily}`;
     ctx.fillStyle = hexToRgba(txt.color);
@@ -970,6 +981,7 @@ export class CanvasEngine {
         transformedShape.endX = shape.endX * scale + panX;
         transformedShape.startY = shape.startY * scale + panY;
         transformedShape.endY = shape.endY * scale + panY;
+        transformedShape.fontSize = shape.fontSize * scale;
         break;
       default:
         break;

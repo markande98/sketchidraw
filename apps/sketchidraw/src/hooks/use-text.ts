@@ -11,21 +11,15 @@ import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 type TextProps = {
   canvasEngine: CanvasEngine | null;
   canvasRef: RefObject<HTMLCanvasElement | null>;
-  scale: number;
   panX: number;
   panY: number;
 };
 
-export const useText = ({
-  canvasRef,
-  canvasEngine,
-  scale,
-  panX,
-  panY,
-}: TextProps) => {
+export const useText = ({ canvasRef, canvasEngine, panX, panY }: TextProps) => {
   const {
     canvas,
     tooltype,
+    canvasScale,
     canvaFontSize,
     canvaStrokeColor,
     canvaFontFamily,
@@ -69,11 +63,11 @@ export const useText = ({
       if (!canvas) return { x: 0, y: 0 };
       const rect = canvas.getBoundingClientRect();
       return {
-        x: e.clientX - rect.left - panX,
-        y: e.clientY - rect.top - panY,
+        x: (e.clientX - rect.left - panX) / canvasScale,
+        y: (e.clientY - rect.top - panY) / canvasScale,
       };
     },
-    [canvas, panX, panY]
+    [canvas, panX, panY, canvasScale]
   );
 
   const getTextMetrics = useCallback(
@@ -614,14 +608,14 @@ export const useText = ({
       !canvasEngine
     )
       return;
-    canvasEngine.redrawShapes(null, scale, panX, panY);
+    canvasEngine.redrawShapes(null, canvasScale, panX, panY);
     const text = canvaShapes.find(
       (shape) => shape.type === ToolType.Text && shape.id === activeTextId
     );
     if (text) {
       canvasEngine.renderText(
         text,
-        scale,
+        canvasScale,
         panX,
         panY,
         activeTextId,
@@ -637,7 +631,7 @@ export const useText = ({
     showCursor,
     isEditing,
     tooltype,
-    scale,
+    canvasScale,
     activeTextId,
     canvasEngine,
     canvaShapes,
@@ -679,7 +673,6 @@ export const useText = ({
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (isEditing && tooltype === ToolType.Text && activeTextId) {
         handleKeyDown(e);
-        // Reset cursor visibility on keypress
         setShowCursor(true);
       }
     };
