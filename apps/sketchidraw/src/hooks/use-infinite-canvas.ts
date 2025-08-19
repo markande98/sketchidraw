@@ -52,9 +52,10 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
   console.log(scale, panX, panY);
   const zoomAt = useCallback(
     (mouseX: number, mouseY: number, factor: number) => {
-      // const minScale = 0.05;
-      // const maxScale = 20;
-      const newScale = scale * factor;
+      const minScale = 0.05; // 5%
+      const maxScale = 2.0; // 200%
+      const newScale = Math.max(minScale, Math.min(maxScale, scale * factor));
+
       if (newScale !== scale) {
         const canvasX = (mouseX - panX) / scale;
         const canvasY = (mouseY - panY) / scale;
@@ -159,12 +160,14 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
-      const isTrackpad = Math.abs(e.deltaX) > 0 || Math.abs(e.deltaY % 1) !== 0;
+      const isPinchZoom = e.ctrlKey || e.metaKey;
 
-      if (isTrackpad) {
-        const zoomDelta = -e.deltaY * 0.01;
+      if (isPinchZoom) {
+        let zoomDelta = -e.deltaY * 0.001;
+        zoomDelta = Math.max(-0.1, Math.min(0.1, zoomDelta));
+        const zoomFactor = 1 + zoomDelta;
 
-        zoomAt(mouseX, mouseY, 1 + zoomDelta);
+        zoomAt(mouseX, mouseY, zoomFactor);
       } else {
         const panSensitivity = Math.max(0.5, 1.2 / scale);
 
