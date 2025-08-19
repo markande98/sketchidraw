@@ -27,7 +27,7 @@ export const CanvasProperty = () => {
 
   if (isSelectAndGrab || isEraserTool) return null;
   return (
-    <ScrollArea className="z-[100] absolute top-22 bg-surface-high/50 rounded-md left-6 w-[200px] max-h-[calc(100vh-250px)] overflow-y-auto">
+    <ScrollArea className="z-[100] absolute top-22 bg-surface-low rounded-md left-6 w-[200px] max-h-[calc(100vh-250px)] overflow-y-auto">
       <div className="p-3 space-y-6 text-neutral-800">
         <StrokeOptions />
         {!isTextTool && <BackgroundOptions />}

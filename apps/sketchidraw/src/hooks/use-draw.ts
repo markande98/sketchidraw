@@ -51,8 +51,8 @@ export const useDraw = ({
     panY,
   });
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
-  const [dragStart, setDragStart] = useState({ x: panX, y: panY });
-  const [cursorPos, setCursorPos] = useState({ x: panX, y: panY });
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -96,11 +96,15 @@ export const useDraw = ({
     const handleCursorMove = (e: any) => {
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
-      const pos = {
-        x: e.clientX - rect.left - panX,
-        y: e.clientY - rect.top - panY,
+      const cursorPos = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
       };
-      cursor.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+      cursor.style.transform = `translate(${cursorPos.x}px, ${cursorPos.y}px)`;
+      const pos = {
+        x: cursorPos.x - panX,
+        y: cursorPos.y - panY,
+      };
       setCursorPos(pos);
     };
 
@@ -148,6 +152,7 @@ export const useDraw = ({
       return;
     }
     if (tooltype === ToolType.Text) {
+      setSelectedShapeIndex(null);
       handleMouseDown(e);
       return;
     }

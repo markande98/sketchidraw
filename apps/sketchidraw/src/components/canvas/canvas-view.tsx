@@ -7,7 +7,7 @@ export const CanvasView = () => {
   return (
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
       <CanvasProperty />
-      <div className="absolute z-[100] top-0 left-0 right-0 px-6 py-4 flex justify-between">
+      <div className="absolute z-[100] top-0 left-0 right-0 px-6 py-4 flex justify-between cursor-none">
         <CanvasMenu />
         <ToolsMenu />
         <button

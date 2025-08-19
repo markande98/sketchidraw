@@ -19,7 +19,7 @@ export const ToolsMenu = () => {
   return (
     <div
       className={cn(
-        "z-[100] flex items-center bg-surface-high/50 p-1 gap-2 rounded-md transition duration-200"
+        "z-[100] flex items-center bg-surface-low p-1 gap-2 rounded-md transition duration-200"
       )}
     >
       {tools.map((tool, index) => (

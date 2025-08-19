@@ -651,8 +651,6 @@ export const useText = ({
     if (!isEditing || tooltype !== ToolType.Text || activeTextId === null) {
       return;
     }
-    // Start with cursor visible
-    setShowCursor(true);
 
     const interval = setInterval(() => {
       setShowCursor((prev) => !prev);
