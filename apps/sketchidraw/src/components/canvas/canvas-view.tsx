@@ -2,6 +2,7 @@ import { ToolsMenu } from "./tools-menu";
 import { CanvasBoard } from "./canvas-board";
 import { CanvasProperty } from "../canvas-property";
 import { CanvasMenu } from "./canvas-Menu";
+import { CanvaZoom } from "../canva-zoom";
 
 export const CanvasView = () => {
   return (
@@ -17,6 +18,7 @@ export const CanvasView = () => {
           Share
         </button>
       </div>
+      <CanvaZoom />
       <CanvasBoard />
     </div>
   );

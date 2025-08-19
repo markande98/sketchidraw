@@ -80,7 +80,7 @@ export const Tool = ({
           </span>
         </div>
       </TooltipTrigger>
-      <TooltipContent>
+      <TooltipContent sideOffset={10}>
         <span>{label}</span>
       </TooltipContent>
     </Tooltip>

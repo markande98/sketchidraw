@@ -206,6 +206,41 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
     [canvasRef, expandCanvasForPanning, zoomAt, canvasScale]
   );
 
+  // const zoomIn = useCallback(
+  //   (factor: number = 1.2) => {
+  //     if (!canvasRef.current) return;
+
+  //     const rect = canvasRef.current.getBoundingClientRect();
+  //     const centerX = rect.width / 2;
+  //     const centerY = rect.height / 2;
+
+  //     zoomAt(centerX, centerY, factor);
+  //   },
+  //   [canvasRef, zoomAt]
+  // );
+
+  // const zoomOut = useCallback(
+  //   (factor: number = 0.8) => {
+  //     if (!canvasRef.current) return;
+
+  //     const rect = canvasRef.current.getBoundingClientRect();
+  //     const centerX = rect.width / 2;
+  //     const centerY = rect.height / 2;
+
+  //     zoomAt(centerX, centerY, factor);
+  //   },
+  //   [canvasRef, zoomAt]
+  // );
+
+  // const resetZoom = useCallback(() => {
+  //   setCanvasState((prev) => ({
+  //     ...prev,
+  //     scale: 1,
+  //     panX: 0,
+  //     panY: 0,
+  //   }));
+  // }, []);
+
   const handleTouchStart = useCallback(
     (
       touches: Array<{ identifier: number; clientX: number; clientY: number }>,
