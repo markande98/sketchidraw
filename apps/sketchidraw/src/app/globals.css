@@ -132,6 +132,12 @@ body,
   --surface-high: oklch(0.3033 0.0215 288.87);
 }
 
+@theme {
+  --font-sketchifont: "Sketchifont", "Virgil", "Comic Sans MS", cursive;
+  --font-nunito: "Nunito", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-comicShanns: "Comic Shanns", "Comic Sans MS", "Marker Felt", cursive;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -148,6 +154,30 @@ body,
   100% {
     transform: translateY(5px);
   }
+}
+
+@font-face {
+  font-family: "Sketchifont";
+  src: url("/fonts/Sketchidraw_Regular.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-swap: swap;
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("/fonts/Nunito.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-swap: swap;
+}
+
+@font-face {
+  font-family: "Comic Shanns";
+  src: url("/fonts/ComicSans.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-swap: swap;
 }
 
 .animate-float {

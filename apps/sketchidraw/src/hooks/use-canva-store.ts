@@ -60,7 +60,7 @@ export const useCanva = create<CanvaStore>((set) => ({
   canvas: null,
   themeColor: CANVAS_BG_COLOR[0],
   roughCanvas: null,
-  tooltype: ToolType.Rectangle,
+  tooltype: ToolType.Select,
   canvasScale: 1,
   canvaCursorType: CursorType.Crosshair,
   canvaShapes: [],

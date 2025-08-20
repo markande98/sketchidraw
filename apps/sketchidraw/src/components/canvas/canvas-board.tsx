@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import rough from "roughjs";
@@ -139,38 +138,6 @@ export const CanvasBoard = ({
       canvas.removeEventListener("wheel", handleWheel);
     };
   }, [onSetCanva, onSetRoughCanvas, handleWheel]);
-
-  // font loading
-  useEffect(() => {
-    const loadCustomFonts = async () => {
-      if ("fonts" in document) {
-        try {
-          const sketchifont = new FontFace(
-            "Sketchifont",
-            "url(/fonts/Sketchidraw_Regular.woff2)"
-          );
-          const nunito = new FontFace("Nunito", "url(/fonts/Nunito.woff2)");
-          const comicShanns = new FontFace(
-            "Comic Shanns",
-            "url(/fonts/ComicSans.woff2)"
-          );
-
-          await Promise.all([
-            sketchifont.load(),
-            nunito.load(),
-            comicShanns.load(),
-          ]);
-
-          (document.fonts as any).add(sketchifont);
-          (document.fonts as any).add(nunito);
-          (document.fonts as any).add(comicShanns);
-        } catch (error) {
-          console.log("Custom fonts not available, using fallbacks", error);
-        }
-      }
-    };
-    loadCustomFonts();
-  }, []);
 
   return (
     <canvas

@@ -7,6 +7,7 @@ import { CanvasMenu } from "./canvas-Menu";
 import { CanvaZoom } from "../canva-zoom";
 import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
 import { useRef } from "react";
+import { WelcomeScreen } from "../welcome-screen";
 
 export const CanvasView = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,6 +24,7 @@ export const CanvasView = () => {
   } = useInfiniteCanvas({ canvasRef });
   return (
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
+      <WelcomeScreen />
       <CanvasProperty />
       <div className="absolute z-[100] top-0 left-0 right-0 px-6 py-4 flex justify-between cursor-none">
         <CanvasMenu />
