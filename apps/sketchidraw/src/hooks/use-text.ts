@@ -1,5 +1,6 @@
 "use client";
 
+import { v4 as uuidv4 } from "uuid";
 import { KeyTypes } from "@/constants";
 import { Text } from "@/types/shape";
 import { ToolType } from "@/types/tools";
@@ -41,7 +42,7 @@ export const useText = ({ canvasRef, canvasEngine, panX, panY }: TextProps) => {
   const createTextObject = useCallback(
     (x: number, y: number, text: string = ""): Text => ({
       type: ToolType.Text,
-      id: (Date.now() + Math.random()).toString(),
+      id: uuidv4(),
       isDeleted: false,
       x,
       y,

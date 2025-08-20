@@ -4,7 +4,7 @@ import { useCanva } from "@/hooks/use-canva-store";
 import { hexToRgba } from "@/lib/utils";
 import { LogIn, Users } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const welcomeText = [
   {
@@ -27,6 +27,7 @@ const welcomeText = [
 
 export const WelcomeScreen = () => {
   const { canvas } = useCanva();
+  const [mounted, setMounted] = useState(false);
 
   const drawBezierArrow = (
     ctx: CanvasRenderingContext2D,
@@ -57,6 +58,10 @@ export const WelcomeScreen = () => {
     ctx.lineTo(endX - 10, endY);
     ctx.fill();
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!canvas) return;
@@ -98,8 +103,15 @@ export const WelcomeScreen = () => {
         });
       });
     });
+
+    return () => {
+      if (canvas) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    };
   }, [canvas]);
 
+  if (!mounted) return null;
   return (
     <div className="absolute z-[100] inset-0 flex items-center justify-center">
       <div className="flex flex-col items-center justify-center space-y-4 mt-20">

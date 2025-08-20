@@ -18,6 +18,7 @@ export type ShapeOptions = {
 
 type Rectangle = ShapeOptions & {
   type: ToolType.Rectangle;
+  id: string;
   startX: number;
   startY: number;
   endX: number;
@@ -27,6 +28,7 @@ type Rectangle = ShapeOptions & {
 
 type Ellipse = ShapeOptions & {
   type: ToolType.Ellipse;
+  id: string;
   startX: number;
   startY: number;
   endX: number;
@@ -35,6 +37,7 @@ type Ellipse = ShapeOptions & {
 
 type Diamond = ShapeOptions & {
   type: ToolType.Diamond;
+  id: string;
   startX: number;
   startY: number;
   endX: number;
@@ -43,6 +46,7 @@ type Diamond = ShapeOptions & {
 
 type Line = ShapeOptions & {
   type: ToolType.Line;
+  id: string;
   startX: number;
   startY: number;
   endX: number;
@@ -57,6 +61,7 @@ type Line = ShapeOptions & {
 
 type Arrow = ShapeOptions & {
   type: ToolType.Arrow;
+  id: string;
   startX: number;
   startY: number;
   endX: number;
@@ -72,6 +77,7 @@ type Arrow = ShapeOptions & {
 
 type Pencil = ShapeOptions & {
   type: ToolType.Pencil;
+  id: string;
   startX: number;
   startY: number;
   endX: number;

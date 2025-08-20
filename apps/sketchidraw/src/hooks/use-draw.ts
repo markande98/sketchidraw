@@ -1,5 +1,7 @@
 "use client";
 
+import { v4 as uuidv4 } from "uuid";
+
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { Shape } from "@/types/shape";
 import { RefObject, useEffect, useState } from "react";
@@ -235,6 +237,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
       case ToolType.Rectangle:
         setCurrentShape({
           type: ToolType.Rectangle,
+          id: uuidv4(),
           startX: pos.x,
           startY: pos.y,
           endX: pos.x,
@@ -246,6 +249,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
       case ToolType.Ellipse:
         setCurrentShape({
           type: ToolType.Ellipse,
+          id: uuidv4(),
           startX: pos.x,
           startY: pos.y,
           endX: pos.x,
@@ -256,6 +260,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
       case ToolType.Diamond:
         setCurrentShape({
           type: ToolType.Diamond,
+          id: uuidv4(),
           startX: pos.x,
           startY: pos.y,
           endX: pos.x,
@@ -266,6 +271,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
       case ToolType.Line:
         setCurrentShape({
           type: ToolType.Line,
+          id: uuidv4(),
           startX: pos.x,
           startY: pos.y,
           endX: pos.x,
@@ -282,6 +288,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
       case ToolType.Arrow:
         setCurrentShape({
           type: ToolType.Arrow,
+          id: uuidv4(),
           startX: pos.x,
           startY: pos.y,
           endX: pos.x,
@@ -299,6 +306,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
       case ToolType.Pencil:
         setCurrentShape({
           type: ToolType.Pencil,
+          id: uuidv4(),
           startX: pos.x,
           startY: pos.y,
           endX: pos.x,
@@ -565,7 +573,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
       }
       const newShapes = [...canvaShapes];
       newShapes[selectedShapeIndex] = shape;
-      onSetCanvaShapes([...newShapes]);
+      onSetCanvaShapes(newShapes);
       setDragStart(pos);
     } else if (isDragging && selectedShapeIndex != null) {
       const newShapes = [...canvaShapes];
@@ -633,12 +641,13 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
           break;
       }
       onSetCanvaCursorType(CursorType.Crossmove);
-      onSetCanvaShapes([...newShapes]);
+      onSetCanvaShapes(newShapes);
       setDragStart(pos);
     } else if (isDrawing && currentShape) {
       switch (tooltype) {
         case ToolType.Rectangle:
           setCurrentShape({
+            ...currentShape,
             type: ToolType.Rectangle,
             startX: Math.min(pos.x, dragStart.x),
             startY: Math.min(pos.y, dragStart.y),
@@ -650,6 +659,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
           break;
         case ToolType.Ellipse:
           setCurrentShape({
+            ...currentShape,
             type: ToolType.Ellipse,
             startX: Math.min(pos.x, dragStart.x),
             startY: Math.min(pos.y, dragStart.y),
@@ -660,6 +670,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
           break;
         case ToolType.Diamond:
           setCurrentShape({
+            ...currentShape,
             type: ToolType.Diamond,
             startX: Math.min(pos.x, dragStart.x),
             startY: Math.min(pos.y, dragStart.y),
@@ -670,6 +681,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
           break;
         case ToolType.Line:
           setCurrentShape({
+            ...currentShape,
             type: ToolType.Line,
             sX: dragStart.x,
             sY: dragStart.y,
@@ -686,6 +698,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
           break;
         case ToolType.Arrow:
           setCurrentShape({
+            ...currentShape,
             type: ToolType.Arrow,
             sX: dragStart.x,
             sY: dragStart.y,
@@ -792,7 +805,7 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
         default:
           break;
       }
-      onSetCanvaShapes([...canvaShapes]);
+      onSetCanvaShapes(canvaShapes);
     }
     onSetCanvaCursorType(CursorType.Crosshair);
     setIsDrawing(false);

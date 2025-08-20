@@ -1,4 +1,5 @@
 import { FontFamily } from "@/constants";
+import { Shape } from "@/types/shape";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -48,4 +49,12 @@ export const getFontCSS = (fontFamily: FontFamily) => {
   };
 
   return cssFontMap[fontFamily];
+};
+
+export const saveToLocalStorage = (shapes: Shape[]) => {
+  const hasSketchiShapes = localStorage.getItem("sketchidraw");
+  if (hasSketchiShapes) {
+    localStorage.removeItem("sketchidraw");
+  }
+  localStorage.setItem("sketchidraw", JSON.stringify(shapes));
 };
