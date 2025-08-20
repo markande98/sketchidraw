@@ -3,27 +3,36 @@
 
 import rough from "roughjs";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { useDraw } from "@/hooks/use-draw";
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { useCanva } from "@/hooks/use-canva-store";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
+import { TouchEvent } from "@/hooks/use-infinite-canvas";
 
-export const CanvasBoard = () => {
+type CanvasBoardProps = {
+  panX: number;
+  panY: number;
+  canvasRef: RefObject<HTMLCanvasElement | null>;
+  handleTouchStart: (event: TouchEvent) => void;
+  handleTouchMove: (event: TouchEvent) => void;
+  handleTouchEnd: (event: TouchEvent) => void;
+  handleWheel: (e: WheelEvent) => void;
+};
+
+export const CanvasBoard = ({
+  panX,
+  panY,
+  canvasRef,
+  handleTouchEnd,
+  handleTouchMove,
+  handleTouchStart,
+  handleWheel,
+}: CanvasBoardProps) => {
   const { onSetCanva, onSetRoughCanvas, themeColor, canvaCursorType } =
     useCanva();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const roughCanvas = useRef<RoughCanvas>(null);
   const [canvasEngine, setCanvasEngine] = useState<CanvasEngine | null>(null);
-  const {
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
-    handleWheel,
-    panX,
-    panY,
-  } = useInfiniteCanvas({ canvasRef });
 
   const { handlePointDown, handlePointMove, handlePointUp } = useDraw({
     canvasEngine,
@@ -35,16 +44,17 @@ export const CanvasBoard = () => {
   const handleUnifiedPointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (e.pointerType === "touch") {
-        handleTouchStart(
-          [
+        const event: TouchEvent = {
+          touches: [
             {
               identifier: e.pointerId,
               clientX: e.clientX,
               clientY: e.clientY,
             },
           ],
-          () => e.preventDefault()
-        );
+          preventDefault: () => e.preventDefault(),
+        };
+        handleTouchStart(event);
 
         if (e.isPrimary) {
           handlePointDown(e);
@@ -59,16 +69,17 @@ export const CanvasBoard = () => {
   const handleUnifiedPointerMove = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (e.pointerType === "touch") {
-        handleTouchMove(
-          [
+        const event: TouchEvent = {
+          touches: [
             {
               identifier: e.pointerId,
               clientX: e.clientX,
               clientY: e.clientY,
             },
           ],
-          () => e.preventDefault()
-        );
+          preventDefault: () => e.preventDefault(),
+        };
+        handleTouchMove(event);
 
         if (e.isPrimary) {
           handlePointMove(e);
@@ -83,16 +94,17 @@ export const CanvasBoard = () => {
   const handleUnifiedPointerUp = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (e.pointerType === "touch") {
-        handleTouchEnd(
-          [
+        const event: TouchEvent = {
+          touches: [
             {
               identifier: e.pointerId,
               clientX: e.clientX,
               clientY: e.clientY,
             },
           ],
-          () => e.preventDefault()
-        );
+          preventDefault: () => e.preventDefault(),
+        };
+        handleTouchEnd(event);
 
         if (e.isPrimary) {
           handlePointUp(e);
@@ -106,25 +118,27 @@ export const CanvasBoard = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas) {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      roughCanvas.current = rough.canvas(canvas);
-      const canvasEngine = new CanvasEngine(canvas, roughCanvas.current);
-      onSetCanva(canvas);
-      onSetRoughCanvas(rough.canvas(canvas));
-      setCanvasEngine(canvasEngine);
+    if (!canvas) return;
 
-      canvas.addEventListener("wheel", handleWheel, { passive: false });
-    }
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const roughCanvasInstance = rough.canvas(canvas);
+    roughCanvas.current = roughCanvasInstance;
+
+    const canvasEngine = new CanvasEngine(canvas, roughCanvasInstance);
+
+    onSetCanva(canvas);
+    onSetRoughCanvas(roughCanvasInstance);
+    setCanvasEngine(canvasEngine);
+
+    canvas.addEventListener("wheel", handleWheel, { passive: false });
 
     return () => {
-      if (canvasEngine) {
-        canvasEngine.destroy();
-        canvas?.removeEventListener("wheel", handleWheel);
-      }
+      canvasEngine.destroy();
+      canvas.removeEventListener("wheel", handleWheel);
     };
-  }, [onSetCanva, onSetRoughCanvas]);
+  }, [onSetCanva, onSetRoughCanvas, handleWheel]);
 
   // font loading
   useEffect(() => {

@@ -1,10 +1,26 @@
+"use client";
+
 import { ToolsMenu } from "./tools-menu";
 import { CanvasBoard } from "./canvas-board";
 import { CanvasProperty } from "../canvas-property";
 import { CanvasMenu } from "./canvas-Menu";
 import { CanvaZoom } from "../canva-zoom";
+import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
+import { useRef } from "react";
 
 export const CanvasView = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const {
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+    handleWheel,
+    zoomIn,
+    zoomOut,
+    resetZoom,
+    panX,
+    panY,
+  } = useInfiniteCanvas({ canvasRef });
   return (
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
       <CanvasProperty />
@@ -18,8 +34,16 @@ export const CanvasView = () => {
           Share
         </button>
       </div>
-      <CanvaZoom />
-      <CanvasBoard />
+      <CanvaZoom zoomIn={zoomIn} zoomOut={zoomOut} resetZoom={resetZoom} />
+      <CanvasBoard
+        panX={panX}
+        panY={panY}
+        canvasRef={canvasRef}
+        handleTouchStart={handleTouchStart}
+        handleTouchMove={handleTouchMove}
+        handleTouchEnd={handleTouchEnd}
+        handleWheel={handleWheel}
+      />
     </div>
   );
 };

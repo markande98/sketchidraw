@@ -6,30 +6,21 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const MIN_ZOOM_VALUE = 0.05;
 const MAX_ZOOM_VALUE = 2.0;
-const RESET_ZOOM_VALUE = 1;
 
-export const CanvaZoom = () => {
-  const { canvasScale, onSetCanvasScale } = useCanva();
+type CanvasZoomProps = {
+  zoomIn: (factor: number) => void;
+  zoomOut: (factor: number) => void;
+  resetZoom: () => void;
+};
 
-  const handleIncrease = () => {
-    const value = Math.min(MAX_ZOOM_VALUE, canvasScale + 0.05);
-    onSetCanvasScale(value);
-  };
-
-  const resetZoom = () => {
-    onSetCanvasScale(RESET_ZOOM_VALUE);
-  };
-
-  const handleDecrease = () => {
-    const value = Math.max(MIN_ZOOM_VALUE, canvasScale - 0.05);
-    onSetCanvasScale(value);
-  };
+export const CanvaZoom = ({ zoomIn, zoomOut, resetZoom }: CanvasZoomProps) => {
+  const { canvasScale } = useCanva();
 
   const displayPercetage = (canvasScale * 100).toFixed(0);
   return (
-    <div className="absolute z-[100] left-10 bottom-10 flex items-center gap-2 bg-surface-low rounded-md cursor-pointer">
+    <div className="absolute z-[100] left-6 bottom-6 flex items-center gap-2 bg-surface-low rounded-md cursor-pointer">
       <button
-        onClick={handleDecrease}
+        onClick={() => zoomOut(0.9)}
         disabled={canvasScale === MIN_ZOOM_VALUE}
         className="h-[40px] px-2 hover:bg-surface-high cursor-pointer flex items-center justify-center overflow-hidden rounded-l-md"
       >
@@ -60,7 +51,7 @@ export const CanvaZoom = () => {
       </Tooltip>
 
       <button
-        onClick={handleIncrease}
+        onClick={() => zoomIn(1.1)}
         disabled={canvasScale === MAX_ZOOM_VALUE}
         className="h-[40px] px-2 hover:bg-surface-high cursor-pointer flex items-center justify-center overflow-hidden rounded-r-md"
       >
