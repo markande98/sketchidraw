@@ -21,6 +21,8 @@ export const CanvasView = () => {
     handleTouchMove,
     handleTouchEnd,
     handleWheel,
+    expandCanvasForPanning,
+    setCanvasState,
     zoomIn,
     zoomOut,
     resetZoom,
@@ -65,6 +67,8 @@ export const CanvasView = () => {
         handleTouchMove={handleTouchMove}
         handleTouchEnd={handleTouchEnd}
         handleWheel={handleWheel}
+        setCanvasState={setCanvasState}
+        expandCanvasForPanning={expandCanvasForPanning}
       />
     </div>
   );

@@ -3,7 +3,7 @@
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { useCanva } from "./use-canva-store";
 
-interface CanvasState {
+export interface CanvasState {
   scale: number;
   panX: number;
   panY: number;
@@ -268,7 +268,6 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
       } else {
         setIsMultitouch(false);
         setIsPanning(true);
-
         const touch = touches[0];
         lastPointerPos.current = { x: touch.clientX, y: touch.clientY };
         startPanPos.current = { x: panX, y: panY };
@@ -336,6 +335,8 @@ export const useInfiniteCanvas = ({ canvasRef }: InfiniteCanvasProps) => {
     handleTouchMove,
     handleTouchEnd,
     handleWheel,
+    setCanvasState,
+    expandCanvasForPanning,
     zoomIn,
     zoomOut,
     resetZoom,

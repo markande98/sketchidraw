@@ -4,21 +4,31 @@ import { v4 as uuidv4 } from "uuid";
 
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { Shape } from "@/types/shape";
-import { RefObject, useEffect, useState } from "react";
+import { RefObject, SetStateAction, useEffect, useState } from "react";
 import { useCanva } from "./use-canva-store";
 import { ToolType } from "@/types/tools";
 import { ShapeOptions } from "@/types/shape";
 import { CursorType } from "@/constants";
 import { useText } from "./use-text";
+import { CanvasState } from "./use-infinite-canvas";
 
 type DrawProps = {
   canvasEngine: CanvasEngine | null;
   canvasRef: RefObject<HTMLCanvasElement | null>;
   panX: number;
   panY: number;
+  setCanvasState: React.Dispatch<SetStateAction<CanvasState>>;
+  expandCanvasForPanning: () => void;
 };
 
-export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
+export const useDraw = ({
+  canvasEngine,
+  canvasRef,
+  panX,
+  panY,
+  setCanvasState,
+  expandCanvasForPanning,
+}: DrawProps) => {
   const {
     canvas,
     canvaBgColor,
@@ -149,6 +159,13 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
   };
 
   const handlePointDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (tooltype === ToolType.Grab) {
+      const pos = getMousePos(e);
+      onSetCanvaCursorType(CursorType.Grabbing);
+      setDragStart(pos);
+      setIsDragging(true);
+      return;
+    }
     if (tooltype === ToolType.Eraser) {
       setIsDeleting(true);
       setSelectedShapeIndex(null);
@@ -575,7 +592,20 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
       newShapes[selectedShapeIndex] = shape;
       onSetCanvaShapes(newShapes);
       setDragStart(pos);
-    } else if (isDragging && selectedShapeIndex != null) {
+    } else if (isDragging && tooltype === ToolType.Grab) {
+      const deltaX = pos.x - dragStart.x;
+      const deltaY = pos.y - dragStart.y;
+      setCanvasState((prev) => ({
+        ...prev,
+        panX: prev.panX + deltaX,
+        panY: prev.panY + deltaY,
+      }));
+      expandCanvasForPanning();
+    } else if (
+      isDragging &&
+      selectedShapeIndex != null &&
+      tooltype === ToolType.Select
+    ) {
       const newShapes = [...canvaShapes];
       const dx = pos.x - dragStart.x;
       const dy = pos.y - dragStart.y;
@@ -758,6 +788,11 @@ export const useDraw = ({ canvasEngine, canvasRef, panX, panY }: DrawProps) => {
   };
 
   const handlePointUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (tooltype === ToolType.Grab) {
+      onSetCanvaCursorType(CursorType.Grab);
+      setIsDragging(false);
+      return;
+    }
     if (tooltype === ToolType.Eraser) {
       const updatedShapes = canvaShapes.filter((shape) => !shape.isDeleted);
       onSetCanvaShapes(updatedShapes);

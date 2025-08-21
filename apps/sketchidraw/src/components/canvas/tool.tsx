@@ -54,6 +54,8 @@ export const Tool = ({
     onSelectTooltype(toolType);
     if (toolType === ToolType.Eraser) {
       onSetCanvaCursorType(CursorType.None);
+    } else if (toolType === ToolType.Grab) {
+      onSetCanvaCursorType(CursorType.Grab);
     } else {
       onSetCanvaCursorType(CursorType.Crosshair);
     }

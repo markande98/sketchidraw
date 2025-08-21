@@ -2,12 +2,19 @@
 
 import rough from "roughjs";
 
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import {
+  RefObject,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useDraw } from "@/hooks/use-draw";
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { useCanva } from "@/hooks/use-canva-store";
 import { RoughCanvas } from "roughjs/bin/canvas";
-import { TouchEvent } from "@/hooks/use-infinite-canvas";
+import { CanvasState, TouchEvent } from "@/hooks/use-infinite-canvas";
 
 type CanvasBoardProps = {
   panX: number;
@@ -17,6 +24,8 @@ type CanvasBoardProps = {
   handleTouchMove: (event: TouchEvent) => void;
   handleTouchEnd: (event: TouchEvent) => void;
   handleWheel: (e: WheelEvent) => void;
+  setCanvasState: React.Dispatch<SetStateAction<CanvasState>>;
+  expandCanvasForPanning: () => void;
 };
 
 export const CanvasBoard = ({
@@ -27,6 +36,8 @@ export const CanvasBoard = ({
   handleTouchMove,
   handleTouchStart,
   handleWheel,
+  setCanvasState,
+  expandCanvasForPanning,
 }: CanvasBoardProps) => {
   const { onSetCanva, onSetRoughCanvas, themeColor, canvaCursorType } =
     useCanva();
@@ -38,6 +49,8 @@ export const CanvasBoard = ({
     canvasRef,
     panX,
     panY,
+    setCanvasState,
+    expandCanvasForPanning,
   });
 
   const handleUnifiedPointerDown = useCallback(
@@ -119,8 +132,12 @@ export const CanvasBoard = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      console.log(canvas.width, canvas.height);
+    };
 
     const roughCanvasInstance = rough.canvas(canvas);
     roughCanvas.current = roughCanvasInstance;
@@ -132,10 +149,13 @@ export const CanvasBoard = ({
     setCanvasEngine(canvasEngine);
 
     canvas.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("resize", handleResize);
 
+    handleResize();
     return () => {
       canvasEngine.destroy();
       canvas.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("resize", handleResize);
     };
   }, [onSetCanva, onSetRoughCanvas, handleWheel]);
 
