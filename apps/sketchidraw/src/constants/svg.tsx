@@ -485,7 +485,7 @@ export const TextSvg = () => {
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-4 w-4 text-black dark:text-white"
+      className="h-2 w-2 lg:h-3 lg:w-3 text-black dark:text-white"
     >
       <g strokeWidth="1.5">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>

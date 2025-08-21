@@ -1,5 +1,3 @@
-import { cn } from "@/lib/utils";
-
 export default function AuthLayout({
   children,
 }: {
@@ -13,7 +11,7 @@ export default function AuthLayout({
       <div className="h-fit min-h-screen w-full relative p-10 lg:p-12 overflow-hidden flex flex-col items-center justify-center">
         <div className="relative z-10">
           <div className="md:flex hidden">
-            <h1 className="text-6xl font-sketchifont font-extrabold dark:text-sky-200 tracking-widest">
+            <h1 className="text-6xl font-sketchifont font-extrabold text-logo-text tracking-widest">
               SKETCHIDRAW
             </h1>
           </div>

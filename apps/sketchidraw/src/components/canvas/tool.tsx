@@ -70,8 +70,8 @@ export const Tool = ({
       <TooltipTrigger onClick={() => handleClick(toolType)} asChild>
         <div
           className={cn(
-            "relative p-3 cursor-pointer flex items-center justify-center",
-            isSelected && "bg-surface-primary-container rounded-md",
+            "relative p-2 lg:p-3 cursor-pointer flex items-center justify-center",
+            isSelected && "bg-surface-primary-container rounded-sm",
             !isSelected &&
               "hover:rounded-md hover:bg-surface-primary-container/30"
           )}
@@ -81,13 +81,13 @@ export const Tool = ({
               <TextSvg />
             ) : (
               <Icon
-                size={13}
+                className="h-2 w-2 lg:h-3 lg:w-3"
                 fill={isSelected ? (isDark ? "white" : "black") : "transparent"}
               />
             ))}
           <span
             className={cn(
-              "absolute opacity-50 right-[5px] bottom-[1px] text-[10px]",
+              "absolute opacity-50 right-[4px] bottom-[-1px] lg:right-[6px] text-[6px] lg:text-[10px]",
               isSelected && "opacity-100"
             )}
           >

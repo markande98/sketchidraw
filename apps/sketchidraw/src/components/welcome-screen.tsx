@@ -116,23 +116,23 @@ export const WelcomeScreen = () => {
     <div className="absolute z-[100] inset-0 flex items-center justify-center">
       <div className="flex flex-col items-center justify-center space-y-4 mt-20">
         <div className="flex items-center gap-2 mb-10">
-          <h1 className="text-5xl font-extrabold text-neutral-100 font-sketchifont tracking-tighter">
+          <h1 className="text-5xl font-extrabold text-logo-text font-sketchifont tracking-tighter">
             SKETCHIDRAW
           </h1>
         </div>
         <div className="flex items-center">
-          <p className="text-neutral-500 font-sketchifont text-xl">
+          <p className="text-[#999999] font-sketchifont text-xl">
             All your data is saved locally in your browser
           </p>
         </div>
         <div className="flex flex-col items-start space-y-2">
-          <div className="w-74 flex items-center gap-2 cursor-pointer p-3 rounded-md text-neutral-500 hover:bg-surface-high hover:text-white transition duration-150">
+          <div className="w-74 flex items-center gap-2 cursor-pointer p-3 rounded-md text-[#999999] hover:bg-surface-primary-container/50 dark:hover:bg-surface-high hover:text-on-surface transition duration-150">
             <Users size={14} />
             <p className="text-sm">Live collaboration...</p>
           </div>
           <Link
             href="/auth/signup"
-            className="w-74 flex items-center gap-2 cursor-pointer p-3 rounded-md text-neutral-500 hover:bg-surface-high hover:text-white transition duration-150"
+            className="w-74 flex items-center gap-2 cursor-pointer p-3 rounded-md text-[#999999] hover:bg-surface-primary-container/50 dark:hover:bg-surface-high hover:text-on-surface transition duration-150"
           >
             <LogIn size={14} />
             <p className="text-sm">Sign up</p>

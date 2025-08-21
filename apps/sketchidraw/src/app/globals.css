@@ -57,6 +57,7 @@ body,
   --color-default-border-color: var(--default-border-color);
   --color-button-bg: var(--button-bg);
   --color-brand-hover: var(--brand-hover);
+  --color-logo-text: var(--logo-text);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -107,6 +108,7 @@ body,
   --default-border-color: oklch(0.9603 0.02 289.08);
   --button-bg: oklch(0.974 0.004 286.33);
   --brand-hover: oklch(0.5189 0.1871 279.07);
+  --logo-text: oklch(0.2433 0.1496 277.82);
 }
 
 .dark {
@@ -152,6 +154,7 @@ body,
   --default-border-color: oklch(0.3033 0.0215 288.87);
   --button-bg: oklch(0.3033 0.0215 288.87);
   --brand-hover: oklch(0.8106 0.0995 285.88);
+  --logo-text: oklch(0.9158 0.0434 289.82);
 }
 
 @theme {
