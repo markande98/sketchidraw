@@ -15,7 +15,7 @@ export const StrokeStyle = () => {
   };
   return (
     <div className="flex flex-col space-y-2">
-      <h3 className="text-white text-[11px] font-normal tracking-tigher">
+      <h3 className="text-on-surface text-[11px] font-normal tracking-tigher">
         Stroke style
       </h3>
       <div className="flex items-center">
@@ -23,8 +23,9 @@ export const StrokeStyle = () => {
           <div
             onClick={() => onClick(0)}
             className={cn(
-              "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
-              strokeDashIndex === 0 && "ring-1 ring-white bg-[#403e6a]"
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              strokeDashIndex === 0 &&
+                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <D1 />
@@ -32,8 +33,9 @@ export const StrokeStyle = () => {
           <div
             onClick={() => onClick(1)}
             className={cn(
-              "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
-              strokeDashIndex === 1 && "ring-1 ring-white bg-[#403e6a]"
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              strokeDashIndex === 1 &&
+                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <D2 />
@@ -41,8 +43,9 @@ export const StrokeStyle = () => {
           <div
             onClick={() => onClick(2)}
             className={cn(
-              "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
-              strokeDashIndex === 2 && "ring-1 ring-white bg-[#403e6a]"
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              strokeDashIndex === 2 &&
+                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <D3 />
@@ -65,7 +68,7 @@ const D1 = () => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="icon icon-tabler icons-tabler-outline icon-tabler-minus text-white"
+      className="icon icon-tabler icons-tabler-outline icon-tabler-minus text-black dark:text-white"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M5 12l14 0" />
@@ -85,7 +88,7 @@ const D2 = () => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="icon icon-tabler icons-tabler-outline icon-tabler-line-dashed text-white"
+      className="icon icon-tabler icons-tabler-outline icon-tabler-line-dashed text-black dark:text-white"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M5 12h2" />
@@ -107,7 +110,7 @@ const D3 = () => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="icon icon-tabler icons-tabler-outline icon-tabler-line-dotted text-white"
+      className="icon icon-tabler icons-tabler-outline icon-tabler-line-dotted text-black dark:text-white"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M4 12v.01" />

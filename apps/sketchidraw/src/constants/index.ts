@@ -1,5 +1,5 @@
 // color constants
-export const STROKE_COLORS = [
+export const STROKE_DARK_COLORS = [
   "#d3d3d3",
   "#ff7976",
   "#308e40",
@@ -7,7 +7,15 @@ export const STROKE_COLORS = [
   "#af5900",
 ];
 
-export const BACKGROUND_COLOR = [
+export const STROKE_LIGHT_COLORS = [
+  "#1e1e1e",
+  "#e03131",
+  "#2f9e44",
+  "#1971c2",
+  "#f08c00",
+];
+
+export const BACKGROUND_DARK_COLORS = [
   "transparent",
   "#6b90c9",
   "#003804",
@@ -15,12 +23,28 @@ export const BACKGROUND_COLOR = [
   "#342400",
 ];
 
-export const CANVAS_BG_COLOR = [
+export const BACKGROUND_LIGHT_COLORS = [
+  "transparent",
+  "#ffc9c9",
+  "#b2f2bb",
+  "#a5d8ff",
+  "#ffec99",
+];
+
+export const CANVAS_BG_DARK_COLOR = [
   "#121212",
   "#161718",
   "#13171b",
   "#181604",
   "#1b1715",
+];
+
+export const CANVAS_BG_LIGHT_COLOR = [
+  "#ffffff",
+  "#f8f9fa",
+  "#f5fafe",
+  "#fefce8",
+  "#fdf8f6",
 ];
 
 // stroke constants

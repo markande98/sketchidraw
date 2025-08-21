@@ -4,9 +4,11 @@ import { STROKE_WIDTH } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
 import { Minus } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useState } from "react";
 
 export const StrokeWidth = () => {
+  const { resolvedTheme } = useTheme();
   const { onSetCanvaStrokeWidth } = useCanva();
   const [widthIndex, setWidthIndex] = useState(0);
 
@@ -17,7 +19,7 @@ export const StrokeWidth = () => {
 
   return (
     <div className="flex flex-col space-y-2">
-      <h3 className="text-white text-[11px] font-normal tracking-tigher">
+      <h3 className="text-on-surface text-[11px] font-normal tracking-tigher">
         Stroke width
       </h3>
       <div className="flex items-center">
@@ -27,11 +29,16 @@ export const StrokeWidth = () => {
               onClick={() => onClick(index)}
               key={index}
               className={cn(
-                "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
-                widthIndex === index && "ring-1 ring-white bg-[#403e6a]"
+                "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+                widthIndex === index &&
+                  "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
               )}
             >
-              <Minus size={20} color="white" strokeWidth={width + 1 * index} />
+              <Minus
+                size={20}
+                color={resolvedTheme === "dark" ? "white" : "black"}
+                strokeWidth={width + 1 * index}
+              />
             </div>
           ))}
         </div>

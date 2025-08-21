@@ -26,7 +26,7 @@ export const CanvaZoom = ({ zoomIn, zoomOut, resetZoom }: CanvasZoomProps) => {
       >
         <Minus
           size={16}
-          className={`${canvasScale === MIN_ZOOM_VALUE ? "text-gray-600" : "text-white"} transition-colors`}
+          className={`${canvasScale === MIN_ZOOM_VALUE ? "text-on-surface/30" : "text-on-surface"} transition-colors`}
         />
       </button>
 
@@ -36,7 +36,7 @@ export const CanvaZoom = ({ zoomIn, zoomOut, resetZoom }: CanvasZoomProps) => {
             onClick={resetZoom}
             className="min-w-[60px] text-center py-2 px-2"
           >
-            <span className="text-xs font-normal text-white tracking-wide">
+            <span className="text-xs font-normal text-on-surface tracking-wide">
               {displayPercetage}%
             </span>
           </div>
@@ -57,7 +57,7 @@ export const CanvaZoom = ({ zoomIn, zoomOut, resetZoom }: CanvasZoomProps) => {
       >
         <Plus
           size={16}
-          className={`${canvasScale >= MAX_ZOOM_VALUE ? "text-gray-600" : "text-white"} transition-colors`}
+          className={`${canvasScale >= MAX_ZOOM_VALUE ? "text-on-surface/30" : "text-on-surface"} transition-colors`}
         />
       </button>
     </div>

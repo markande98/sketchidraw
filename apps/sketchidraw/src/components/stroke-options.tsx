@@ -2,24 +2,29 @@
 
 import { cn } from "@/lib/utils";
 
-import { STROKE_COLORS } from "@/constants/index";
-import { ColorToolTip } from "./color-tooltip";
+import { STROKE_DARK_COLORS, STROKE_LIGHT_COLORS } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
+import { useTheme } from "next-themes";
+import { ColorToolTip } from "./color-tooltip";
 
 export const StrokeOptions = () => {
+  const { resolvedTheme } = useTheme();
   const { canvaStrokeColor, onSetCanvaStrokeColor } = useCanva();
 
   const onChange = (color: string) => {
     onSetCanvaStrokeColor(color);
   };
+
+  const COLORS =
+    resolvedTheme === "dark" ? STROKE_DARK_COLORS : STROKE_LIGHT_COLORS;
   return (
     <div className="flex flex-col space-y-2">
-      <h3 className="text-white text-[11px] font-normal tracking-tigher">
+      <h3 className="text-on-surface text-[11px] font-normal tracking-tigher">
         Stroke
       </h3>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
-          {STROKE_COLORS.map((color, index) => (
+          {COLORS.map((color, index) => (
             <div
               key={index}
               className={cn(

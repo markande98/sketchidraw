@@ -9,7 +9,7 @@ export const HachureSvg = () => {
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
     >
       <path
         d="M5.879 2.625h8.242a3.254 3.254 0 0 1 3.254 3.254v8.242a3.254 3.254 0 0 1-3.254 3.254H5.88a3.254 3.254 0 0 1-3.254-3.254V5.88a3.254 3.254 0 0 1 3.254-3.254Z"
@@ -56,7 +56,7 @@ export const CrossHatchSvg = () => {
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
     >
       <g clipPath="url(#a)">
         <path
@@ -108,7 +108,7 @@ export const SolidSvg = () => {
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
     >
       <g clipPath="url(#a)">
         <path
@@ -133,7 +133,7 @@ export const ArchitectSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -154,7 +154,7 @@ export const ArtistSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -175,7 +175,7 @@ export const CartoonistSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -196,7 +196,7 @@ export const SharpEdgeSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -227,7 +227,7 @@ export const RoundEdgeSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 24 24"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       strokeWidth="2"
       stroke="currentColor"
@@ -423,7 +423,7 @@ export const ArrowSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 40 20"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
     >
       <g transform="" stroke="currentColor" strokeWidth="2" fill="none">
         <path d="M34 10H6M34 10L27 5M34 10L27 15"></path>
@@ -440,7 +440,7 @@ export const TriangleSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 40 20"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
     >
       <g stroke="currentColor" fill="currentColor" transform="">
         <path d="M32 10L6 10" strokeWidth="2"></path>
@@ -457,7 +457,7 @@ export const TriangleOutlineSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 40 20"
-      className="h-4 w-4 text-white/90"
+      className="h-4 w-4 text-black dark:text-white"
     >
       <g
         stroke="currentColor"
@@ -485,7 +485,7 @@ export const TextSvg = () => {
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-4 w-4 text-white"
+      className="h-4 w-4 text-black dark:text-white"
     >
       <g strokeWidth="1.5">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -506,7 +506,7 @@ export const FontSmallSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -537,7 +537,7 @@ export const FontMediumSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -568,7 +568,7 @@ export const FontLargeSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -599,7 +599,7 @@ export const FontExtraLargeSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -623,7 +623,7 @@ export const SketchiFontSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -647,7 +647,7 @@ export const ComicShannsFontSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -678,7 +678,7 @@ export const NunitoFontSvg = () => {
       focusable="false"
       role="img"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-white"
+      className="h-4 w-4 text-black dark:text-white"
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"

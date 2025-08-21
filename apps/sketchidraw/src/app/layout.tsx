@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "../../auth";
+import { ThemeSync } from "@/components/theme-sync";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <ThemeSync />
             {children}
           </ThemeProvider>
         </body>

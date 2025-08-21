@@ -13,7 +13,7 @@ export const ThemeToggler = () => {
 
   return (
     <div className="flex items-center justify-between">
-      <h2 className="text-xs font-semibold">Theme</h2>
+      <h2 className="text-xs font-semibold text-on-surface">Theme</h2>
 
       <div className="flex items-center gap-1 justify-between p-1 rounded-lg border">
         <div
@@ -21,7 +21,7 @@ export const ThemeToggler = () => {
           className={cn(
             "cursor-pointer rounded-md px-2 py-1 text-[#a8a5ff]",
             theme === "light" &&
-              "bg-[#a8a5ff] text-surface-high  transition-colors duration-150"
+              "bg-primary border-primary hover:bg-primary-darker hover:border-primary-darker text-surface-lowest transition-colors duration-150"
           )}
         >
           <LightSvg />
@@ -31,7 +31,7 @@ export const ThemeToggler = () => {
           className={cn(
             "cursor-pointer rounded-md px-2 py-1 text-[#a8a5ff]",
             theme === "dark" &&
-              "bg-[#a8a5ff] text-surface-high  transition-colors duration-150"
+              "bg-primary border-primary hover:bg-primary-darker hover:border-primary-darker text-surface-lowest transition-colors duration-150"
           )}
         >
           <DarkSvg />
@@ -41,7 +41,7 @@ export const ThemeToggler = () => {
           className={cn(
             "cursor-pointer rounded-md px-2 py-1 text-[#a8a5ff]",
             theme === "system" &&
-              "bg-[#a8a5ff] text-surface-high  transition-colors duration-150"
+              "bg-primary border-primary hover:bg-primary-darker hover:border-primary-darker text-surface-lowest transition-colors duration-150"
           )}
         >
           <SystemSvg />

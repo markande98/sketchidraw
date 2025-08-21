@@ -34,15 +34,15 @@ export const SocialLinks = () => {
         <div
           onClick={() => onClick(href)}
           key={index}
-          className="flex items-center gap-2 cursor-pointer rounded-md p-2 hover:bg-surface-high transition duration-150"
+          className="flex items-center gap-2 cursor-pointer rounded-md p-2 hover:bg-surface-primary-container/50 dark:hover:bg-surface-high transition duration-150"
         >
-          <div className={cn(label === "Signup" && "text-[#a8a5ff]")}>
+          <div className={cn(label === "Signup" && "text-promo")}>
             <Icon />
           </div>
           <h2
             className={cn(
-              "text-xs font-semibold",
-              label === "Signup" && "text-[#a8a5ff]"
+              "text-xs font-extrabold text-on-surface",
+              label === "Signup" && "text-promo"
             )}
           >
             {label}

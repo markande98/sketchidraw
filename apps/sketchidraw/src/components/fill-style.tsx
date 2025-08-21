@@ -13,7 +13,7 @@ export const FillStyle = () => {
   };
   return (
     <div className="flex flex-col space-y-2">
-      <h3 className="text-white text-[11px] font-normal tracking-tigher">
+      <h3 className="text-on-surface text-[11px] font-normal tracking-tigher">
         Fill
       </h3>
       <div className="flex items-center">
@@ -21,9 +21,9 @@ export const FillStyle = () => {
           <div
             onClick={() => onClick(FILLSTYLE.Hachure)}
             className={cn(
-              "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
               canvaFillstyle === FILLSTYLE.Hachure &&
-                "ring-1 ring-white bg-[#403e6a]"
+                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <HachureSvg />
@@ -31,9 +31,9 @@ export const FillStyle = () => {
           <div
             onClick={() => onClick(FILLSTYLE.CrossHatch)}
             className={cn(
-              "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
               canvaFillstyle === FILLSTYLE.CrossHatch &&
-                "ring-1 ring-white bg-[#403e6a]"
+                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <CrossHatchSvg />
@@ -41,9 +41,9 @@ export const FillStyle = () => {
           <div
             onClick={() => onClick(FILLSTYLE.Solid)}
             className={cn(
-              "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
               canvaFillstyle === FILLSTYLE.Solid &&
-                "ring-1 ring-white bg-[#403e6a]"
+                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <SolidSvg />

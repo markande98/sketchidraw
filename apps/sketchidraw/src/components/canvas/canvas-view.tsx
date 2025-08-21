@@ -48,16 +48,14 @@ export const CanvasView = () => {
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
       {showWelcomeScreen && <WelcomeScreen />}
       <CanvasProperty />
-      <div className="absolute z-[100] top-0 left-0 right-0 px-6 py-4 flex justify-between cursor-none">
-        <CanvasMenu />
-        <ToolsMenu />
-        <button
-          type="button"
-          className="text-xs bg-[#a8a5ff]/95 hover:bg-[#a8a5ff] shadow-md p-3 rounded-md cursor-pointer font-normal text-black"
-        >
-          Share
-        </button>
-      </div>
+      <CanvasMenu />
+      <ToolsMenu />
+      <button
+        type="button"
+        className="absolute z-[100] right-6 top-6 h-10 text-xs bg-primary border-primary hover:bg-primary-darker hover:border-primary-darker shadow-md p-3 rounded-md cursor-pointer font-normal text-surface-lowest"
+      >
+        Share
+      </button>
       <CanvaZoom zoomIn={zoomIn} zoomOut={zoomOut} resetZoom={resetZoom} />
       <CanvasBoard
         panX={panX}

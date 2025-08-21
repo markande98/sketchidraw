@@ -14,7 +14,7 @@ export const Sloppiness = () => {
 
   return (
     <div className="flex flex-col space-y-2">
-      <h3 className="text-white text-[11px] font-normal tracking-tigher">
+      <h3 className="text-on-surface text-[11px] font-normal tracking-tigher">
         Sloppiness
       </h3>
       <div className="flex items-center">
@@ -22,9 +22,9 @@ export const Sloppiness = () => {
           <div
             onClick={() => onClick(SLOPPINESS.Architect)}
             className={cn(
-              "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
               canvaSloppiness === SLOPPINESS.Architect &&
-                "ring-1 ring-white bg-[#403e6a]"
+                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <ArchitectSvg />
@@ -32,9 +32,9 @@ export const Sloppiness = () => {
           <div
             onClick={() => onClick(SLOPPINESS.Artist)}
             className={cn(
-              "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
               canvaSloppiness === SLOPPINESS.Artist &&
-                "ring-1 ring-white bg-[#403e6a]"
+                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <ArtistSvg />
@@ -42,9 +42,9 @@ export const Sloppiness = () => {
           <div
             onClick={() => onClick(SLOPPINESS.Cartoonist)}
             className={cn(
-              "flex items-center justify-center bg-surface-high h-8 w-8 rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
               canvaSloppiness === SLOPPINESS.Cartoonist &&
-                "ring-1 ring-white bg-[#403e6a]"
+                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <CartoonistSvg />

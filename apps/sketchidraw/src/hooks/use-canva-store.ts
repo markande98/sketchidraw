@@ -1,22 +1,22 @@
 import { create } from "zustand";
 
-import { ToolType } from "@/types/tools";
-import { RoughCanvas } from "roughjs/bin/canvas";
 import {
   ArrowTypes,
-  BACKGROUND_COLOR,
-  CANVAS_BG_COLOR,
+  BACKGROUND_DARK_COLORS,
+  CANVAS_BG_DARK_COLOR,
   CursorType,
   Edges,
   FillStyle,
   FontFamily,
   FontSize,
   Sloppiness,
-  STROKE_COLORS,
+  STROKE_DARK_COLORS,
   STROKE_DASH_OFFSET,
   STROKE_WIDTH,
 } from "@/constants/index";
 import { Shape } from "@/types/shape";
+import { ToolType } from "@/types/tools";
+import { RoughCanvas } from "roughjs/bin/canvas";
 
 interface CanvaStore {
   canvas: HTMLCanvasElement | null;
@@ -58,14 +58,14 @@ interface CanvaStore {
 
 export const useCanva = create<CanvaStore>((set) => ({
   canvas: null,
-  themeColor: CANVAS_BG_COLOR[0],
+  themeColor: CANVAS_BG_DARK_COLOR[0],
   roughCanvas: null,
   tooltype: ToolType.Select,
   canvasScale: 1,
   canvaCursorType: CursorType.Crosshair,
   canvaShapes: [],
-  canvaBgColor: BACKGROUND_COLOR[0],
-  canvaStrokeColor: STROKE_COLORS[0],
+  canvaBgColor: BACKGROUND_DARK_COLORS[0],
+  canvaStrokeColor: STROKE_DARK_COLORS[0],
   canvaStrokeWidth: STROKE_WIDTH[0],
   canvaStrokeDashOffset: STROKE_DASH_OFFSET[0],
   canvaFillstyle: FillStyle.Hachure,
