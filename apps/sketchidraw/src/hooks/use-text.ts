@@ -18,7 +18,6 @@ type TextProps = {
 
 export const useText = ({ canvasRef, canvasEngine, panX, panY }: TextProps) => {
   const {
-    canvas,
     tooltype,
     canvasScale,
     canvaFontSize,
@@ -61,14 +60,16 @@ export const useText = ({ canvasRef, canvasEngine, panX, panY }: TextProps) => {
 
   const getMousePos = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!canvas) return { x: 0, y: 0 };
-      const rect = canvas.getBoundingClientRect();
+      const canvasElement =
+        canvasRef.current || (e.target as HTMLCanvasElement);
+      if (!canvasElement) return { x: 0, y: 0 };
+      const rect = canvasElement.getBoundingClientRect();
       return {
         x: (e.clientX - rect.left - panX) / canvasScale,
         y: (e.clientY - rect.top - panY) / canvasScale,
       };
     },
-    [canvas, panX, panY, canvasScale]
+    [canvasRef, canvasScale, panX, panY]
   );
 
   const getTextMetrics = useCallback(

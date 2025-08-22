@@ -55,7 +55,10 @@ export const CanvasBoard = ({
 
   const handleUnifiedPointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (e.pointerType === "touch") {
+      if (e.isPrimary) {
+        handlePointDown(e);
+      }
+      if (e.pointerType === "touch" && !e.isPrimary) {
         const event: TouchEvent = {
           touches: [
             {
@@ -67,12 +70,6 @@ export const CanvasBoard = ({
           preventDefault: () => e.preventDefault(),
         };
         handleTouchStart(event);
-
-        if (e.isPrimary) {
-          handlePointDown(e);
-        }
-      } else {
-        handlePointDown(e);
       }
     },
     [handleTouchStart, handlePointDown]
@@ -80,7 +77,10 @@ export const CanvasBoard = ({
 
   const handleUnifiedPointerMove = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (e.pointerType === "touch") {
+      if (e.isPrimary) {
+        handlePointMove(e);
+      }
+      if (e.pointerType === "touch" && !e.isPrimary) {
         const event: TouchEvent = {
           touches: [
             {
@@ -92,12 +92,6 @@ export const CanvasBoard = ({
           preventDefault: () => e.preventDefault(),
         };
         handleTouchMove(event);
-
-        if (e.isPrimary) {
-          handlePointMove(e);
-        }
-      } else {
-        handlePointMove(e);
       }
     },
     [handleTouchMove, handlePointMove]
@@ -105,7 +99,10 @@ export const CanvasBoard = ({
 
   const handleUnifiedPointerUp = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
-      if (e.pointerType === "touch") {
+      if (e.isPrimary) {
+        handlePointUp(e);
+      }
+      if (e.pointerType === "touch" && !e.isPrimary) {
         const event: TouchEvent = {
           touches: [
             {
@@ -117,12 +114,6 @@ export const CanvasBoard = ({
           preventDefault: () => e.preventDefault(),
         };
         handleTouchEnd(event);
-
-        if (e.isPrimary) {
-          handlePointUp(e);
-        }
-      } else {
-        handlePointUp(e);
       }
     },
     [handleTouchEnd, handlePointUp]
