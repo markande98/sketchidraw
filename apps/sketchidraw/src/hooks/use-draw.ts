@@ -30,7 +30,6 @@ export const useDraw = ({
   expandCanvasForPanning,
 }: DrawProps) => {
   const {
-    canvas,
     canvaBgColor,
     canvaStrokeColor,
     canvaStrokeWidth,
@@ -103,34 +102,46 @@ export const useDraw = ({
 
   useEffect(() => {
     if (tooltype !== ToolType.Eraser) return;
+
+    const isInspectMode =
+      window.navigator.webdriver ||
+      window.outerHeight - window.innerHeight > 100 ||
+      (window.devicePixelRatio !== 1 &&
+        !window.matchMedia("(hover: hover)").matches);
+
     const cursor = document.createElement("div");
     cursor.id = "cursor";
     document.body.appendChild(cursor);
 
     const handleCursorMove = (e: any) => {
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
+      const canvasElement = canvasRef.current;
+      if (!canvasElement) return;
+      const rect = canvasElement.getBoundingClientRect();
       const cursorPos = {
         x: e.clientX - rect.left,
         y: e.clientY - rect.top,
       };
-      cursor.style.transform = `translate(${cursorPos.x}px, ${cursorPos.y}px)`;
+      if (!isInspectMode)
+        cursor.style.transform = `translate(${cursorPos.x + 100}px, ${cursorPos.y + 100}px)`;
+      if (isInspectMode) cursor.style.display = "none";
       const pos = {
         x: (cursorPos.x - panX) / canvasScale,
         y: (cursorPos.y - panY) / canvasScale,
       };
       setCursorPos(pos);
     };
-
-    document.addEventListener("mousemove", handleCursorMove);
+    if (!isInspectMode) cursor.style.display = "block";
+    if (isInspectMode) cursor.style.display = "none";
+    cursor.style.transform = `translate(${cursorPos.x + 100}px, ${cursorPos.y + 100}px)`;
+    document.addEventListener("pointermove", handleCursorMove);
 
     return () => {
       if (cursor && cursor.parentNode) {
         cursor.parentNode.removeChild(cursor);
       }
-      document.removeEventListener("mousemove", handleCursorMove);
+      document.removeEventListener("pointermove", handleCursorMove);
     };
-  }, [tooltype, canvas, panX, panY, canvasScale]);
+  }, [tooltype, canvasRef, panX, panY, canvasScale, cursorPos]);
 
   const measureText = (text: string, fontSize: number, fontFamily: string) => {
     if (typeof document !== "undefined") {

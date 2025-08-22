@@ -211,8 +211,9 @@ body,
 
 #cursor {
   position: fixed;
-  top: -5px;
-  left: -5px;
+  display: "none";
+  top: -100px;
+  left: -100px;
   width: 10px;
   height: 10px;
   background-color: transparent;

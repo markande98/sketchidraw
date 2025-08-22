@@ -123,6 +123,12 @@ export const CanvasBoard = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const isInspectMode =
+      window.navigator.webdriver ||
+      window.outerHeight - window.innerHeight > 100 ||
+      (window.devicePixelRatio !== 1 &&
+        !window.matchMedia("(hover: hover)").matches);
+
     const handleResize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -131,6 +137,10 @@ export const CanvasBoard = ({
       roughCanvas.current = roughCanvasInstance;
 
       const canvasEngine = new CanvasEngine(canvas, roughCanvasInstance);
+
+      const cursor = document.getElementById("cursor");
+
+      if (cursor && isInspectMode) cursor.style.display = "none";
 
       onSetCanva(canvas);
       onSetRoughCanvas(roughCanvasInstance);
