@@ -485,7 +485,7 @@ export const TextSvg = () => {
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-2 w-2 lg:h-3 lg:w-3 text-black dark:text-white"
+      className="h-2 w-2 sm:h-3 sm:w-3 text-black dark:text-white"
     >
       <g strokeWidth="1.5">
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -692,6 +692,22 @@ export const NunitoFontSvg = () => {
       >
         <path d="M5.833 16.667v-10a3.333 3.333 0 0 1 3.334-3.334h1.666a3.333 3.333 0 0 1 3.334 3.334v10M5.833 10.833h8.334"></path>
       </g>
+    </svg>
+  );
+};
+
+export const CanvasPropertyPaletteSvg = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="h-4 w-4"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 2c5.498 0 10 4.002 10 9c0 1.351 -.6 2.64 -1.654 3.576c-1.03 .914 -2.412 1.424 -3.846 1.424h-2.516a1 1 0 0 0 -.5 1.875a1 1 0 0 1 .194 .14a2.3 2.3 0 0 1 -1.597 3.99l-.156 -.009l.068 .004l-.273 -.004c-5.3 -.146 -9.57 -4.416 -9.716 -9.716l-.004 -.28c0 -5.523 4.477 -10 10 -10m-3.5 6.5a2 2 0 0 0 -1.995 1.85l-.005 .15a2 2 0 1 0 2 -2m8 0a2 2 0 0 0 -1.995 1.85l-.005 .15a2 2 0 1 0 2 -2m-4 -3a2 2 0 0 0 -1.995 1.85l-.005 .15a2 2 0 1 0 2 -2" />
     </svg>
   );
 };

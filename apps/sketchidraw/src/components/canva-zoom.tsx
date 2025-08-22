@@ -18,7 +18,7 @@ export const CanvaZoom = ({ zoomIn, zoomOut, resetZoom }: CanvasZoomProps) => {
 
   const displayPercetage = (canvasScale * 100).toFixed(0);
   return (
-    <div className="hidden md:flex absolute z-[100] left-6 bottom-6 items-center gap-2 bg-surface-low rounded-md cursor-pointer">
+    <div className="hidden sm:flex absolute z-[100] left-6 bottom-6 items-center gap-2 bg-surface-low rounded-md cursor-pointer">
       <button
         onClick={() => zoomOut(0.9)}
         disabled={canvasScale === MIN_ZOOM_VALUE}

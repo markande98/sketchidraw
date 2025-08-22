@@ -1,5 +1,7 @@
 "use client";
 
+import { useMediaQuery } from "use-media-query-react";
+
 import { useCanva } from "@/hooks/use-canva-store";
 import { BackgroundOptions } from "./background-options";
 import { EdgeStyle } from "./edge.style";
@@ -15,6 +17,7 @@ import { FontSize } from "./font-size";
 import { FontFamily } from "./font-family";
 
 export const CanvasProperty = () => {
+  const isMobile = useMediaQuery("(max-width: 639px)");
   const { tooltype } = useCanva();
 
   const isEllipseTool = tooltype === ToolType.Ellipse;
@@ -25,9 +28,9 @@ export const CanvasProperty = () => {
   const isTextTool = tooltype === ToolType.Text;
   const isEraserTool = tooltype === ToolType.Eraser;
 
-  if (isSelectAndGrab || isEraserTool) return null;
+  if (isSelectAndGrab || isEraserTool || isMobile) return null;
   return (
-    <ScrollArea className="z-[100] absolute top-22 bg-white dark:bg-surface-low border shadow-md rounded-md left-6 w-[200px] max-h-[calc(100vh-190px)] overflow-y-auto">
+    <ScrollArea className="z-[100] absolute top-22 bg-white dark:bg-surface-low border shadow-md rounded-md left-6 w-[210px] max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-190px)] overflow-y-auto">
       <div className="p-3 space-y-6">
         <StrokeOptions />
         {!isTextTool && <BackgroundOptions />}

@@ -1,13 +1,15 @@
 import React from "react";
+import { Button } from "../ui/button";
 
 export const AppHamburger = React.forwardRef<
   HTMLButtonElement,
   React.ComponentPropsWithoutRef<"button">
 >((props, ref) => (
-  <button
+  <Button
     ref={ref}
     {...props}
-    className="hidden md:flex absolute left-6 top-6 h-10 w-10 items-center justify-center z-[100] bg-surface-low px-3 rounded-lg cursor-pointer transition-colors hover:bg-surface-high duration-200"
+    variant="outline"
+    className="h-10 w-10 flex items-center border sm:border-none justify-center bg-surface-low px-3 rounded-lg cursor-pointer transition-colors hover:bg-surface-high duration-200"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +27,7 @@ export const AppHamburger = React.forwardRef<
       <path d="M4 12l16 0" />
       <path d="M4 18l16 0" />
     </svg>
-  </button>
+  </Button>
 ));
 
 AppHamburger.displayName = "AppHamburger";
