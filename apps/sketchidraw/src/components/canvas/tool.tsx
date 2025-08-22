@@ -29,13 +29,12 @@ const iconMap = {
   MoveRight,
   Minus,
   Pencil,
-  TextSvg,
   Eraser,
 };
 
 interface ToolProps {
   label: string;
-  iconName: keyof typeof iconMap;
+  iconName: keyof typeof iconMap | "TextSvg";
   index: number;
   isSelected: boolean;
   toolType: ToolType;
@@ -50,7 +49,7 @@ export const Tool = ({
 }: ToolProps) => {
   const { onSelectTooltype, onSetCanvaCursorType } = useCanva();
   const { resolvedTheme } = useTheme();
-  const Icon = iconMap[iconName];
+  const Icon = iconName !== "TextSvg" ? iconMap[iconName] : null;
 
   const handleClick = (toolType: ToolType) => {
     onSelectTooltype(toolType);
@@ -62,9 +61,6 @@ export const Tool = ({
       onSetCanvaCursorType(CursorType.Crosshair);
     }
   };
-
-  const isDark = resolvedTheme === "dark";
-
   return (
     <Tooltip>
       <TooltipTrigger onClick={() => handleClick(toolType)} asChild>
@@ -76,15 +72,18 @@ export const Tool = ({
               "hover:rounded-md hover:bg-surface-primary-container/30"
           )}
         >
-          {Icon &&
-            (toolType === ToolType.Text ? (
-              <TextSvg />
-            ) : (
-              <Icon
-                className="h-2 w-2 lg:h-3 lg:w-3"
-                fill={isSelected ? (isDark ? "white" : "black") : "transparent"}
-              />
-            ))}
+          {!Icon && <TextSvg />}
+          {Icon && (
+            <Icon
+              className={`h-2 w-2 lg:h-3 lg:w-3 ${
+                isSelected
+                  ? resolvedTheme === "dark"
+                    ? "fill-white"
+                    : "fill-black"
+                  : "fill-transparent"
+              }`}
+            />
+          )}
           <span
             className={cn(
               "absolute opacity-50 right-[4px] bottom-[-1px] lg:right-[6px] text-[6px] lg:text-[10px]",

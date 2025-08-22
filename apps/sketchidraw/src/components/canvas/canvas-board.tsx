@@ -136,25 +136,23 @@ export const CanvasBoard = ({
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      console.log(canvas.width, canvas.height);
+      const roughCanvasInstance = rough.canvas(canvas);
+      roughCanvas.current = roughCanvasInstance;
+
+      const canvasEngine = new CanvasEngine(canvas, roughCanvasInstance);
+
+      onSetCanva(canvas);
+      onSetRoughCanvas(roughCanvasInstance);
+      setCanvasEngine(canvasEngine);
+
+      canvas.addEventListener("wheel", handleWheel, { passive: false });
     };
-
-    const roughCanvasInstance = rough.canvas(canvas);
-    roughCanvas.current = roughCanvasInstance;
-
-    const canvasEngine = new CanvasEngine(canvas, roughCanvasInstance);
-
-    onSetCanva(canvas);
-    onSetRoughCanvas(roughCanvasInstance);
-    setCanvasEngine(canvasEngine);
-
-    canvas.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("resize", handleResize);
 
     handleResize();
     return () => {
-      canvasEngine.destroy();
-      canvas.removeEventListener("wheel", handleWheel);
+      if (canvasEngine) canvasEngine.destroy();
+      if (canvas) canvas.removeEventListener("wheel", handleWheel);
       window.removeEventListener("resize", handleResize);
     };
   }, [onSetCanva, onSetRoughCanvas, handleWheel]);
