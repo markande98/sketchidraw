@@ -40,12 +40,16 @@ export const StrokeWidth = ({ selectedShapeIndex }: StrokeWidthProps) => {
         <div className="flex items-center gap-2">
           {STROKE_WIDTH.map((width, index) => (
             <div
-              onClick={() => onClick(index)}
+              tabIndex={0}
+              onClick={(e) => {
+                e.currentTarget.focus();
+                onClick(index);
+              }}
               key={index}
               className={cn(
-                "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+                "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
                 widthIndex === index &&
-                  "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                  "bg-surface-primary-container border-surface-primary-container"
               )}
             >
               <Minus

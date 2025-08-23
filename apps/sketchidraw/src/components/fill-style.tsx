@@ -34,31 +34,43 @@ export const FillStyle = ({ selectedShapeIndex }: FillStyleProps) => {
       <div className="flex items-center">
         <div className="flex items-center gap-2">
           <div
-            onClick={() => onClick(FILLSTYLE.Hachure)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(FILLSTYLE.Hachure);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover  rounded-sm cursor-pointer transition duration-100",
               canvaFillstyle === FILLSTYLE.Hachure &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <HachureSvg />
           </div>
           <div
-            onClick={() => onClick(FILLSTYLE.CrossHatch)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(FILLSTYLE.CrossHatch);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               canvaFillstyle === FILLSTYLE.CrossHatch &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <CrossHatchSvg />
           </div>
           <div
-            onClick={() => onClick(FILLSTYLE.Solid)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(FILLSTYLE.Solid);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               canvaFillstyle === FILLSTYLE.Solid &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <SolidSvg />

@@ -36,31 +36,43 @@ export const StrokeStyle = ({ selectedShapeIndex }: StrokeStyleProps) => {
       <div className="flex items-center">
         <div className="flex items-center gap-2">
           <div
-            onClick={() => onClick(0)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(0);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               strokeDashIndex === 0 &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <D1 />
           </div>
           <div
-            onClick={() => onClick(1)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(1);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               strokeDashIndex === 1 &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <D2 />
           </div>
           <div
-            onClick={() => onClick(2)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(2);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               strokeDashIndex === 2 &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <D3 />

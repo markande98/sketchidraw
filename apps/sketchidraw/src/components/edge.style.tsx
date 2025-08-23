@@ -36,21 +36,28 @@ export const EdgeStyle = ({ selectedShapeIndex }: EdgeStyleProps) => {
       <div className="flex items-center">
         <div className="flex items-center gap-2">
           <div
-            onClick={() => onClick(Edges.Sharp)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(Edges.Sharp);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               canvaEdge === Edges.Sharp &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <SharpEdgeSvg />
           </div>
           <div
-            onClick={() => onClick(Edges.Round)}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(Edges.Round);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               canvaEdge === Edges.Round &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <RoundEdgeSvg />

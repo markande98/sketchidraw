@@ -38,31 +38,43 @@ export const ArrowHeads = ({ selectedShapeIndex }: ArrowHeadsProps) => {
       <div className="flex items-center">
         <div className="flex items-center gap-2">
           <div
-            onClick={() => onClick(ArrowTypes.Arrow)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(ArrowTypes.Arrow);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               canvaArrowType === ArrowTypes.Arrow &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <ArrowSvg />
           </div>
           <div
-            onClick={() => onClick(ArrowTypes.Triangle)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(ArrowTypes.Triangle);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               canvaArrowType === ArrowTypes.Triangle &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <TriangleSvg />
           </div>
           <div
-            onClick={() => onClick(ArrowTypes.TriangleOutline)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(ArrowTypes.TriangleOutline);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               canvaArrowType === ArrowTypes.TriangleOutline &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <TriangleOutlineSvg />

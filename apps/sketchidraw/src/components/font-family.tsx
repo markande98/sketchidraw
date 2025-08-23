@@ -45,31 +45,37 @@ export const FontFamily = ({ selectedShapeIndex }: FontFamilyProps) => {
       <div className="flex items-center">
         <div className="flex items-center gap-2">
           <div
-            onClick={() => onClick(FONT_FAMILY.SketchiFont)}
+            tabIndex={0}
+            onClick={(e) => {
+              e.currentTarget.focus();
+              onClick(FONT_FAMILY.SketchiFont);
+            }}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               canvaFontFamily === FONT_FAMILY.SketchiFont &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <SketchiFontSvg />
           </div>
           <div
+            tabIndex={0}
             onClick={() => onClick(FONT_FAMILY.Nunito)}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               canvaFontFamily === FONT_FAMILY.Nunito &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <NunitoFontSvg />
           </div>
           <div
+            tabIndex={0}
             onClick={() => onClick(FONT_FAMILY.Comicshanns)}
             className={cn(
-              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg rounded-sm cursor-pointer transition duration-100",
+              "flex items-center justify-center h-8 w-8 border-default-border-color bg-button-bg focus:ring-1 focus:ring-brand-hover rounded-sm cursor-pointer transition duration-100",
               canvaFontFamily === FONT_FAMILY.Comicshanns &&
-                "ring-1 ring-brand-hover bg-surface-primary-container border-surface-primary-container"
+                "bg-surface-primary-container border-surface-primary-container"
             )}
           >
             <ComicShannsFontSvg />
