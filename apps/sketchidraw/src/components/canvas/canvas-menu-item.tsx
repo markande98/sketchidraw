@@ -8,7 +8,7 @@ const menuItems = [
   { label: "Save to..", icon: Save },
   { label: "Command Palette", icon: Zap },
   { label: "Live collaboration..", icon: Users },
-  { label: "Reset the Canvas", icon: Trash2 },
+  { label: "Reset the Canvas", icon: Trash2, isModal: true },
 ];
 
 export const CanvasMenuItem = () => {
@@ -20,6 +20,7 @@ export const CanvasMenuItem = () => {
           key={index}
           label={item.label}
           icon={item.icon}
+          isModal={item.isModal}
         />
       ))}
     </div>

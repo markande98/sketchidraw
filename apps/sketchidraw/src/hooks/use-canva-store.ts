@@ -22,6 +22,7 @@ interface CanvaStore {
   canvas: HTMLCanvasElement | null;
   roughCanvas: RoughCanvas | null;
   themeColor: string;
+  isOpen: boolean;
   tooltype: ToolType;
   canvasScale: number;
   canvaCursorType: CursorType;
@@ -39,6 +40,8 @@ interface CanvaStore {
 
   onSetCanva: (canvas: HTMLCanvasElement) => void;
   onSetThemeColor: (color: string) => void;
+  onOpen: () => void;
+  onClose: () => void;
   onSelectTooltype: (tooltype: ToolType) => void;
   onSetCanvasScale: (scale: number) => void;
   onSetCanvaCursorType: (cursorType: CursorType) => void;
@@ -59,6 +62,7 @@ interface CanvaStore {
 export const useCanva = create<CanvaStore>((set) => ({
   canvas: null,
   themeColor: CANVAS_BG_DARK_COLOR[0],
+  isOpen: false,
   roughCanvas: null,
   tooltype: ToolType.Select,
   canvasScale: 1,
@@ -77,6 +81,8 @@ export const useCanva = create<CanvaStore>((set) => ({
 
   onSetCanva: (canvas: HTMLCanvasElement) => set({ canvas }),
   onSetThemeColor: (color: string) => set({ themeColor: color }),
+  onOpen: () => set({ isOpen: true }),
+  onClose: () => set({ isOpen: false }),
   onSetRoughCanvas: (roughCanvas: RoughCanvas) => set({ roughCanvas }),
   onSetCanvasScale: (scale: number) => set({ canvasScale: scale }),
   onSelectTooltype: (tooltype: ToolType) => set({ tooltype }),

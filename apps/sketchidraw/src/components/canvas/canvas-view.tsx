@@ -12,6 +12,7 @@ import { useCanva } from "@/hooks/use-canva-store";
 import { ToolType } from "@/types/tools";
 import { saveToLocalStorage } from "@/lib/utils";
 import { Shape } from "@/types/shape";
+import { CanvaClearModal } from "./canva-clear-modal";
 
 export const CanvasView = () => {
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
@@ -50,6 +51,7 @@ export const CanvasView = () => {
   return (
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
       {showWelcomeScreen && <WelcomeScreen />}
+      <CanvaClearModal setSelectedShapeIndex={setSelectedShapeIndex} />
       <CanvasProperty selectedShapeIndex={selectedShapeIndex} />
       <CanvasMenu />
       <ToolsMenu />
