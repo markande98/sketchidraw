@@ -621,14 +621,14 @@ export class CanvasEngine {
       );
       switch (transformedShape.type) {
         case ToolType.Rectangle:
-          const path = this.roundedRectPath(
+          const rectPath = this.roundedRectPath(
             transformedShape.startX,
             transformedShape.startY,
             transformedShape.endX - transformedShape.startX,
             transformedShape.endY - transformedShape.startY,
             transformedShape.edgeType
           );
-          this.roughCanvas.path(path, options);
+          this.roughCanvas.path(rectPath, options);
           break;
         case ToolType.Ellipse:
           this.roughCanvas.ellipse(
@@ -640,13 +640,14 @@ export class CanvasEngine {
           );
           break;
         case ToolType.Diamond:
-          const points = this.getDiamondPoints(
+          const diamondPath = this.getDiamondPath(
             (transformedShape.startX + transformedShape.endX) / 2,
             (transformedShape.startY + transformedShape.endY) / 2,
             (transformedShape.endX - transformedShape.startX) / 2,
-            (transformedShape.endY - transformedShape.startY) / 2
+            (transformedShape.endY - transformedShape.startY) / 2,
+            transformedShape.edgeType
           );
-          this.roughCanvas.polygon(points, options);
+          this.roughCanvas.path(diamondPath, options);
           break;
         case ToolType.Line:
           this.roughCanvas.line(
@@ -714,20 +715,94 @@ export class CanvasEngine {
           L ${x} ${y + radius}
           Q ${x} ${y} ${x + radius} ${y} Z`;
   }
-
-  private getDiamondPoints(
+  private getDiamonPoints(
     centerX: number,
     centerY: number,
     width: number,
     height: number
-  ): [number, number][] {
-    const points: [number, number][] = [
+  ) {
+    const points: [x: number, y: number][] = [
       [centerX, centerY - height],
       [centerX + width, centerY],
       [centerX, centerY + height],
       [centerX - width, centerY],
     ];
+
     return points;
+  }
+  private getDiamondPath(
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number,
+    cornerRadius: number = 0
+  ): string {
+    if (cornerRadius === 0 || width === 0 || height === 0) {
+      return `M ${centerX} ${centerY - height}
+          L ${centerX + width} ${centerY}
+          L ${centerX} ${centerY + height}
+          L ${centerX - width} ${centerY}
+          Z`;
+    }
+    const points = this.getDiamonPoints(centerX, centerY, width, height);
+    const pathCommands: string[] = [];
+    const numPoints = points.length;
+
+    for (let i = 0; i < numPoints; i++) {
+      const prevIndex = (i - 1 + numPoints) % numPoints;
+      const currentIndex = i;
+      const nextIndex = (i + 1) % numPoints;
+
+      const prev = points[prevIndex];
+      const current = points[currentIndex];
+      const next = points[nextIndex];
+
+      // Calculate vectors and distances
+      const v1 = [current[0] - prev[0], current[1] - prev[1]];
+      const v2 = [next[0] - current[0], next[1] - current[1]];
+
+      const d1 = Math.sqrt(v1[0] * v1[0] + v1[1] * v1[1]);
+      const d2 = Math.sqrt(v2[0] * v2[0] + v2[1] * v2[1]);
+
+      const maxRadius = Math.min(d1 / 2, d2 / 2, cornerRadius);
+
+      const u1 = [v1[0] / d1, v1[1] / d1];
+      const u2 = [v2[0] / d2, v2[1] / d2];
+
+      // Calculate tangent points
+      const startTangent = [
+        current[0] - u1[0] * maxRadius,
+        current[1] - u1[1] * maxRadius,
+      ];
+      const endTangent = [
+        current[0] + u2[0] * maxRadius,
+        current[1] + u2[1] * maxRadius,
+      ];
+
+      // Calculate control points for cubic bezier (closer to tangent points for smoother curve)
+      const controlPoint1 = [
+        startTangent[0] + u1[0] * maxRadius * 0.55, // 0.55 ≈ smooth curve factor
+        startTangent[1] + u1[1] * maxRadius * 0.55,
+      ];
+      const controlPoint2 = [
+        endTangent[0] - u2[0] * maxRadius * 0.55,
+        endTangent[1] - u2[1] * maxRadius * 0.55,
+      ];
+
+      if (i === 0) {
+        pathCommands.push(`M ${startTangent[0]} ${startTangent[1]}`);
+      } else {
+        pathCommands.push(`L ${startTangent[0]} ${startTangent[1]}`);
+      }
+
+      // Use cubic bezier for smoother curve
+      pathCommands.push(
+        `C ${controlPoint1[0]} ${controlPoint1[1]} ${controlPoint2[0]} ${controlPoint2[1]} ${endTangent[0]} ${endTangent[1]}`
+      );
+    }
+
+    pathCommands.push("Z");
+    return pathCommands.join(" ");
   }
 
   private drawLineWithArrow(
@@ -1005,14 +1080,14 @@ export class CanvasEngine {
     const options = this.getCanvaOptions();
     switch (transformedShape.type) {
       case ToolType.Rectangle:
-        const path = this.roundedRectPath(
+        const rectPath = this.roundedRectPath(
           transformedShape.startX,
           transformedShape.startY,
           transformedShape.endX - transformedShape.startX,
           transformedShape.endY - transformedShape.startY,
           transformedShape.edgeType
         );
-        this.roughCanvas.path(path, options);
+        this.roughCanvas.path(rectPath, options);
         break;
       case ToolType.Ellipse:
         this.roughCanvas.ellipse(
@@ -1024,13 +1099,14 @@ export class CanvasEngine {
         );
         break;
       case ToolType.Diamond:
-        const points = this.getDiamondPoints(
+        const diamondPath = this.getDiamondPath(
           (transformedShape.startX + transformedShape.endX) / 2,
           (transformedShape.startY + transformedShape.endY) / 2,
           (transformedShape.endX - transformedShape.startX) / 2,
-          (transformedShape.endY - transformedShape.startY) / 2
+          (transformedShape.endY - transformedShape.startY) / 2,
+          transformedShape.edgeType
         );
-        this.roughCanvas.polygon(points, options);
+        this.roughCanvas.path(diamondPath, options);
         break;
       case ToolType.Line:
         this.roughCanvas.line(

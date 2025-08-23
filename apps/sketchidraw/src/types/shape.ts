@@ -42,6 +42,7 @@ type Diamond = ShapeOptions & {
   startY: number;
   endX: number;
   endY: number;
+  edgeType: Edges;
 };
 
 type Line = ShapeOptions & {

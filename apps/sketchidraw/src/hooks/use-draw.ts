@@ -297,6 +297,7 @@ export const useDraw = ({
           startY: pos.y,
           endX: pos.x,
           endY: pos.y,
+          edgeType: canvaEdge,
           ...options,
         });
         break;
@@ -722,6 +723,7 @@ export const useDraw = ({
             startY: Math.min(pos.y, dragStart.y),
             endX: Math.max(pos.x, dragStart.x),
             endY: Math.max(pos.y, dragStart.y),
+            edgeType: canvaEdge,
             ...options,
           });
           break;
