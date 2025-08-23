@@ -55,6 +55,7 @@ export const useDraw = ({
     canvasRef,
     panX,
     panY,
+    selectedShapeIndex,
   });
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });

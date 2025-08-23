@@ -10,14 +10,42 @@ import { useCanva } from "@/hooks/use-canva-store";
 import { FontSize as FONT_SIZE } from "@/constants/index";
 import { cn } from "@/lib/utils";
 import { ToolType } from "@/types/tools";
+import { RefObject } from "react";
+import { Text } from "@/types/shape";
 
 type FontSizeProps = {
   selectedShapeIndex: number | null;
+  canvasRef: RefObject<HTMLCanvasElement | null>;
 };
 
-export const FontSize = ({ selectedShapeIndex }: FontSizeProps) => {
+export const FontSize = ({ selectedShapeIndex, canvasRef }: FontSizeProps) => {
   const { canvaFontSize, canvaShapes, onSetCanvaFontSize, onSetCanvaShapes } =
     useCanva();
+
+  const getTextMetrics = (textObj: Text) => {
+    if (!canvasRef.current) return { lines: [], width: 0, height: 0 };
+
+    const ctx = canvasRef.current.getContext("2d");
+    if (!ctx) return { lines: [], width: 0, height: 0 };
+    ctx.font = `${textObj.fontSize}px ${textObj.fontFamily}`;
+    const lines = textObj.text.split("\n");
+    const lineHeight = textObj.fontSize * textObj.lineHeight;
+    const measuredLines = lines.map((line) => ({
+      text: line,
+      width: ctx.measureText(line).width,
+      height: lineHeight,
+    }));
+
+    const maxWidth = Math.max(...measuredLines.map((l) => l.width));
+    const totalHeight = measuredLines.length * lineHeight;
+
+    return {
+      lines,
+      width: maxWidth,
+      height: totalHeight,
+      lineHeight,
+    };
+  };
 
   const onClick = (fontSize: FONT_SIZE) => {
     onSetCanvaFontSize(fontSize);
@@ -28,6 +56,14 @@ export const FontSize = ({ selectedShapeIndex }: FontSizeProps) => {
         shapeToUpdate = {
           ...shapeToUpdate,
           fontSize,
+        };
+        const metrics = getTextMetrics(shapeToUpdate);
+        const endX = shapeToUpdate.startX + (metrics?.width ?? 0);
+        const endY = shapeToUpdate.startY + (metrics?.height ?? 0);
+        shapeToUpdate = {
+          ...shapeToUpdate,
+          endX,
+          endY,
         };
       }
       newShapes[selectedShapeIndex] = shapeToUpdate;

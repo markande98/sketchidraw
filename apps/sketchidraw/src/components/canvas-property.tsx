@@ -15,12 +15,17 @@ import { ToolType } from "@/types/tools";
 import { ArrowHeads } from "./arrow-heads";
 import { FontSize } from "./font-size";
 import { FontFamily } from "./font-family";
+import { RefObject } from "react";
 
 type CanvasPropertyProps = {
   selectedShapeIndex: number | null;
+  canvasRef: RefObject<HTMLCanvasElement | null>;
 };
 
-export const CanvasProperty = ({ selectedShapeIndex }: CanvasPropertyProps) => {
+export const CanvasProperty = ({
+  selectedShapeIndex,
+  canvasRef,
+}: CanvasPropertyProps) => {
   const isMobile = useMediaQuery("(max-width: 639px)");
   const { tooltype } = useCanva();
 
@@ -55,7 +60,12 @@ export const CanvasProperty = ({ selectedShapeIndex }: CanvasPropertyProps) => {
           <ArrowHeads selectedShapeIndex={selectedShapeIndex} />
         )}
         {isTextTool && <FontFamily selectedShapeIndex={selectedShapeIndex} />}
-        {isTextTool && <FontSize selectedShapeIndex={selectedShapeIndex} />}
+        {isTextTool && (
+          <FontSize
+            canvasRef={canvasRef}
+            selectedShapeIndex={selectedShapeIndex}
+          />
+        )}
       </div>
     </ScrollArea>
   );

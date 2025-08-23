@@ -52,7 +52,10 @@ export const CanvasView = () => {
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
       {showWelcomeScreen && <WelcomeScreen />}
       <CanvaClearModal setSelectedShapeIndex={setSelectedShapeIndex} />
-      <CanvasProperty selectedShapeIndex={selectedShapeIndex} />
+      <CanvasProperty
+        canvasRef={canvasRef}
+        selectedShapeIndex={selectedShapeIndex}
+      />
       <CanvasMenu />
       <ToolsMenu />
       <button

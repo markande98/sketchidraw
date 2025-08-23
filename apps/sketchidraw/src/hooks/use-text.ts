@@ -14,9 +14,16 @@ type TextProps = {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   panX: number;
   panY: number;
+  selectedShapeIndex: number | null;
 };
 
-export const useText = ({ canvasRef, canvasEngine, panX, panY }: TextProps) => {
+export const useText = ({
+  canvasRef,
+  canvasEngine,
+  panX,
+  panY,
+  selectedShapeIndex,
+}: TextProps) => {
   const {
     tooltype,
     canvasScale,
@@ -610,7 +617,7 @@ export const useText = ({ canvasRef, canvasEngine, panX, panY }: TextProps) => {
       !canvasEngine
     )
       return;
-    canvasEngine.redrawShapes(null, canvasScale, panX, panY);
+    canvasEngine.redrawShapes(selectedShapeIndex, canvasScale, panX, panY);
     const text = canvaShapes.find(
       (shape) => shape.type === ToolType.Text && shape.id === activeTextId
     );
@@ -643,6 +650,7 @@ export const useText = ({ canvasRef, canvasEngine, panX, panY }: TextProps) => {
     getCursorCoordinates,
     panX,
     panY,
+    selectedShapeIndex,
   ]);
 
   useEffect(() => {
