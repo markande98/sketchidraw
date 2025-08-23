@@ -212,8 +212,8 @@ body,
 #cursor {
   position: fixed;
   display: "none";
-  top: -100px;
-  left: -100px;
+  top: 0px;
+  left: 0px;
   width: 10px;
   height: 10px;
   background-color: transparent;

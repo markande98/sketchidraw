@@ -122,7 +122,7 @@ export const useDraw = ({
         y: e.clientY - rect.top,
       };
       if (!isInspectMode)
-        cursor.style.transform = `translate(${cursorPos.x + 100}px, ${cursorPos.y + 100}px)`;
+        cursor.style.transform = `translate(${cursorPos.x}px, ${cursorPos.y}px)`;
       if (isInspectMode) cursor.style.display = "none";
       const pos = {
         x: (cursorPos.x - panX) / canvasScale,
@@ -132,7 +132,7 @@ export const useDraw = ({
     };
     if (!isInspectMode) cursor.style.display = "block";
     if (isInspectMode) cursor.style.display = "none";
-    cursor.style.transform = `translate(${cursorPos.x + 100}px, ${cursorPos.y + 100}px)`;
+    cursor.style.transform = `translate(${cursorPos.x + panX}px, ${cursorPos.y + panY}px)`;
     document.addEventListener("pointermove", handleCursorMove);
 
     return () => {
