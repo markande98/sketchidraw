@@ -48,7 +48,7 @@ export const CANVAS_BG_LIGHT_COLOR = [
 ];
 
 // stroke constants
-export const STROKE_WIDTH = [1, 2, 3];
+export const STROKE_WIDTH = [1, 3, 5];
 export const STROKE_DASH_OFFSET = [0, 5, 10];
 
 // Handle constants

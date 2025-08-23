@@ -7,14 +7,28 @@ import { Minus } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
 
-export const StrokeWidth = () => {
+type StrokeWidthProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const StrokeWidth = ({ selectedShapeIndex }: StrokeWidthProps) => {
   const { resolvedTheme } = useTheme();
-  const { onSetCanvaStrokeWidth } = useCanva();
+  const { onSetCanvaStrokeWidth, canvaShapes, onSetCanvaShapes } = useCanva();
   const [widthIndex, setWidthIndex] = useState(0);
 
   const onClick = (index: number) => {
     setWidthIndex(index);
     onSetCanvaStrokeWidth(STROKE_WIDTH[index]);
+    if (selectedShapeIndex !== null) {
+      const newShapes = canvaShapes;
+      let shapeToUpdate = newShapes[selectedShapeIndex];
+      shapeToUpdate = {
+        ...shapeToUpdate,
+        strokeWidth: STROKE_WIDTH[index],
+      };
+      newShapes[selectedShapeIndex] = shapeToUpdate;
+      onSetCanvaShapes([...newShapes]);
+    }
   };
 
   return (

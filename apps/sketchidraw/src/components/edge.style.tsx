@@ -4,11 +4,29 @@ import { Edges } from "@/constants";
 import { RoundEdgeSvg, SharpEdgeSvg } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
+import { ToolType } from "@/types/tools";
 
-export const EdgeStyle = () => {
-  const { canvaEdge, onSetCanvaEdge } = useCanva();
+type EdgeStyleProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const EdgeStyle = ({ selectedShapeIndex }: EdgeStyleProps) => {
+  const { canvaEdge, onSetCanvaEdge, canvaShapes, onSetCanvaShapes } =
+    useCanva();
   const onClick = (edge: Edges) => {
     onSetCanvaEdge(edge);
+    if (selectedShapeIndex !== null) {
+      const newShapes = canvaShapes;
+      let shapeToUpdate = newShapes[selectedShapeIndex];
+      if (shapeToUpdate.type === ToolType.Rectangle) {
+        shapeToUpdate = {
+          ...shapeToUpdate,
+          edgeType: edge,
+        };
+      }
+      newShapes[selectedShapeIndex] = shapeToUpdate;
+      onSetCanvaShapes([...newShapes]);
+    }
   };
   return (
     <div className="flex flex-col space-y-2">

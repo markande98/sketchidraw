@@ -4,12 +4,30 @@ import { ArrowTypes } from "@/constants";
 import { ArrowSvg, TriangleOutlineSvg, TriangleSvg } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
+import { ToolType } from "@/types/tools";
 
-export const ArrowHeads = () => {
-  const { canvaArrowType, onsetCanvaArrowType } = useCanva();
+type ArrowHeadsProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const ArrowHeads = ({ selectedShapeIndex }: ArrowHeadsProps) => {
+  const { canvaArrowType, onsetCanvaArrowType, canvaShapes, onSetCanvaShapes } =
+    useCanva();
 
   const onClick = (type: ArrowTypes) => {
     onsetCanvaArrowType(type);
+    if (selectedShapeIndex !== null) {
+      const newShapes = canvaShapes;
+      let shapeToUpdate = newShapes[selectedShapeIndex];
+      if (shapeToUpdate.type === ToolType.Arrow) {
+        shapeToUpdate = {
+          ...shapeToUpdate,
+          arrowType: type,
+        };
+      }
+      newShapes[selectedShapeIndex] = shapeToUpdate;
+      onSetCanvaShapes([...newShapes]);
+    }
   };
 
   return (

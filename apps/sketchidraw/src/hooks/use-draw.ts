@@ -17,6 +17,8 @@ type DrawProps = {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   panX: number;
   panY: number;
+  selectedShapeIndex: number | null;
+  setSelectedShapeIndex: React.Dispatch<SetStateAction<number | null>>;
   setCanvasState: React.Dispatch<SetStateAction<CanvasState>>;
   expandCanvasForPanning: () => void;
 };
@@ -26,6 +28,8 @@ export const useDraw = ({
   canvasRef,
   panX,
   panY,
+  selectedShapeIndex,
+  setSelectedShapeIndex,
   setCanvasState,
   expandCanvasForPanning,
 }: DrawProps) => {
@@ -45,9 +49,7 @@ export const useDraw = ({
     onSetCanvaCursorType,
     onSelectTooltype,
   } = useCanva();
-  const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
-    null
-  );
+
   const { handleMouseDown, handleMouseMove, handleMouseUp } = useText({
     canvasEngine,
     canvasRef,
@@ -113,6 +115,7 @@ export const useDraw = ({
     cursor.id = "cursor";
     document.body.appendChild(cursor);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleCursorMove = (e: any) => {
       const canvasElement = canvasRef.current;
       if (!canvasElement) return;
@@ -132,7 +135,7 @@ export const useDraw = ({
     };
     if (!isInspectMode) cursor.style.display = "block";
     if (isInspectMode) cursor.style.display = "none";
-    cursor.style.transform = `translate(${cursorPos.x + panX}px, ${cursorPos.y + panY}px)`;
+    cursor.style.transform = `translate(${cursorPos.x * canvasScale + panX}px, ${cursorPos.y * canvasScale + panY}px)`;
     document.addEventListener("pointermove", handleCursorMove);
 
     return () => {
@@ -192,7 +195,7 @@ export const useDraw = ({
         }
         return updatedShape;
       });
-      onSetCanvaShapes(updatedCanvas);
+      onSetCanvaShapes([...updatedCanvas]);
       return;
     }
     if (tooltype === ToolType.Text) {
@@ -602,7 +605,7 @@ export const useDraw = ({
       }
       const newShapes = [...canvaShapes];
       newShapes[selectedShapeIndex] = shape;
-      onSetCanvaShapes(newShapes);
+      onSetCanvaShapes([...newShapes]);
       setDragStart(pos);
     } else if (isDragging && tooltype === ToolType.Grab) {
       const pos = getMousePos(e);
@@ -684,7 +687,7 @@ export const useDraw = ({
           break;
       }
       onSetCanvaCursorType(CursorType.Crossmove);
-      onSetCanvaShapes(newShapes);
+      onSetCanvaShapes([...newShapes]);
       setDragStart(pos);
     } else if (isDrawing && currentShape) {
       switch (tooltype) {
@@ -796,7 +799,7 @@ export const useDraw = ({
         }
         return updatedShape;
       });
-      onSetCanvaShapes(updatedCanvas);
+      onSetCanvaShapes([...updatedCanvas]);
     }
   };
 
@@ -808,7 +811,7 @@ export const useDraw = ({
     }
     if (tooltype === ToolType.Eraser) {
       const updatedShapes = canvaShapes.filter((shape) => !shape.isDeleted);
-      onSetCanvaShapes(updatedShapes);
+      onSetCanvaShapes([...updatedShapes]);
       setIsDeleting(false);
       return;
     }
@@ -853,7 +856,7 @@ export const useDraw = ({
         default:
           break;
       }
-      onSetCanvaShapes(canvaShapes);
+      onSetCanvaShapes([...canvaShapes]);
     }
     onSetCanvaCursorType(CursorType.Crosshair);
     setIsDrawing(false);

@@ -801,7 +801,7 @@ export class CanvasEngine {
 
     if (stroke.length === 0) return;
 
-    ctx.fillStyle = options.stroke;
+    ctx.fillStyle = options.stroke ?? "#ffffff";
     ctx.beginPath();
 
     ctx.moveTo(stroke[0][0], stroke[0][1]);

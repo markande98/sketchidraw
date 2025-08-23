@@ -5,11 +5,30 @@ import { Sloppiness as SLOPPINESS } from "@/constants/index";
 import { ArchitectSvg, ArtistSvg, CartoonistSvg } from "@/constants/svg";
 import { cn } from "@/lib/utils";
 
-export const Sloppiness = () => {
-  const { canvaSloppiness, onSetCanvaSloppiness } = useCanva();
+type SloppinessProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const Sloppiness = ({ selectedShapeIndex }: SloppinessProps) => {
+  const {
+    canvaSloppiness,
+    onSetCanvaSloppiness,
+    canvaShapes,
+    onSetCanvaShapes,
+  } = useCanva();
 
   const onClick = (sloppiness: SLOPPINESS) => {
     onSetCanvaSloppiness(sloppiness);
+    if (selectedShapeIndex !== null) {
+      const newShapes = canvaShapes;
+      let shapeToUpdate = newShapes[selectedShapeIndex];
+      shapeToUpdate = {
+        ...shapeToUpdate,
+        sloppiness,
+      };
+      newShapes[selectedShapeIndex] = shapeToUpdate;
+      onSetCanvaShapes([...newShapes]);
+    }
   };
 
   return (

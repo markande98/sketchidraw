@@ -9,12 +9,29 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { ColorToolTip } from "./color-tooltip";
 
-export const BackgroundOptions = () => {
+type BackgroundOptionsProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const BackgroundOptions = ({
+  selectedShapeIndex,
+}: BackgroundOptionsProps) => {
   const { resolvedTheme } = useTheme();
-  const { canvaBgColor, onSetCanvaBgColor } = useCanva();
+  const { canvaBgColor, onSetCanvaBgColor, canvaShapes, onSetCanvaShapes } =
+    useCanva();
 
   const onChange = (color: string | "transparent") => {
     onSetCanvaBgColor(color);
+    if (selectedShapeIndex !== null) {
+      const newShapes = canvaShapes;
+      let shapeToUpdate = newShapes[selectedShapeIndex];
+      shapeToUpdate = {
+        ...shapeToUpdate,
+        fill: color,
+      };
+      newShapes[selectedShapeIndex] = shapeToUpdate;
+      onSetCanvaShapes([...newShapes]);
+    }
   };
 
   const COLORS =

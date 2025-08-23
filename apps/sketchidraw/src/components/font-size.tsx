@@ -9,12 +9,30 @@ import {
 import { useCanva } from "@/hooks/use-canva-store";
 import { FontSize as FONT_SIZE } from "@/constants/index";
 import { cn } from "@/lib/utils";
+import { ToolType } from "@/types/tools";
 
-export const FontSize = () => {
-  const { canvaFontSize, onSetCanvaFontSize } = useCanva();
+type FontSizeProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const FontSize = ({ selectedShapeIndex }: FontSizeProps) => {
+  const { canvaFontSize, canvaShapes, onSetCanvaFontSize, onSetCanvaShapes } =
+    useCanva();
 
   const onClick = (fontSize: FONT_SIZE) => {
     onSetCanvaFontSize(fontSize);
+    if (selectedShapeIndex !== null) {
+      const newShapes = canvaShapes;
+      let shapeToUpdate = newShapes[selectedShapeIndex];
+      if (shapeToUpdate.type === ToolType.Text) {
+        shapeToUpdate = {
+          ...shapeToUpdate,
+          fontSize,
+        };
+      }
+      newShapes[selectedShapeIndex] = shapeToUpdate;
+      onSetCanvaShapes([...newShapes]);
+    }
   };
 
   return (

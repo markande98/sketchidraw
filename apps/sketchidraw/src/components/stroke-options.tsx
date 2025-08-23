@@ -6,13 +6,39 @@ import { STROKE_DARK_COLORS, STROKE_LIGHT_COLORS } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { useTheme } from "next-themes";
 import { ColorToolTip } from "./color-tooltip";
+import { ToolType } from "@/types/tools";
 
-export const StrokeOptions = () => {
+type StrokeOptionsProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const StrokeOptions = ({ selectedShapeIndex }: StrokeOptionsProps) => {
   const { resolvedTheme } = useTheme();
-  const { canvaStrokeColor, onSetCanvaStrokeColor } = useCanva();
+  const {
+    canvaStrokeColor,
+    onSetCanvaStrokeColor,
+    canvaShapes,
+    onSetCanvaShapes,
+  } = useCanva();
 
   const onChange = (color: string) => {
     onSetCanvaStrokeColor(color);
+    if (selectedShapeIndex !== null) {
+      const newShapes = canvaShapes;
+      let shapeToUpdate = newShapes[selectedShapeIndex];
+      shapeToUpdate = {
+        ...shapeToUpdate,
+        stroke: color,
+      };
+      if (shapeToUpdate.type === ToolType.Text) {
+        shapeToUpdate = {
+          ...shapeToUpdate,
+          color,
+        };
+      }
+      newShapes[selectedShapeIndex] = shapeToUpdate;
+      onSetCanvaShapes([...newShapes]);
+    }
   };
 
   const COLORS =

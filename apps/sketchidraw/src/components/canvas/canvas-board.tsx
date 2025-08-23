@@ -20,6 +20,8 @@ type CanvasBoardProps = {
   panX: number;
   panY: number;
   canvasRef: RefObject<HTMLCanvasElement | null>;
+  selectedShapeIndex: number | null;
+  setSelectedShapeIndex: React.Dispatch<SetStateAction<number | null>>;
   handleTouchStart: (event: TouchEvent) => void;
   handleTouchMove: (event: TouchEvent) => void;
   handleTouchEnd: (event: TouchEvent) => void;
@@ -36,6 +38,8 @@ export const CanvasBoard = ({
   handleTouchMove,
   handleTouchStart,
   handleWheel,
+  selectedShapeIndex,
+  setSelectedShapeIndex,
   setCanvasState,
   expandCanvasForPanning,
 }: CanvasBoardProps) => {
@@ -49,6 +53,8 @@ export const CanvasBoard = ({
     canvasRef,
     panX,
     panY,
+    selectedShapeIndex,
+    setSelectedShapeIndex,
     setCanvasState,
     expandCanvasForPanning,
   });
@@ -156,6 +162,7 @@ export const CanvasBoard = ({
       if (canvas) canvas.removeEventListener("wheel", handleWheel);
       window.removeEventListener("resize", handleResize);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onSetCanva, onSetRoughCanvas, handleWheel]);
 
   return (

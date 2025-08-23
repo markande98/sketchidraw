@@ -5,13 +5,28 @@ import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-export const StrokeStyle = () => {
-  const { onSetCanvaStrokeDashOffset } = useCanva();
+type StrokeStyleProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const StrokeStyle = ({ selectedShapeIndex }: StrokeStyleProps) => {
+  const { onSetCanvaStrokeDashOffset, canvaShapes, onSetCanvaShapes } =
+    useCanva();
   const [strokeDashIndex, setStrokeDashIndex] = useState(0);
 
   const onClick = (index: number) => {
     onSetCanvaStrokeDashOffset(STROKE_DASH_OFFSET[index]);
     setStrokeDashIndex(index);
+    if (selectedShapeIndex !== null) {
+      const newShapes = canvaShapes;
+      let shapeToUpdate = newShapes[selectedShapeIndex];
+      shapeToUpdate = {
+        ...shapeToUpdate,
+        strokeDashOffset: STROKE_DASH_OFFSET[index],
+      };
+      newShapes[selectedShapeIndex] = shapeToUpdate;
+      onSetCanvaShapes([...newShapes]);
+    }
   };
   return (
     <div className="flex flex-col space-y-2">

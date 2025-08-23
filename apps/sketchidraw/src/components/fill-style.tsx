@@ -5,11 +5,26 @@ import { FillStyle as FILLSTYLE } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
 
-export const FillStyle = () => {
-  const { canvaFillstyle, onSetCanvaFillstyle } = useCanva();
+type FillStyleProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const FillStyle = ({ selectedShapeIndex }: FillStyleProps) => {
+  const { canvaFillstyle, onSetCanvaFillstyle, canvaShapes, onSetCanvaShapes } =
+    useCanva();
 
   const onClick = (fillStyle: FILLSTYLE) => {
     onSetCanvaFillstyle(fillStyle);
+    if (selectedShapeIndex !== null) {
+      const newShapes = canvaShapes;
+      let shapeToUpdate = newShapes[selectedShapeIndex];
+      shapeToUpdate = {
+        ...shapeToUpdate,
+        fillStyle,
+      };
+      newShapes[selectedShapeIndex] = shapeToUpdate;
+      onSetCanvaShapes([...newShapes]);
+    }
   };
   return (
     <div className="flex flex-col space-y-2">

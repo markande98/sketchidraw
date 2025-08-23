@@ -16,7 +16,11 @@ import { ArrowHeads } from "./arrow-heads";
 import { FontSize } from "./font-size";
 import { FontFamily } from "./font-family";
 
-export const CanvasProperty = () => {
+type CanvasPropertyProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const CanvasProperty = ({ selectedShapeIndex }: CanvasPropertyProps) => {
   const isMobile = useMediaQuery("(max-width: 639px)");
   const { tooltype } = useCanva();
 
@@ -32,18 +36,26 @@ export const CanvasProperty = () => {
   return (
     <ScrollArea className="z-[100] absolute top-22 bg-white dark:bg-surface-low border shadow-md rounded-md left-6 w-[210px] max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-190px)] overflow-y-auto">
       <div className="p-3 space-y-6">
-        <StrokeOptions />
-        {!isTextTool && <BackgroundOptions />}
-        {!isTextTool && <FillStyle />}
-        {!isTextTool && <StrokeWidth />}
-        {!isPencilTool && !isTextTool && <StrokeStyle />}
-        {!isPencilTool && !isTextTool && <Sloppiness />}
-        {!isEllipseTool && !isArrowTool && !isPencilTool && !isTextTool && (
-          <EdgeStyle />
+        <StrokeOptions selectedShapeIndex={selectedShapeIndex} />
+        {!isTextTool && (
+          <BackgroundOptions selectedShapeIndex={selectedShapeIndex} />
         )}
-        {isArrowTool && !isPencilTool && <ArrowHeads />}
-        {isTextTool && <FontFamily />}
-        {isTextTool && <FontSize />}
+        {!isTextTool && <FillStyle selectedShapeIndex={selectedShapeIndex} />}
+        {!isTextTool && <StrokeWidth selectedShapeIndex={selectedShapeIndex} />}
+        {!isPencilTool && !isTextTool && (
+          <StrokeStyle selectedShapeIndex={selectedShapeIndex} />
+        )}
+        {!isPencilTool && !isTextTool && (
+          <Sloppiness selectedShapeIndex={selectedShapeIndex} />
+        )}
+        {!isEllipseTool && !isArrowTool && !isPencilTool && !isTextTool && (
+          <EdgeStyle selectedShapeIndex={selectedShapeIndex} />
+        )}
+        {isArrowTool && !isPencilTool && (
+          <ArrowHeads selectedShapeIndex={selectedShapeIndex} />
+        )}
+        {isTextTool && <FontFamily selectedShapeIndex={selectedShapeIndex} />}
+        {isTextTool && <FontSize selectedShapeIndex={selectedShapeIndex} />}
       </div>
     </ScrollArea>
   );

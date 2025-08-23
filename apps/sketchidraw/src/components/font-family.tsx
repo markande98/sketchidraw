@@ -8,12 +8,34 @@ import {
 } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
+import { ToolType } from "@/types/tools";
 
-export const FontFamily = () => {
-  const { canvaFontFamily, onSetCanvaFontFamily } = useCanva();
+type FontFamilyProps = {
+  selectedShapeIndex: number | null;
+};
+
+export const FontFamily = ({ selectedShapeIndex }: FontFamilyProps) => {
+  const {
+    canvaFontFamily,
+    canvaShapes,
+    onSetCanvaFontFamily,
+    onSetCanvaShapes,
+  } = useCanva();
 
   const onClick = (font: FONT_FAMILY) => {
     onSetCanvaFontFamily(font);
+    if (selectedShapeIndex !== null) {
+      const newShapes = canvaShapes;
+      let shapeToUpdate = newShapes[selectedShapeIndex];
+      if (shapeToUpdate.type === ToolType.Text) {
+        shapeToUpdate = {
+          ...shapeToUpdate,
+          fontFamily: font,
+        };
+      }
+      newShapes[selectedShapeIndex] = shapeToUpdate;
+      onSetCanvaShapes([...newShapes]);
+    }
   };
   return (
     <div className="flex flex-col space-y-2">

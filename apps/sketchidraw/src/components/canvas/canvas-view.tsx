@@ -6,7 +6,7 @@ import { CanvasProperty } from "../canvas-property";
 import { CanvasMenu } from "./canvas-Menu";
 import { CanvaZoom } from "../canva-zoom";
 import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { WelcomeScreen } from "../welcome-screen";
 import { useCanva } from "@/hooks/use-canva-store";
 import { ToolType } from "@/types/tools";
@@ -14,6 +14,9 @@ import { saveToLocalStorage } from "@/lib/utils";
 import { Shape } from "@/types/shape";
 
 export const CanvasView = () => {
+  const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
+    null
+  );
   const { tooltype, canvaShapes, onSetCanvaShapes } = useCanva();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const {
@@ -47,7 +50,7 @@ export const CanvasView = () => {
   return (
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
       {showWelcomeScreen && <WelcomeScreen />}
-      <CanvasProperty />
+      <CanvasProperty selectedShapeIndex={selectedShapeIndex} />
       <CanvasMenu />
       <ToolsMenu />
       <button
@@ -61,6 +64,8 @@ export const CanvasView = () => {
         panX={panX}
         panY={panY}
         canvasRef={canvasRef}
+        selectedShapeIndex={selectedShapeIndex}
+        setSelectedShapeIndex={setSelectedShapeIndex}
         handleTouchStart={handleTouchStart}
         handleTouchMove={handleTouchMove}
         handleTouchEnd={handleTouchEnd}
