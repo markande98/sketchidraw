@@ -58,3 +58,14 @@ export const saveToLocalStorage = (shapes: Shape[]) => {
   }
   localStorage.setItem("sketchidraw", JSON.stringify(shapes));
 };
+
+export function generateAlphanumericSubstring(len: number) {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < len; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters[randomIndex];
+  }
+  return result;
+}

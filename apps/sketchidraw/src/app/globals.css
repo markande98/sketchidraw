@@ -59,6 +59,7 @@ body,
   --color-brand-hover: var(--brand-hover);
   --color-logo-text: var(--logo-text);
   --color-danger: var(--danger);
+  --color-danger-darker: var(--danger-darker);
   --color-primary-color: var(--primary-color);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -113,6 +114,7 @@ body,
   --logo-text: oklch(0.2433 0.1496 277.82);
   --danger: oklch(0.6561 0.1439 23.86);
   --primary-color: oklch(0.2238 0.0077 285.76);
+  --danger-darker: oklch(0.6173 0.1638 25.29);
 }
 
 .dark {
@@ -161,6 +163,7 @@ body,
   --logo-text: oklch(0.9158 0.0434 289.82);
   --danger: oklch(0.8161 0.1034 21.74);
   --primary-color: oklch(0.9173 0.0067 286.27);
+  --danger-darker: oklch(0.436 0.1408 25.66);
 }
 
 @theme {

@@ -6,7 +6,7 @@ import { CanvasProperty } from "../canvas-property";
 import { CanvasMenu } from "./canvas-Menu";
 import { CanvaZoom } from "../canva-zoom";
 import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { WelcomeScreen } from "../welcome-screen";
 import { useCanva } from "@/hooks/use-canva-store";
 import { ToolType } from "@/types/tools";
@@ -14,12 +14,14 @@ import { saveToLocalStorage } from "@/lib/utils";
 import { Shape } from "@/types/shape";
 import { CanvaClearModal } from "./canva-clear-modal";
 import { CanvaCollabModal } from "./canva-collab-modal";
+import { CanvaModalType } from "@/constants";
+import { CanvaShareModal } from "./canva-share-modal";
 
 export const CanvasView = () => {
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
     null
   );
-  const { tooltype, canvaShapes, onSetCanvaShapes } = useCanva();
+  const { tooltype, canvaShapes, onSetCanvaShapes, onOpen } = useCanva();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const {
     handleTouchStart,
@@ -34,6 +36,15 @@ export const CanvasView = () => {
     panX,
     panY,
   } = useInfiniteCanvas({ canvasRef });
+
+  const handleClick = useCallback(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      onOpen(CanvaModalType.Share);
+      return;
+    }
+    onOpen(CanvaModalType.Session);
+  }, [onOpen]);
 
   useEffect(() => {
     const hasShapes = localStorage.getItem("sketchidraw");
@@ -54,6 +65,7 @@ export const CanvasView = () => {
       {showWelcomeScreen && <WelcomeScreen />}
       <CanvaClearModal setSelectedShapeIndex={setSelectedShapeIndex} />
       <CanvaCollabModal />
+      <CanvaShareModal />
       <CanvasProperty
         canvasRef={canvasRef}
         selectedShapeIndex={selectedShapeIndex}
@@ -61,6 +73,7 @@ export const CanvasView = () => {
       <CanvasMenu />
       <ToolsMenu />
       <button
+        onClick={handleClick}
         type="button"
         className="hidden sm:block absolute z-[100] right-6 top-6 h-10 text-xs bg-primary border-primary hover:bg-primary-darker hover:border-primary-darker shadow-md p-3 rounded-md cursor-pointer font-normal text-surface-lowest"
       >

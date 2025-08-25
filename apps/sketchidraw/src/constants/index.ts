@@ -118,4 +118,5 @@ export enum KeyTypes {
 export enum CanvaModalType {
   Clear = "clear",
   Session = "session",
+  Share = "share",
 }
