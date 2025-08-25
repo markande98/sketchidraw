@@ -1,10 +1,10 @@
 "use client";
 
-import { SetStateAction, useCallback, useEffect, useState } from "react";
-import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
 import { useCanva } from "@/hooks/use-canva-store";
 import { saveToLocalStorage } from "@/lib/utils";
+import { SetStateAction, useCallback, useEffect, useState } from "react";
+import { Separator } from "../ui/separator";
+import { CanvaModalType } from "@/constants";
 
 type CanvaClearModalProps = {
   setSelectedShapeIndex: React.Dispatch<SetStateAction<number | null>>;
@@ -12,7 +12,7 @@ type CanvaClearModalProps = {
 export const CanvaClearModal = ({
   setSelectedShapeIndex,
 }: CanvaClearModalProps) => {
-  const { isOpen, onClose, onSetCanvaShapes } = useCanva();
+  const { isOpen, canvaModalType, onClose, onSetCanvaShapes } = useCanva();
   const [showModal, setShowModal] = useState(isOpen);
 
   useEffect(() => {
@@ -37,12 +37,16 @@ export const CanvaClearModal = ({
     }, 300);
   }, [onClose, onSetCanvaShapes, setSelectedShapeIndex]);
 
-  if (!showModal) return null;
+  const isModalOpen = showModal && canvaModalType === CanvaModalType.Clear;
+
+  console.log(isModalOpen);
+
+  if (!isModalOpen) return null;
 
   return (
-    <>
-      <div
-        className="
+    <div
+      onClick={handleCancel}
+      className="
                     flex
                     justify-center
                     items-center
@@ -53,35 +57,35 @@ export const CanvaClearModal = ({
                     inset-0
                     outline-none
                     focus:outline-none
-                    bg-neutral-800/20
+                    bg-neutral-800/5
                 "
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="flex flex-col dark:border-2 border-surface-high rounded-md p-10 w-full max-w-[550px] shadow-md space-y-4 bg-white dark:bg-surface-low"
       >
-        <div className="flex flex-col rounded-md p-10 w-full max-w-[550px] shadow-md space-y-4 bg-surface-low">
-          <h1 className="text-xl text-on-surface font-extrabold font-sketchifont">
-            Clear canvas
-          </h1>
-          <Separator />
-          <p className="text-on-surface font-sketchifont">
-            This will clear the whole canvas. Are you sure?
-          </p>
-          <div className="flex items-center gap-2 ml-auto">
-            <Button
-              onClick={handleCancel}
-              className="p-6 cursor-pointer font-sketchifont"
-              variant="outline"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleConfirm}
-              className="p-6 cursor-pointer font-sketchifont"
-              variant="destructive"
-            >
-              Confirm
-            </Button>
-          </div>
+        <h1 className="text-xl text-on-surface font-extrabold font-comicShanns">
+          Clear canvas
+        </h1>
+        <Separator />
+        <p className="text-on-surface font-comicShanns">
+          This will clear the whole canvas. Are you sure?
+        </p>
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={handleCancel}
+            className="py-3 px-4 text-sm rounded-md font-comicShanns cursor-pointer border border-default-border-color"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirm}
+            className="text-white text-sm font-comicShanns dark:text-[#121212] py-3 px-4 rounded-md cursor-pointer border border-default-border-color bg-danger"
+          >
+            Confirm
+          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };

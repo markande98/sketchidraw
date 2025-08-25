@@ -114,3 +114,8 @@ export enum KeyTypes {
   ArrowLeft = "ArrowLeft",
   ArrowRight = "ArrowRight",
 }
+
+export enum CanvaModalType {
+  Clear = "clear",
+  Session = "session",
+}

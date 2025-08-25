@@ -10,6 +10,7 @@ import {
   FontFamily,
   FontSize,
   Sloppiness,
+  CanvaModalType,
   STROKE_DARK_COLORS,
   STROKE_DASH_OFFSET,
   STROKE_WIDTH,
@@ -22,8 +23,9 @@ interface CanvaStore {
   canvas: HTMLCanvasElement | null;
   roughCanvas: RoughCanvas | null;
   themeColor: string;
-  isOpen: boolean;
   tooltype: ToolType;
+  isOpen: boolean;
+  canvaModalType: CanvaModalType | null;
   canvasScale: number;
   canvaCursorType: CursorType;
   canvaShapes: Shape[];
@@ -40,9 +42,9 @@ interface CanvaStore {
 
   onSetCanva: (canvas: HTMLCanvasElement) => void;
   onSetThemeColor: (color: string) => void;
-  onOpen: () => void;
-  onClose: () => void;
   onSelectTooltype: (tooltype: ToolType) => void;
+  onOpen: (type: CanvaModalType) => void;
+  onClose: () => void;
   onSetCanvasScale: (scale: number) => void;
   onSetCanvaCursorType: (cursorType: CursorType) => void;
   onSetRoughCanvas: (roughCanvas: RoughCanvas) => void;
@@ -63,8 +65,9 @@ export const useCanva = create<CanvaStore>((set) => ({
   canvas: null,
   themeColor: CANVAS_BG_DARK_COLOR[0],
   isOpen: false,
-  roughCanvas: null,
   tooltype: ToolType.Select,
+  roughCanvas: null,
+  canvaModalType: null,
   canvasScale: 1,
   canvaCursorType: CursorType.Crosshair,
   canvaShapes: [],
@@ -81,8 +84,8 @@ export const useCanva = create<CanvaStore>((set) => ({
 
   onSetCanva: (canvas: HTMLCanvasElement) => set({ canvas }),
   onSetThemeColor: (color: string) => set({ themeColor: color }),
-  onOpen: () => set({ isOpen: true }),
-  onClose: () => set({ isOpen: false }),
+  onOpen: (type: CanvaModalType) => set({ isOpen: true, canvaModalType: type }),
+  onClose: () => set({ isOpen: false, canvaModalType: null }),
   onSetRoughCanvas: (roughCanvas: RoughCanvas) => set({ roughCanvas }),
   onSetCanvasScale: (scale: number) => set({ canvasScale: scale }),
   onSelectTooltype: (tooltype: ToolType) => set({ tooltype }),
