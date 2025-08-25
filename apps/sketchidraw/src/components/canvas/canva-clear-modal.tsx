@@ -12,7 +12,7 @@ type CanvaClearModalProps = {
 export const CanvaClearModal = ({
   setSelectedShapeIndex,
 }: CanvaClearModalProps) => {
-  const { isOpen, canvaModalType, onClose, onSetCanvaShapes } = useCanva();
+  const { isOpen, canvasModalType, onClose, onSetCanvaShapes } = useCanva();
   const [showModal, setShowModal] = useState(isOpen);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export const CanvaClearModal = ({
     }, 300);
   }, [onClose, onSetCanvaShapes, setSelectedShapeIndex]);
 
-  const isModalOpen = showModal && canvaModalType === CanvaModalType.Clear;
+  const isModalOpen = showModal && canvasModalType === CanvaModalType.Clear;
 
   console.log(isModalOpen);
 

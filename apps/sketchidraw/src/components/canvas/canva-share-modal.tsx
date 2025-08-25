@@ -9,23 +9,12 @@ import { useRouter } from "next/navigation";
 
 export const CanvaShareModal = () => {
   const router = useRouter();
-  const { isOpen, onOpen, onClose, canvaModalType } = useCanva();
+  const { isOpen, onClose, canvasData, canvasModalType } = useCanva();
   const [showModal, setShowModal] = useState(isOpen);
-  const [value, setValue] = useState("");
 
   useEffect(() => {
     setShowModal(isOpen);
   }, [isOpen]);
-
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (!hash) {
-      onOpen(CanvaModalType.Session);
-      return;
-    }
-    const fullUrl = `${window.location.origin}/${hash}`;
-    setValue(fullUrl);
-  }, [onOpen]);
 
   const handleCancel = useCallback(() => {
     setShowModal(false);
@@ -39,7 +28,7 @@ export const CanvaShareModal = () => {
     onClose();
   }, [router, onClose]);
 
-  const isModalOpen = showModal && canvaModalType === CanvaModalType.Share;
+  const isModalOpen = showModal && canvasModalType === CanvaModalType.Share;
 
   if (!isModalOpen) return null;
   return (
@@ -72,7 +61,7 @@ export const CanvaShareModal = () => {
           <div className="flex items-center gap-2">
             <input
               readOnly
-              value={value}
+              value={canvasData || ""}
               className="flex-1 p-3 border border-[#c5c5d0] dark:border-[#46464f] focus:outline-none dark:bg-surface-high bg-[#f1f0ff] rounded-md truncate"
             />
             <button className="flex items-center gap-2 rounded-md cursor-pointer text-surface-lowest bg-primary py-3 px-4 font-comicShanns hover:bg-brand-hover transition duration-150">

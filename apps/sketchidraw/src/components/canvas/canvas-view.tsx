@@ -40,10 +40,11 @@ export const CanvasView = () => {
   const handleClick = useCallback(() => {
     const hash = window.location.hash;
     if (hash) {
-      onOpen(CanvaModalType.Share);
+      const url = `${window.location.origin}/${hash}`;
+      onOpen(CanvaModalType.Share, url);
       return;
     }
-    onOpen(CanvaModalType.Session);
+    onOpen(CanvaModalType.Session, null);
   }, [onOpen]);
 
   useEffect(() => {

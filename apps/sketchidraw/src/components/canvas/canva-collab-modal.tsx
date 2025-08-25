@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export const CanvaCollabModal = () => {
   const router = useRouter();
-  const { isOpen, onOpen, onClose, canvaModalType } = useCanva();
+  const { isOpen, onOpen, onClose, canvasModalType } = useCanva();
   const [showModal, setShowModal] = useState(isOpen);
 
   useEffect(() => {
@@ -27,12 +27,12 @@ export const CanvaCollabModal = () => {
     const roomId = generateAlphanumericSubstring(20);
     const key = generateAlphanumericSubstring(22);
     const fragment = `#room=${roomId},${key}`;
-    const url = `${window.location.origin}${fragment}`;
+    const url = `${window.location.origin}/${fragment}`;
     router.replace(url);
-    onOpen(CanvaModalType.Share);
+    onOpen(CanvaModalType.Share, url);
   }, [router, onOpen]);
 
-  const isModalOpen = showModal && canvaModalType === CanvaModalType.Session;
+  const isModalOpen = showModal && canvasModalType === CanvaModalType.Session;
 
   if (!isModalOpen) return null;
 
