@@ -7,7 +7,7 @@ import {
   SketchiFontSvg,
 } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
-import { cn } from "@/lib/utils";
+import { cn, getFontCSS } from "@/lib/utils";
 import { ToolType } from "@/types/tools";
 
 type FontFamilyProps = {
@@ -30,7 +30,7 @@ export const FontFamily = ({ selectedShapeIndex }: FontFamilyProps) => {
       if (shapeToUpdate.type === ToolType.Text) {
         shapeToUpdate = {
           ...shapeToUpdate,
-          fontFamily: font,
+          fontFamily: getFontCSS(font),
         };
       }
       newShapes[selectedShapeIndex] = shapeToUpdate;

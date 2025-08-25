@@ -18,7 +18,10 @@ export const EdgeStyle = ({ selectedShapeIndex }: EdgeStyleProps) => {
     if (selectedShapeIndex !== null) {
       const newShapes = canvaShapes;
       let shapeToUpdate = newShapes[selectedShapeIndex];
-      if (shapeToUpdate.type === ToolType.Rectangle) {
+      if (
+        shapeToUpdate.type === ToolType.Rectangle ||
+        shapeToUpdate.type === ToolType.Diamond
+      ) {
         shapeToUpdate = {
           ...shapeToUpdate,
           edgeType: edge,
