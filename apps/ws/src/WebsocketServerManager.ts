@@ -1,7 +1,10 @@
-import { v4 as uuidv4 } from "uuid";
-
 import { WebSocketServer, WebSocket } from "ws";
-import { ServerEvents, WebSocketEvents } from "./types.js";
+import {
+  ServerEvents,
+  WebSocketClientEvents,
+  WebSocketServerEvents,
+} from "./types.js";
+import { RoomManager } from "./RoomManager.js";
 
 export interface User {
   id: string;
@@ -10,11 +13,13 @@ export interface User {
   lastSeen: Date;
 }
 
-interface Message {
-  type: WebSocketEvents;
-  id?: string;
-  data?: any;
-  timestamp: number;
+export interface Message {
+  type: WebSocketServerEvents;
+  payload: {
+    id?: string;
+    data?: any;
+    timestamp: number;
+  };
 }
 
 export interface ServerConfig {
@@ -24,13 +29,11 @@ export interface ServerConfig {
 
 export class WebsocketServerManager {
   private wss: WebSocketServer;
-  private users: Map<string, User>;
   private config: ServerConfig;
   private heartbeatTimer?: NodeJS.Timeout;
 
   constructor(config: ServerConfig) {
     this.config = config;
-    this.users = new Map<string, User>();
     this.wss = new WebSocketServer({
       port: config.port,
       perMessageDeflate: {
@@ -49,51 +52,70 @@ export class WebsocketServerManager {
 
   private setupServer() {
     this.wss.on(ServerEvents.Connection, (ws: WebSocket) => {
-      const userId = uuidv4();
-      const user: User = {
-        id: userId,
-        ws,
-        isAlive: true,
-        lastSeen: new Date(),
-      };
-      this.users.set(userId, user);
-      console.log(`User connected: ${userId} (${this.users.size} total)`);
-
-      // send message to user
-      this.sendToUser(userId, {
-        type: WebSocketEvents.Join,
-        id: userId,
-        data: { message: "Welcome to Websocket server!", userId },
-        timestamp: Date.now(),
-      });
-
-      // notify all users except this user
-      this.broadcast(
-        {
-          type: WebSocketEvents.Join,
-          data: { message: `User ${userId} joined`, userId },
-          timestamp: Date.now(),
-        },
-        userId
-      );
-
-      // setup ping/pong for heartbeat
-      ws.on(WebSocketEvents.Pong, () => {
-        const user = this.users.get(userId);
-        if (user) {
-          user.isAlive = true;
-          user.lastSeen = new Date();
+      ws.on(WebSocketServerEvents.Message, (data) => {
+        const parsedData = JSON.parse(data.toString());
+        const userId = parsedData.payload.userId;
+        const roomId = parsedData.payload.roomId;
+        const user: User = {
+          id: userId,
+          ws,
+          isAlive: true,
+          lastSeen: new Date(),
+        };
+        switch (parsedData.type) {
+          case WebSocketClientEvents.Join:
+            RoomManager.getInstance().addUser(roomId, user);
+            console.log(
+              `User connected: ${userId} (${RoomManager.getInstance().rooms.get(roomId)?.length} total)`
+            );
+            // send to user
+            WebsocketServerManager.sendToUser(user, {
+              type: WebSocketServerEvents.Joined,
+              payload: {
+                id: userId,
+                data: {
+                  message: "Welcome to Websocket server!",
+                  totalUsers: RoomManager.getInstance().rooms.get(roomId),
+                },
+                timestamp: Date.now(),
+              },
+            });
+            // notify all users except this user
+            RoomManager.getInstance().broadcast(
+              {
+                type: WebSocketServerEvents.Joined,
+                payload: {
+                  data: { message: `User ${user.id} joined`, userId: user.id },
+                  timestamp: Date.now(),
+                },
+              },
+              user,
+              roomId
+            );
+            break;
+          default:
+            break;
         }
-      });
+        // setup ping/pong for heartbeat
+        ws.on(WebSocketServerEvents.Pong, () => {
+          const user = RoomManager.getInstance()
+            .rooms.get(roomId)
+            ?.find((u) => u.id === userId);
+          if (user) {
+            user.isAlive = true;
+            user.lastSeen = new Date();
+          }
+        });
 
-      // close events
-      ws.on(WebSocketEvents.Close, () => {
-        this.users.delete(userId);
-      });
+        // close events
+        ws.on(WebSocketServerEvents.Close, () => {
+          RoomManager.getInstance().removeUser(roomId, user);
+        });
 
-      // error events
-      ws.on(WebSocketEvents.Error, (error: Error) => {
-        console.error(`WebSocket error for user ${userId}:`, error);
+        // error events
+        ws.on(WebSocketServerEvents.Error, (error: Error) => {
+          console.error(`WebSocket error for user ${userId}:`, error);
+        });
       });
     });
 
@@ -105,52 +127,42 @@ export class WebsocketServerManager {
     });
   }
 
-  private sendToUser(userId: string, message: Message) {
-    const user = this.users.get(userId);
+  static sendToUser(user: User, message: Message) {
     if (!user || user.ws.readyState !== WebSocket.OPEN) {
       return false;
     }
-
     try {
       user.ws.send(JSON.stringify(message));
       return true;
     } catch (error) {
-      console.error(`Error sending message to ${userId}:`, error);
-      this.users.delete(userId);
+      console.error(`Error sending message to ${user.id}:`, error);
       return false;
     }
   }
 
-  private broadcast(message: Message, excludeUserId?: string) {
-    let sendCount = 0;
-    for (const [userId, _user] of this.users) {
-      if (excludeUserId && userId === excludeUserId) continue;
-      if (this.sendToUser(userId, message)) {
-        sendCount++;
-      }
-    }
-    return sendCount;
-  }
-
   private startHeartbeat() {
     this.heartbeatTimer = setInterval(() => {
-      for (const [userId, user] of this.users) {
-        if (user.ws.readyState === WebSocket.OPEN) {
-          if (!user.isAlive) {
-            console.log(`Terminating inactive user: ${userId}`);
-            user.ws.terminate();
-            this.users.delete(userId);
-            continue;
+      const rooms = RoomManager.getInstance().rooms.entries();
+      for (const [roomId, users] of rooms) {
+        for (const user of users) {
+          if (user.ws.readyState === WebSocket.OPEN) {
+            if (!user.isAlive) {
+              console.log(`Terminating inactive user: ${user.id}`);
+              user.ws.terminate();
+              RoomManager.getInstance().removeUser(roomId, user);
+              continue;
+            }
+
+            user.isAlive = false;
+            user.ws.ping();
+          } else {
+            RoomManager.getInstance().removeUser(roomId, user);
           }
-
-          user.isAlive = false;
-          user.ws.ping();
-        } else {
-          this.users.delete(userId);
         }
+        console.log(
+          `💓 Heartbeat - Active users in room with Id ${roomId}: ${RoomManager.getInstance().rooms.get(roomId)?.length}`
+        );
       }
-
-      console.log(`💓 Heartbeat - Active users: ${this.users.size}`);
     }, this.config.heartbeatInterval);
   }
 

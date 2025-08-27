@@ -4,9 +4,14 @@ export enum ServerEvents {
   Error = "error",
 }
 
-export enum WebSocketEvents {
-  Join = "join",
+export enum WebSocketServerEvents {
+  Message = "message",
+  Joined = "joined",
   Pong = "pong",
   Error = "error",
   Close = "close",
+}
+
+export enum WebSocketClientEvents {
+  Join = "join",
 }
