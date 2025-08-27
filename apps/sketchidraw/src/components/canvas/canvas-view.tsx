@@ -18,9 +18,12 @@ import { CanvasMenu } from "./canvas-Menu";
 import { ToolsMenu } from "./tools-menu";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { redirect } from "next/navigation";
-import { useE2EWebsocket } from "@/hooks/use-e2e-websocket";
+import { useE2EWebsocket, User } from "@/hooks/use-e2e-websocket";
+import { UsersShareIcon } from "../users-share-icon";
 
 export const CanvasView = () => {
+  const [hash, setHash] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
   const { user, status } = useCurrentUser();
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
     null
@@ -41,23 +44,35 @@ export const CanvasView = () => {
     panY,
   } = useInfiniteCanvas({ canvasRef });
 
-  const { isConnected, users } = useE2EWebsocket({
-    hash: window.location.hash,
+  const { isConnected, wsRef, roomData } = useE2EWebsocket({
+    hash,
+    setUsers,
   });
-
+  console.log(users);
   const handleClick = useCallback(() => {
     if (!user || status === "unauthenticated") {
       redirect("/auth/signin");
       return;
     }
-    const hash = window.location.hash;
-    if (hash) {
+    if (hash.startsWith("#room=")) {
       const url = `${window.location.origin}/${hash}`;
       onOpen(CanvaModalType.Share, url);
       return;
     }
     onOpen(CanvaModalType.Session, null);
-  }, [onOpen, status, user]);
+  }, [onOpen, status, user, hash]);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setHash(window.location.hash);
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, []);
 
   useEffect(() => {
     const hasShapes = localStorage.getItem("sketchidraw");
@@ -78,13 +93,14 @@ export const CanvasView = () => {
       {showWelcomeScreen && <WelcomeScreen />}
       <CanvaClearModal setSelectedShapeIndex={setSelectedShapeIndex} />
       <CanvaCollabModal />
-      <CanvaShareModal />
+      <CanvaShareModal wsRef={wsRef} roomId={roomData?.roomId} />
       <CanvasProperty
         canvasRef={canvasRef}
         selectedShapeIndex={selectedShapeIndex}
       />
       <CanvasMenu />
       <ToolsMenu />
+      {isConnected && <UsersShareIcon users={users} />}
       <button
         onClick={handleClick}
         type="button"

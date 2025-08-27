@@ -1,9 +1,10 @@
 "use client";
 
 import { E2EEncryption } from "@/lib/crypto";
-import { useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState } from "react";
 import { useCurrentUser } from "./use-current-user";
 import { ClientEvents, ServerEvents } from "@/constants";
+import { toast } from "sonner";
 
 type RoomInfo = {
   roomId: string;
@@ -12,18 +13,18 @@ type RoomInfo = {
 
 type E2EWebsocketProps = {
   hash: string;
+  setUsers: React.Dispatch<SetStateAction<User[]>>;
 };
 
-type User = {
+export type User = {
   id: string;
   username: string;
 };
 
-export const useE2EWebsocket = ({ hash }: E2EWebsocketProps) => {
+export const useE2EWebsocket = ({ hash, setUsers }: E2EWebsocketProps) => {
   const { user } = useCurrentUser();
   const [roomData, setRoomData] = useState<RoomInfo | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
   const wsRef = useRef<WebSocket>(null);
   const encryptionRef = useRef<E2EEncryption>(null);
 
@@ -51,7 +52,7 @@ export const useE2EWebsocket = ({ hash }: E2EWebsocketProps) => {
       setIsConnected(true);
       ws.send(
         JSON.stringify({
-          type: ClientEvents.Join,
+          type: ClientEvents.RoomJoin,
           payload: {
             roomId: roomInfo.roomId,
             userId: user?.id,
@@ -65,21 +66,28 @@ export const useE2EWebsocket = ({ hash }: E2EWebsocketProps) => {
       const data = JSON.parse(event.data);
 
       switch (data.type) {
-        case ServerEvents.Joined:
+        case ServerEvents.RoomJoined:
           const { users } = data.payload;
           setUsers([...users]);
+          toast.success(`Welcome to room ${user?.name} 👋`);
           break;
-        case ServerEvents.Broadcast:
-          const { user } = data.payload;
+        case ServerEvents.UserJoined:
+          const { user: userJoin } = data.payload;
           setUsers((prev) => {
             const userExists = prev.some(
-              (existingUser) => existingUser.id === user.id
+              (existingUser) => existingUser.id === userJoin.id
             );
             if (userExists) {
               return prev;
             }
-            return [...prev, user];
+            return [...prev, userJoin];
           });
+          toast.success(`${userJoin.username} joined ✅`);
+          break;
+        case ServerEvents.UserLeaved:
+          const { user: userLeave } = data.payload;
+          setUsers((prev) => prev.filter((u) => u.id !== userLeave.id));
+          toast.success(`${userLeave.username} leaved ❌`);
           break;
         default:
           break;
@@ -100,11 +108,11 @@ export const useE2EWebsocket = ({ hash }: E2EWebsocketProps) => {
         wsRef.current = null;
       }
     };
-  }, [user, hash]);
+  }, [user, hash, setUsers]);
 
   return {
     roomData,
     isConnected,
-    users,
+    wsRef,
   };
 };

@@ -1,14 +1,28 @@
 "use client";
 
-import { CanvaModalType } from "@/constants";
-import { ShareLinkButtonSvg, StopSessionButtonSvg } from "@/constants/svg";
-import { useCanva } from "@/hooks/use-canva-store";
-import { useCallback, useEffect, useState } from "react";
-import { Separator } from "../ui/separator";
+import { CanvaModalType, ClientEvents } from "@/constants";
 
-export const CanvaShareModal = () => {
+import {
+  CopySvg,
+  ShareLinkButtonSvg,
+  StopSessionButtonSvg,
+} from "@/constants/svg";
+import { useCanva } from "@/hooks/use-canva-store";
+import { RefObject, useCallback, useEffect, useState } from "react";
+import { Separator } from "../ui/separator";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { cn } from "@/lib/utils";
+
+type CanvaShareModalProps = {
+  wsRef: RefObject<WebSocket | null>;
+  roomId?: string;
+};
+
+export const CanvaShareModal = ({ wsRef, roomId }: CanvaShareModalProps) => {
+  const { user } = useCurrentUser();
   const { isOpen, onClose, canvasData, canvasModalType } = useCanva();
   const [showModal, setShowModal] = useState(isOpen);
+  const [isCopy, setIsCopy] = useState(false);
 
   useEffect(() => {
     setShowModal(isOpen);
@@ -23,8 +37,33 @@ export const CanvaShareModal = () => {
 
   const handleCloseSession = useCallback(() => {
     window.location.hash = "";
+    // emit an event to notify users that he left.
+    if (wsRef.current && roomId) {
+      wsRef.current.send(
+        JSON.stringify({
+          type: ClientEvents.LeaveRoom,
+          payload: {
+            roomId,
+            userId: user?.id,
+            username: user?.name,
+          },
+        })
+      );
+    }
     onClose();
-  }, [onClose]);
+  }, [onClose, user, wsRef, roomId]);
+
+  const handleCopy = async () => {
+    try {
+      setIsCopy(true);
+      await navigator.clipboard.writeText(canvasData || "");
+      setTimeout(() => {
+        setIsCopy(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+    }
+  };
 
   const isModalOpen = showModal && canvasModalType === CanvaModalType.Share;
 
@@ -62,9 +101,20 @@ export const CanvaShareModal = () => {
               value={canvasData || ""}
               className="flex-1 p-3 border border-[#c5c5d0] dark:border-[#46464f] focus:outline-none dark:bg-surface-high bg-[#f1f0ff] rounded-md truncate"
             />
-            <button className="flex items-center gap-2 rounded-md cursor-pointer text-surface-lowest bg-primary py-3 px-4 font-comicShanns hover:bg-brand-hover transition duration-150">
-              <ShareLinkButtonSvg />
-              Copy link
+            <button
+              onClick={handleCopy}
+              className={cn(
+                "w-35 flex items-center justify-center gap-2 rounded-md cursor-pointer text-surface-lowest bg-primary py-3 px-4 font-comicShanns hover:bg-brand-hover transition duration-150",
+                isCopy && "bg-yellow-200 hover:bg-yellow-200"
+              )}
+            >
+              {!isCopy && (
+                <>
+                  <ShareLinkButtonSvg />
+                  Copy link
+                </>
+              )}
+              {isCopy && <CopySvg />}
             </button>
           </div>
         </div>

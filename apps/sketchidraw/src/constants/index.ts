@@ -122,10 +122,12 @@ export enum CanvaModalType {
 }
 
 export enum ServerEvents {
-  Joined = "joined",
-  Broadcast = "broadcast",
+  RoomJoined = "room-joined",
+  UserJoined = "user-joined",
+  UserLeaved = "user-leaved",
 }
 
 export enum ClientEvents {
-  Join = "join",
+  RoomJoin = "room-join",
+  LeaveRoom = "leave-room",
 }

@@ -67,14 +67,14 @@ export class WebsocketServerManager {
           lastSeen: new Date(),
         };
         switch (parsedData.type) {
-          case WebSocketClientEvents.Join:
+          case WebSocketClientEvents.RoomJoin:
             RoomManager.getInstance().addUser(roomId, user);
             console.log(
               `User connected: ${userId} (${RoomManager.getInstance().rooms.get(roomId)?.length} total)`
             );
             // send to user
             WebsocketServerManager.sendToUser(user, {
-              type: WebSocketServerEvents.Joined,
+              type: WebSocketServerEvents.RoomJoined,
               payload: {
                 id: userId,
                 message: "Welcome to Websocket server!",
@@ -90,9 +90,27 @@ export class WebsocketServerManager {
             // notify all users except this user
             RoomManager.getInstance().broadcast(
               {
-                type: WebSocketServerEvents.Broadcast,
+                type: WebSocketServerEvents.UserJoined,
                 payload: {
                   message: `User ${user.id} joined`,
+                  user: {
+                    id: user.id,
+                    username: user.username,
+                  },
+                  timestamp: Date.now(),
+                },
+              },
+              user,
+              roomId
+            );
+            break;
+          case WebSocketClientEvents.LeaveRoom:
+            RoomManager.getInstance().removeUser(roomId, user);
+            RoomManager.getInstance().broadcast(
+              {
+                type: WebSocketServerEvents.UserLeaved,
+                payload: {
+                  message: `User ${userId} leaved`,
                   user: {
                     id: user.id,
                     username: user.username,

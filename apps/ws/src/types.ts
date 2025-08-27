@@ -6,13 +6,15 @@ export enum ServerEvents {
 
 export enum WebSocketServerEvents {
   Message = "message",
-  Joined = "joined",
-  Broadcast = "broadcast",
+  RoomJoined = "room-joined",
+  UserJoined = "user-joined",
+  UserLeaved = "user-leaved",
   Pong = "pong",
   Error = "error",
   Close = "close",
 }
 
 export enum WebSocketClientEvents {
-  Join = "join",
+  RoomJoin = "room-join",
+  LeaveRoom = "leave-room",
 }
