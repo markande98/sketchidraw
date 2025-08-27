@@ -7,6 +7,7 @@ export enum ServerEvents {
 export enum WebSocketServerEvents {
   Message = "message",
   Joined = "joined",
+  Broadcast = "broadcast",
   Pong = "pong",
   Error = "error",
   Close = "close",

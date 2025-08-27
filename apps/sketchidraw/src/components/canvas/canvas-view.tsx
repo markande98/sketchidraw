@@ -41,7 +41,7 @@ export const CanvasView = () => {
     panY,
   } = useInfiniteCanvas({ canvasRef });
 
-  const { isConnected } = useE2EWebsocket({
+  const { isConnected, users } = useE2EWebsocket({
     hash: window.location.hash,
   });
 
@@ -96,7 +96,7 @@ export const CanvasView = () => {
         Share
         {isConnected && (
           <div className="h-4 w-4 flex items-center justify-center -right-1 p-[3px] rounded-full absolute bg-[#b2f2bb] text-[#2b8a3e]">
-            1
+            {users.length}
           </div>
         )}
       </button>

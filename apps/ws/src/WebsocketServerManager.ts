@@ -8,6 +8,7 @@ import { RoomManager } from "./RoomManager.js";
 
 export interface User {
   id: string;
+  username: string;
   ws: WebSocket;
   isAlive: boolean;
   lastSeen: Date;
@@ -17,7 +18,9 @@ export interface Message {
   type: WebSocketServerEvents;
   payload: {
     id?: string;
-    data?: any;
+    message?: string;
+    users?: { id: string; username: string }[];
+    user?: { id: string; username: string };
     timestamp: number;
   };
 }
@@ -54,10 +57,11 @@ export class WebsocketServerManager {
     this.wss.on(ServerEvents.Connection, (ws: WebSocket) => {
       ws.on(WebSocketServerEvents.Message, (data) => {
         const parsedData = JSON.parse(data.toString());
-        const userId = parsedData.payload.userId;
-        const roomId = parsedData.payload.roomId;
+        const { userId, roomId, username } = parsedData.payload;
+
         const user: User = {
           id: userId,
+          username,
           ws,
           isAlive: true,
           lastSeen: new Date(),
@@ -73,19 +77,26 @@ export class WebsocketServerManager {
               type: WebSocketServerEvents.Joined,
               payload: {
                 id: userId,
-                data: {
-                  message: "Welcome to Websocket server!",
-                  totalUsers: RoomManager.getInstance().rooms.get(roomId),
-                },
+                message: "Welcome to Websocket server!",
+                users: RoomManager.getInstance()
+                  .rooms.get(roomId)
+                  ?.map((u) => ({
+                    id: u.id,
+                    username: u.username,
+                  })),
                 timestamp: Date.now(),
               },
             });
             // notify all users except this user
             RoomManager.getInstance().broadcast(
               {
-                type: WebSocketServerEvents.Joined,
+                type: WebSocketServerEvents.Broadcast,
                 payload: {
-                  data: { message: `User ${user.id} joined`, userId: user.id },
+                  message: `User ${user.id} joined`,
+                  user: {
+                    id: user.id,
+                    username: user.username,
+                  },
                   timestamp: Date.now(),
                 },
               },

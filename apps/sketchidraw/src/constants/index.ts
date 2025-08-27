@@ -120,3 +120,12 @@ export enum CanvaModalType {
   Session = "session",
   Share = "share",
 }
+
+export enum ServerEvents {
+  Joined = "joined",
+  Broadcast = "broadcast",
+}
+
+export enum ClientEvents {
+  Join = "join",
+}
