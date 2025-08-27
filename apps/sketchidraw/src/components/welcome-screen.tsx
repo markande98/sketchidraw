@@ -70,8 +70,6 @@ export const WelcomeScreen = () => {
     if (!ctx) return;
 
     document.fonts.ready.then(() => {
-      console.log("welcome screen - fonts loaded");
-
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       welcomeText.forEach((txt) => {

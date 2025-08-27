@@ -5,10 +5,8 @@ import { ShareLinkButtonSvg, StopSessionButtonSvg } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
 import { useCallback, useEffect, useState } from "react";
 import { Separator } from "../ui/separator";
-import { useRouter } from "next/navigation";
 
 export const CanvaShareModal = () => {
-  const router = useRouter();
   const { isOpen, onClose, canvasData, canvasModalType } = useCanva();
   const [showModal, setShowModal] = useState(isOpen);
 
@@ -24,9 +22,9 @@ export const CanvaShareModal = () => {
   }, [onClose]);
 
   const handleCloseSession = useCallback(() => {
-    router.replace(window.location.origin);
+    window.location.hash = "";
     onClose();
-  }, [router, onClose]);
+  }, [onClose]);
 
   const isModalOpen = showModal && canvasModalType === CanvaModalType.Share;
 

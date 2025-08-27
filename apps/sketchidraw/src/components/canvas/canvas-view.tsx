@@ -3,7 +3,7 @@
 import { CanvaModalType } from "@/constants";
 import { useCanva } from "@/hooks/use-canva-store";
 import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
-import { saveToLocalStorage } from "@/lib/utils";
+import { cn, saveToLocalStorage } from "@/lib/utils";
 import { Shape } from "@/types/shape";
 import { ToolType } from "@/types/tools";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -18,6 +18,7 @@ import { CanvasMenu } from "./canvas-Menu";
 import { ToolsMenu } from "./tools-menu";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { redirect } from "next/navigation";
+import { useE2EWebsocket } from "@/hooks/use-e2e-websocket";
 
 export const CanvasView = () => {
   const { user, status } = useCurrentUser();
@@ -39,6 +40,12 @@ export const CanvasView = () => {
     panX,
     panY,
   } = useInfiniteCanvas({ canvasRef });
+
+  const { isConnected, roomData } = useE2EWebsocket({
+    hash: window.location.hash,
+  });
+
+  console.log(isConnected, roomData, window.location.hash);
 
   const handleClick = useCallback(() => {
     if (!user || status === "unauthenticated") {
@@ -83,9 +90,17 @@ export const CanvasView = () => {
       <button
         onClick={handleClick}
         type="button"
-        className="hidden sm:block absolute z-[100] right-6 top-6 h-10 text-xs bg-primary border-primary hover:bg-primary-darker hover:border-primary-darker shadow-md p-3 rounded-md cursor-pointer font-normal text-surface-lowest"
+        className={cn(
+          "hidden sm:block absolute z-[100] right-6 top-6 h-10 text-xs bg-primary border-primary hover:bg-primary-darker hover:border-primary-darker shadow-md p-3 rounded-md cursor-pointer font-normal text-surface-lowest",
+          isConnected && "bg-[#0fb884] hover:bg-[#0fb884] border-[#0fb884]"
+        )}
       >
         Share
+        {isConnected && (
+          <div className="h-4 w-4 flex items-center justify-center -right-1 p-[3px] rounded-full absolute bg-[#b2f2bb] text-[#2b8a3e]">
+            1
+          </div>
+        )}
       </button>
       <CanvaZoom zoomIn={zoomIn} zoomOut={zoomOut} resetZoom={resetZoom} />
       <CanvasBoard

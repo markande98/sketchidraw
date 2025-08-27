@@ -4,11 +4,9 @@ import { CanvaModalType } from "@/constants";
 import { LiveStartButtonSvg } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
 import { generateAlphanumericSubstring } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 export const CanvaCollabModal = () => {
-  const router = useRouter();
   const { isOpen, onOpen, onClose, canvasModalType } = useCanva();
   const [showModal, setShowModal] = useState(isOpen);
 
@@ -28,9 +26,9 @@ export const CanvaCollabModal = () => {
     const key = generateAlphanumericSubstring(22);
     const fragment = `#room=${roomId},${key}`;
     const url = `${window.location.origin}/${fragment}`;
-    router.replace(url);
     onOpen(CanvaModalType.Share, url);
-  }, [router, onOpen]);
+    window.location.hash = fragment;
+  }, [onOpen]);
 
   const isModalOpen = showModal && canvasModalType === CanvaModalType.Session;
 
