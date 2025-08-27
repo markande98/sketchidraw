@@ -39,8 +39,6 @@ export const CanvaClearModal = ({
 
   const isModalOpen = showModal && canvasModalType === CanvaModalType.Clear;
 
-  console.log(isModalOpen);
-
   if (!isModalOpen) return null;
 
   return (

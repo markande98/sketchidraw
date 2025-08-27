@@ -10,9 +10,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async session({ session, token }) {
-      if (session.user && token.email) {
+      if (session.user && token.email && token.sub) {
         session.user.name = token.name;
         session.user.email = token.email;
+        session.user.id = token.sub;
       }
       return session;
     },

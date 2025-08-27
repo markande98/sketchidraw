@@ -1,23 +1,26 @@
 "use client";
 
-import { ToolsMenu } from "./tools-menu";
-import { CanvasBoard } from "./canvas-board";
-import { CanvasProperty } from "../canvas-property";
-import { CanvasMenu } from "./canvas-Menu";
-import { CanvaZoom } from "../canva-zoom";
-import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { WelcomeScreen } from "../welcome-screen";
+import { CanvaModalType } from "@/constants";
 import { useCanva } from "@/hooks/use-canva-store";
-import { ToolType } from "@/types/tools";
+import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
 import { saveToLocalStorage } from "@/lib/utils";
 import { Shape } from "@/types/shape";
+import { ToolType } from "@/types/tools";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { CanvaZoom } from "../canva-zoom";
+import { CanvasProperty } from "../canvas-property";
+import { WelcomeScreen } from "../welcome-screen";
 import { CanvaClearModal } from "./canva-clear-modal";
 import { CanvaCollabModal } from "./canva-collab-modal";
-import { CanvaModalType } from "@/constants";
 import { CanvaShareModal } from "./canva-share-modal";
+import { CanvasBoard } from "./canvas-board";
+import { CanvasMenu } from "./canvas-Menu";
+import { ToolsMenu } from "./tools-menu";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { redirect } from "next/navigation";
 
 export const CanvasView = () => {
+  const { user, status } = useCurrentUser();
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
     null
   );
@@ -38,6 +41,10 @@ export const CanvasView = () => {
   } = useInfiniteCanvas({ canvasRef });
 
   const handleClick = useCallback(() => {
+    if (!user || status === "unauthenticated") {
+      redirect("/auth/signin");
+      return;
+    }
     const hash = window.location.hash;
     if (hash) {
       const url = `${window.location.origin}/${hash}`;
@@ -45,7 +52,7 @@ export const CanvasView = () => {
       return;
     }
     onOpen(CanvaModalType.Session, null);
-  }, [onOpen]);
+  }, [onOpen, status, user]);
 
   useEffect(() => {
     const hasShapes = localStorage.getItem("sketchidraw");

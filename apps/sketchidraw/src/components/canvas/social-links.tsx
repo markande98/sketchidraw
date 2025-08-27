@@ -1,8 +1,10 @@
 "use client";
 
 import { GithubSvg, LinkedIn, SignupSvg, TwitterSvg } from "@/constants/svg";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
 
 const socialLinks = [
   {
@@ -21,13 +23,30 @@ const socialLinks = [
 ];
 
 export const SocialLinks = () => {
+  const { status } = useCurrentUser();
   const router = useRouter();
-  const onClick = (href?: string) => {
+  const onClick = async (href?: string) => {
+    if (status === "authenticated") {
+      await signOut({
+        callbackUrl: "/auth/signin",
+      });
+      return;
+    }
     if (href) {
       router.push(href);
-      router.refresh();
     }
   };
+
+  const getDisplayLabel = (originalLabel: string) => {
+    if (originalLabel === "Signup") {
+      if (status === "loading") {
+        return "Loading...";
+      }
+      return status === "authenticated" ? "Signout" : "Signup";
+    }
+    return originalLabel;
+  };
+
   return (
     <div className="flex flex-1 flex-col space-y-2">
       {socialLinks.map(({ icon: Icon, label, href }, index) => (
@@ -45,7 +64,7 @@ export const SocialLinks = () => {
               label === "Signup" && "text-promo"
             )}
           >
-            {label}
+            {getDisplayLabel(label)}
           </h2>
         </div>
       ))}
