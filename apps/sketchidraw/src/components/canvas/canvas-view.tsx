@@ -41,11 +41,9 @@ export const CanvasView = () => {
     panY,
   } = useInfiniteCanvas({ canvasRef });
 
-  const { isConnected, roomData } = useE2EWebsocket({
+  const { isConnected } = useE2EWebsocket({
     hash: window.location.hash,
   });
-
-  console.log(isConnected, roomData, window.location.hash);
 
   const handleClick = useCallback(() => {
     if (!user || status === "unauthenticated") {
