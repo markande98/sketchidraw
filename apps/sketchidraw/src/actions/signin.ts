@@ -1,10 +1,11 @@
 "use server";
 
-import { z } from "zod";
-import { SignInSchema } from "@repo/db/types";
 import { prisma } from "@repo/db";
-import { signIn } from "../../auth";
+import { SignInSchema } from "@repo/db/types";
 import { AuthError } from "next-auth";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { signIn } from "../../auth";
 
 export const signin = async (values: z.infer<typeof SignInSchema>) => {
   const validateFields = SignInSchema.safeParse(values);
@@ -31,8 +32,8 @@ export const signin = async (values: z.infer<typeof SignInSchema>) => {
       password,
       redirect: false,
     });
+    revalidatePath("/");
   } catch (error) {
-    console.log(error);
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":

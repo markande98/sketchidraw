@@ -16,11 +16,9 @@ import { Button } from "../ui/button";
 import { useState, useTransition } from "react";
 import { signin } from "@/actions/signin";
 import { FormError } from "./form-error";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export const SignInForm = () => {
-  const router = useRouter();
   const [error, setError] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof SignInSchema>>({
@@ -41,10 +39,10 @@ export const SignInForm = () => {
             setError(data.error);
             return;
           }
-
-          router.push("/");
-          router.refresh();
           toast.success("Logged In");
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 1000);
         })
         .catch(() => setError("Something went wrong!"));
     });

@@ -24,7 +24,7 @@ import { UsersShareIcon } from "../users-share-icon";
 export const CanvasView = () => {
   const [hash, setHash] = useState("");
   const [users, setUsers] = useState<User[]>([]);
-  const { user, status } = useCurrentUser();
+  const { user, isAuthenticated } = useCurrentUser();
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
     null
   );
@@ -48,9 +48,8 @@ export const CanvasView = () => {
     hash,
     setUsers,
   });
-  console.log(users);
   const handleClick = useCallback(() => {
-    if (!user || status === "unauthenticated") {
+    if (!user || !isAuthenticated) {
       redirect("/auth/signin");
       return;
     }
@@ -60,7 +59,7 @@ export const CanvasView = () => {
       return;
     }
     onOpen(CanvaModalType.Session, null);
-  }, [onOpen, status, user, hash]);
+  }, [onOpen, isAuthenticated, user, hash]);
 
   useEffect(() => {
     const handleHashChange = () => {
