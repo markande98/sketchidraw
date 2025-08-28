@@ -9,12 +9,15 @@ type UsersShareIconProps = {
 };
 
 export const UsersShareIcon = ({ users }: UsersShareIconProps) => {
-  const { user } = useCurrentUser();
+  const { currentUser } = useCurrentUser();
+  if (!currentUser) return null;
+
+  console.log(users);
   return (
     <div className="absolute right-24 top-7 z-[100] flex items-center gap-2">
       {users.map(
         (u) =>
-          u.id !== user?.id && (
+          u.id !== currentUser.id && (
             <Tooltip key={u.id}>
               <TooltipTrigger asChild>
                 <div className="h-8 w-8 rounded-full bg-green-300 flex items-center justify-center text-black font-extrabold">

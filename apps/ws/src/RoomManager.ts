@@ -29,6 +29,23 @@ export class RoomManager {
       this.rooms.set(roomId, [...(this.rooms.get(roomId) ?? []), user]);
   }
 
+  public updateUser(
+    roomId: string,
+    userId: string,
+    cursorPos: { x: number; y: number }
+  ) {
+    if (!this.rooms.has(roomId)) return;
+    let user = this.rooms.get(roomId)?.find((u) => u.id === userId);
+    const otherUsers = this.rooms.get(roomId)?.filter((u) => u.id !== userId);
+    if (user) {
+      user = {
+        ...user,
+        cursorPos,
+      };
+      this.rooms.set(roomId, [...(otherUsers ?? []), user]);
+    }
+  }
+
   public broadcast(message: Message, user: User, roomId: string) {
     if (!this.rooms.has(roomId)) return;
     this.rooms.get(roomId)?.forEach((u) => {

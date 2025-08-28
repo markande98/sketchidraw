@@ -4,19 +4,31 @@ import { v4 as uuidv4 } from "uuid";
 
 import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { Shape } from "@/types/shape";
-import { RefObject, SetStateAction, useEffect, useState } from "react";
+import {
+  RefObject,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useCanva } from "./use-canva-store";
 import { ToolType } from "@/types/tools";
 import { ShapeOptions } from "@/types/shape";
-import { CursorType } from "@/constants";
+import { ClientEvents, CursorType } from "@/constants";
 import { useText } from "./use-text";
 import { CanvasState } from "./use-infinite-canvas";
+import { RoomInfo } from "./use-e2e-websocket";
+import { useCurrentUser } from "./use-current-user";
 
 type DrawProps = {
   canvasEngine: CanvasEngine | null;
   canvasRef: RefObject<HTMLCanvasElement | null>;
   panX: number;
   panY: number;
+  isConnected: boolean;
+  wsRef: RefObject<WebSocket | null>;
+  roomData: RoomInfo | null;
   selectedShapeIndex: number | null;
   setSelectedShapeIndex: React.Dispatch<SetStateAction<number | null>>;
   setCanvasState: React.Dispatch<SetStateAction<CanvasState>>;
@@ -28,11 +40,15 @@ export const useDraw = ({
   canvasRef,
   panX,
   panY,
+  isConnected,
+  wsRef,
+  roomData,
   selectedShapeIndex,
   setSelectedShapeIndex,
   setCanvasState,
   expandCanvasForPanning,
 }: DrawProps) => {
+  const { currentUser } = useCurrentUser();
   const {
     canvaBgColor,
     canvaStrokeColor,
@@ -65,6 +81,91 @@ export const useDraw = ({
   const [isResizing, setIsResizing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [resizeHandle, setResizehandle] = useState<string | null>(null);
+  const lastSentPosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const lastSentTime = useRef<number>(0);
+  const pendingCursorUpdate = useRef<NodeJS.Timeout | null>(null);
+
+  // Constants for optimization
+  const CURSOR_UPDATE_THROTTLE_MS = 16; // ~60fps
+  const MIN_DISTANCE_THRESHOLD = 2; // pixels
+  const BATCH_DELAY_MS = 10; // milliseconds
+
+  const sendCursorPosition = useCallback(
+    (pos: { x: number; y: number }) => {
+      if (
+        !isConnected ||
+        !roomData ||
+        !wsRef.current ||
+        wsRef.current.readyState !== WebSocket.OPEN
+      ) {
+        return;
+      }
+
+      const now = Date.now();
+      const timeDiff = now - lastSentTime.current;
+
+      // Calculate distance from last sent position
+      const distance = Math.sqrt(
+        Math.pow(pos.x - lastSentPosition.current.x, 2) +
+          Math.pow(pos.y - lastSentPosition.current.y, 2)
+      );
+
+      // Only send if enough time has passed AND cursor moved significantly
+      if (
+        timeDiff >= CURSOR_UPDATE_THROTTLE_MS &&
+        distance >= MIN_DISTANCE_THRESHOLD
+      ) {
+        wsRef.current.send(
+          JSON.stringify({
+            type: ClientEvents.CursorMove,
+            payload: {
+              roomId: roomData.roomId,
+              userId: currentUser?.id,
+              cursorPos: pos,
+            },
+          })
+        );
+
+        lastSentPosition.current = pos;
+        lastSentTime.current = now;
+      }
+    },
+    [isConnected, roomData, wsRef, currentUser?.id]
+  );
+
+  // Debounced version for final position
+  const sendCursorPositionDebounced = useCallback(
+    (pos: { x: number; y: number }) => {
+      // Clear existing timeout
+      if (pendingCursorUpdate.current) {
+        clearTimeout(pendingCursorUpdate.current);
+      }
+
+      // Set new timeout to send final position
+      pendingCursorUpdate.current = setTimeout(() => {
+        if (
+          isConnected &&
+          roomData &&
+          wsRef.current &&
+          wsRef.current.readyState === WebSocket.OPEN
+        ) {
+          wsRef.current.send(
+            JSON.stringify({
+              type: ClientEvents.CursorMove,
+              payload: {
+                roomId: roomData.roomId,
+                userId: currentUser?.id,
+                cursorPos: pos,
+              },
+            })
+          );
+          lastSentPosition.current = pos;
+          lastSentTime.current = Date.now();
+        }
+      }, BATCH_DELAY_MS);
+    },
+    [isConnected, roomData, wsRef, currentUser?.id]
+  );
 
   const options: ShapeOptions = {
     isDeleted: false,
@@ -138,7 +239,6 @@ export const useDraw = ({
     if (isInspectMode) cursor.style.display = "none";
     cursor.style.transform = `translate(${cursorPos.x * canvasScale + panX}px, ${cursorPos.y * canvasScale + panY}px)`;
     document.addEventListener("pointermove", handleCursorMove);
-
     return () => {
       if (cursor && cursor.parentNode) {
         cursor.parentNode.removeChild(cursor);
@@ -356,11 +456,15 @@ export const useDraw = ({
     (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
   };
   const handlePointMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const pos = getMousePos(e);
+
+    sendCursorPosition(pos);
+    sendCursorPositionDebounced(pos);
+
     if (tooltype === ToolType.Text) {
       handleMouseMove(e);
       return;
     }
-    const pos = getMousePos(e);
     if (isResizing && selectedShapeIndex !== null) {
       const shape = { ...canvaShapes[selectedShapeIndex] };
       const dx = pos.x - dragStart.x;

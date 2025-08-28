@@ -9,6 +9,7 @@ import { RoomManager } from "./RoomManager.js";
 export interface User {
   id: string;
   username: string;
+  cursorPos: { x: number; y: number };
   ws: WebSocket;
   isAlive: boolean;
   lastSeen: Date;
@@ -19,8 +20,16 @@ export interface Message {
   payload: {
     id?: string;
     message?: string;
-    users?: { id: string; username: string }[];
-    user?: { id: string; username: string };
+    users?: {
+      id: string;
+      username: string;
+      cursorPos: { x: number; y: number };
+    }[];
+    user?: {
+      id: string;
+      username: string;
+      cursorPos?: { x: number; y: number };
+    };
     timestamp: number;
   };
 }
@@ -57,15 +66,17 @@ export class WebsocketServerManager {
     this.wss.on(ServerEvents.Connection, (ws: WebSocket) => {
       ws.on(WebSocketServerEvents.Message, (data) => {
         const parsedData = JSON.parse(data.toString());
-        const { userId, roomId, username } = parsedData.payload;
+        const { userId, roomId, username, cursorPos } = parsedData.payload;
 
         const user: User = {
           id: userId,
           username,
+          cursorPos,
           ws,
           isAlive: true,
           lastSeen: new Date(),
         };
+
         switch (parsedData.type) {
           case WebSocketClientEvents.RoomJoin:
             RoomManager.getInstance().addUser(roomId, user);
@@ -83,6 +94,7 @@ export class WebsocketServerManager {
                   ?.map((u) => ({
                     id: u.id,
                     username: u.username,
+                    cursorPos: u.cursorPos,
                   })),
                 timestamp: Date.now(),
               },
@@ -96,6 +108,7 @@ export class WebsocketServerManager {
                   user: {
                     id: user.id,
                     username: user.username,
+                    cursorPos: user.cursorPos,
                   },
                   timestamp: Date.now(),
                 },
@@ -114,6 +127,24 @@ export class WebsocketServerManager {
                   user: {
                     id: user.id,
                     username: user.username,
+                  },
+                  timestamp: Date.now(),
+                },
+              },
+              user,
+              roomId
+            );
+            break;
+          case WebSocketClientEvents.CursorMove:
+            RoomManager.getInstance().updateUser(roomId, userId, cursorPos);
+            RoomManager.getInstance().broadcast(
+              {
+                type: WebSocketServerEvents.CursorMoved,
+                payload: {
+                  user: {
+                    id: user.id,
+                    username: user.username,
+                    cursorPos,
                   },
                   timestamp: Date.now(),
                 },

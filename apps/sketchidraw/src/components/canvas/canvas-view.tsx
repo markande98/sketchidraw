@@ -18,13 +18,12 @@ import { CanvasMenu } from "./canvas-Menu";
 import { ToolsMenu } from "./tools-menu";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { redirect } from "next/navigation";
-import { useE2EWebsocket, User } from "@/hooks/use-e2e-websocket";
+import { useE2EWebsocket } from "@/hooks/use-e2e-websocket";
 import { UsersShareIcon } from "../users-share-icon";
 
 export const CanvasView = () => {
   const [hash, setHash] = useState("");
-  const [users, setUsers] = useState<User[]>([]);
-  const { user, isAuthenticated } = useCurrentUser();
+  const { currentUser, isAuthenticated } = useCurrentUser();
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
     null
   );
@@ -44,12 +43,13 @@ export const CanvasView = () => {
     panY,
   } = useInfiniteCanvas({ canvasRef });
 
-  const { isConnected, wsRef, roomData } = useE2EWebsocket({
+  const { isConnected, wsRef, roomData, users } = useE2EWebsocket({
     hash,
-    setUsers,
+    currentUser,
   });
+
   const handleClick = useCallback(() => {
-    if (!user || !isAuthenticated) {
+    if (!currentUser || !isAuthenticated) {
       redirect("/auth/signin");
       return;
     }
@@ -59,13 +59,13 @@ export const CanvasView = () => {
       return;
     }
     onOpen(CanvaModalType.Session, null);
-  }, [onOpen, isAuthenticated, user, hash]);
+  }, [onOpen, isAuthenticated, currentUser, hash]);
 
   useEffect(() => {
     const handleHashChange = () => {
       setHash(window.location.hash);
     };
-
+    setHash(window.location.hash);
     window.addEventListener("hashchange", handleHashChange);
 
     return () => {
@@ -121,6 +121,9 @@ export const CanvasView = () => {
         panY={panY}
         canvasRef={canvasRef}
         selectedShapeIndex={selectedShapeIndex}
+        isConnected={isConnected}
+        wsRef={wsRef}
+        roomData={roomData}
         setSelectedShapeIndex={setSelectedShapeIndex}
         handleTouchStart={handleTouchStart}
         handleTouchMove={handleTouchMove}

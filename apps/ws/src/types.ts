@@ -9,6 +9,7 @@ export enum WebSocketServerEvents {
   RoomJoined = "room-joined",
   UserJoined = "user-joined",
   UserLeaved = "user-leaved",
+  CursorMoved = "cursor-moved",
   Pong = "pong",
   Error = "error",
   Close = "close",
@@ -17,4 +18,5 @@ export enum WebSocketServerEvents {
 export enum WebSocketClientEvents {
   RoomJoin = "room-join",
   LeaveRoom = "leave-room",
+  CursorMove = "cursor-move",
 }

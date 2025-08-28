@@ -53,6 +53,7 @@ export const EdgeStyle = ({ selectedShapeIndex }: EdgeStyleProps) => {
             <SharpEdgeSvg />
           </div>
           <div
+            tabIndex={0}
             onClick={(e) => {
               e.currentTarget.focus();
               onClick(Edges.Round);

@@ -15,12 +15,16 @@ import { CanvasEngine } from "@/canvas-engine/canvas-engine";
 import { useCanva } from "@/hooks/use-canva-store";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { CanvasState, TouchEvent } from "@/hooks/use-infinite-canvas";
+import { RoomInfo } from "@/hooks/use-e2e-websocket";
 
 type CanvasBoardProps = {
   panX: number;
   panY: number;
   canvasRef: RefObject<HTMLCanvasElement | null>;
   selectedShapeIndex: number | null;
+  isConnected: boolean;
+  wsRef: RefObject<WebSocket | null>;
+  roomData: RoomInfo | null;
   setSelectedShapeIndex: React.Dispatch<SetStateAction<number | null>>;
   handleTouchStart: (event: TouchEvent) => void;
   handleTouchMove: (event: TouchEvent) => void;
@@ -34,6 +38,9 @@ export const CanvasBoard = ({
   panX,
   panY,
   canvasRef,
+  isConnected,
+  roomData,
+  wsRef,
   handleTouchEnd,
   handleTouchMove,
   handleTouchStart,
@@ -53,6 +60,9 @@ export const CanvasBoard = ({
     canvasRef,
     panX,
     panY,
+    isConnected,
+    wsRef,
+    roomData,
     selectedShapeIndex,
     setSelectedShapeIndex,
     setCanvasState,
