@@ -12,7 +12,6 @@ export const UsersShareIcon = ({ users }: UsersShareIconProps) => {
   const { currentUser } = useCurrentUser();
   if (!currentUser) return null;
 
-  console.log(users);
   return (
     <div className="absolute right-24 top-7 z-[100] flex items-center gap-2">
       {users.map(

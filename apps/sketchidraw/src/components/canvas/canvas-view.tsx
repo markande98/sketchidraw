@@ -48,6 +48,7 @@ export const CanvasView = () => {
     currentUser,
   });
 
+  console.log(users);
   const handleClick = useCallback(() => {
     if (!currentUser || !isAuthenticated) {
       redirect("/auth/signin");

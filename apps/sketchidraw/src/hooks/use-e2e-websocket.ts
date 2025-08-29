@@ -95,10 +95,16 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
           break;
         case ServerEvents.CursorMoved:
           const { user: updatedUser } = data.payload;
-          setUsers((prev) => {
-            const otherUsers = prev.filter((u) => u.id !== updatedUser.id);
-            return [...otherUsers, updatedUser];
-          });
+          setUsers((prev) =>
+            prev.map((existingUser) =>
+              existingUser.id === updatedUser.id
+                ? {
+                    ...existingUser,
+                    cursorPos: updatedUser.cursorPos,
+                  }
+                : existingUser
+            )
+          );
           break;
         default:
           break;

@@ -22,12 +22,12 @@ export interface Message {
     message?: string;
     users?: {
       id: string;
-      username: string;
-      cursorPos: { x: number; y: number };
+      username?: string;
+      cursorPos?: { x: number; y: number };
     }[];
     user?: {
       id: string;
-      username: string;
+      username?: string;
       cursorPos?: { x: number; y: number };
     };
     timestamp: number;
@@ -126,7 +126,6 @@ export class WebsocketServerManager {
                   message: `User ${userId} leaved`,
                   user: {
                     id: user.id,
-                    username: user.username,
                   },
                   timestamp: Date.now(),
                 },
@@ -143,7 +142,6 @@ export class WebsocketServerManager {
                 payload: {
                   user: {
                     id: user.id,
-                    username: user.username,
                     cursorPos,
                   },
                   timestamp: Date.now(),
