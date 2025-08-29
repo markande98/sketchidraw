@@ -1,9 +1,9 @@
 "use client";
 
-import { CanvaModalType } from "@/constants";
+import { CanvaModalType, FontFamily } from "@/constants";
 import { useCanva } from "@/hooks/use-canva-store";
 import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
-import { cn, saveToLocalStorage } from "@/lib/utils";
+import { cn, getFontCSS, saveToLocalStorage } from "@/lib/utils";
 import { Shape } from "@/types/shape";
 import { ToolType } from "@/types/tools";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -48,7 +48,6 @@ export const CanvasView = () => {
     currentUser,
   });
 
-  console.log(users);
   const handleClick = useCallback(() => {
     if (!currentUser || !isAuthenticated) {
       redirect("/auth/signin");
@@ -85,6 +84,82 @@ export const CanvasView = () => {
   useEffect(() => {
     saveToLocalStorage(canvaShapes);
   }, [canvaShapes]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const drawUserCursorPos = (
+      id: string,
+      username: string,
+      cursorPos: { x: number; y: number }
+    ) => {
+      // Remove existing div if it exists
+      const existingDiv = document.getElementById(id);
+      if (existingDiv) {
+        existingDiv.remove();
+      }
+
+      const div = document.createElement("div");
+      div.id = id;
+      div.innerText = username;
+
+      // Apply styles directly to style properties
+      div.style.position = "absolute";
+      div.style.left = `${cursorPos.x}px`;
+      div.style.top = `${cursorPos.y}px`;
+      div.style.backgroundColor = "white";
+      div.style.color = "black";
+      div.style.fontFamily = getFontCSS(FontFamily.SketchiFont);
+      div.style.fontSize = "14px";
+      div.style.fontWeight = "800";
+      div.style.zIndex = "100";
+      div.style.pointerEvents = "none"; // Prevent interference with mouse events
+      div.style.padding = "2px";
+      div.style.borderRadius = "3px";
+
+      // Create and position the cursor SVG
+      const cursorSvg = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "svg"
+      );
+      cursorSvg.style.position = "absolute";
+      cursorSvg.style.left = "-15px"; // Top-left corner
+      cursorSvg.style.top = "-20px"; // Top-left corner
+      cursorSvg.style.width = "20px";
+      cursorSvg.style.height = "20px";
+      cursorSvg.style.rotate = "15deg";
+      cursorSvg.style.pointerEvents = "none";
+      cursorSvg.style.zIndex = "101"; // Higher than the div
+
+      // Add your cursor path/shape here
+      cursorSvg.innerHTML = `
+        <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"
+        fill="white"
+        stroke="black"
+        stroke-width="1"/>
+      `;
+
+      // Append cursor to the div
+      div.appendChild(cursorSvg);
+
+      document.body.appendChild(div);
+    };
+
+    users.forEach((user) => {
+      if (user.id !== currentUser.id) {
+        drawUserCursorPos(user.id, user.username, user.cursorPos);
+      }
+    });
+
+    return () => {
+      users.forEach((user) => {
+        const div = document.getElementById(user.id);
+        if (div) {
+          div.remove();
+        }
+      });
+    };
+  }, [currentUser, users]); // Removed 'canvas' if not needed
 
   const showWelcomeScreen =
     tooltype === ToolType.Select && canvaShapes.length === 0;

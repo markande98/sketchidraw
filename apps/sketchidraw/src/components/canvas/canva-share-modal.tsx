@@ -19,7 +19,7 @@ type CanvaShareModalProps = {
 };
 
 export const CanvaShareModal = ({ wsRef, roomId }: CanvaShareModalProps) => {
-  const { user } = useCurrentUser();
+  const { currentUser } = useCurrentUser();
   const { isOpen, onClose, canvasData, canvasModalType } = useCanva();
   const [showModal, setShowModal] = useState(isOpen);
   const [isCopy, setIsCopy] = useState(false);
@@ -44,14 +44,14 @@ export const CanvaShareModal = ({ wsRef, roomId }: CanvaShareModalProps) => {
           type: ClientEvents.LeaveRoom,
           payload: {
             roomId,
-            userId: user?.id,
-            username: user?.name,
+            userId: currentUser?.id,
+            username: currentUser?.username,
           },
         })
       );
     }
     onClose();
-  }, [onClose, user, wsRef, roomId]);
+  }, [onClose, currentUser, wsRef, roomId]);
 
   const handleCopy = async () => {
     try {

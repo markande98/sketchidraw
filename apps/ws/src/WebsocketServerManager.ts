@@ -126,6 +126,7 @@ export class WebsocketServerManager {
                   message: `User ${userId} leaved`,
                   user: {
                     id: user.id,
+                    username: user.username,
                   },
                   timestamp: Date.now(),
                 },

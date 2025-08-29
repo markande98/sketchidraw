@@ -75,7 +75,6 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
           break;
         case ServerEvents.UserJoined:
           const { user: userJoin } = data.payload;
-          console.log("userjoin", userJoin);
           setUsers((prev) => {
             const userExists = prev.some(
               (existingUser) => existingUser.id === userJoin.id
@@ -83,7 +82,6 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
             if (userExists) {
               return prev;
             }
-            console.log("reahed", [...prev, userJoin]);
             return [...prev, userJoin];
           });
           toast.success(`${userJoin.username} joined ✅`);
