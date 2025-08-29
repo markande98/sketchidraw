@@ -30,6 +30,8 @@ type DrawProps = {
   wsRef: RefObject<WebSocket | null>;
   roomData: RoomInfo | null;
   selectedShapeIndex: number | null;
+  shapes: Shape[];
+  sendEncryptedMessage: (shape: Shape, type: ClientEvents) => void;
   setSelectedShapeIndex: React.Dispatch<SetStateAction<number | null>>;
   setCanvasState: React.Dispatch<SetStateAction<CanvasState>>;
   expandCanvasForPanning: () => void;
@@ -43,6 +45,8 @@ export const useDraw = ({
   isConnected,
   wsRef,
   roomData,
+  shapes,
+  sendEncryptedMessage,
   selectedShapeIndex,
   setSelectedShapeIndex,
   setCanvasState,
@@ -178,7 +182,14 @@ export const useDraw = ({
   };
   useEffect(() => {
     if (canvasEngine) {
-      canvasEngine.redrawShapes(selectedShapeIndex, canvasScale, panX, panY);
+      canvasEngine.redrawShapes(
+        selectedShapeIndex,
+        canvasScale,
+        panX,
+        panY,
+        isConnected,
+        shapes
+      );
 
       if (currentShape) {
         canvasEngine.drawShape(currentShape, canvasScale, panX, panY);
@@ -192,6 +203,8 @@ export const useDraw = ({
     canvasScale,
     panX,
     panY,
+    shapes,
+    isConnected,
   ]);
 
   const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -808,6 +821,20 @@ export const useDraw = ({
             edgeType: canvaEdge,
             ...options,
           });
+          if (isConnected)
+            sendEncryptedMessage(
+              {
+                ...currentShape,
+                type: ToolType.Rectangle,
+                startX: Math.min(pos.x, dragStart.x),
+                startY: Math.min(pos.y, dragStart.y),
+                endX: Math.max(pos.x, dragStart.x),
+                endY: Math.max(pos.y, dragStart.y),
+                edgeType: canvaEdge,
+                ...options,
+              },
+              ClientEvents.Drawing
+            );
           break;
         case ToolType.Ellipse:
           setCurrentShape({

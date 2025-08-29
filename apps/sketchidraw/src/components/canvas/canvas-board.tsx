@@ -16,6 +16,8 @@ import { useCanva } from "@/hooks/use-canva-store";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import { CanvasState, TouchEvent } from "@/hooks/use-infinite-canvas";
 import { RoomInfo } from "@/hooks/use-e2e-websocket";
+import { Shape } from "@/types/shape";
+import { ClientEvents } from "@/constants";
 
 type CanvasBoardProps = {
   panX: number;
@@ -25,6 +27,8 @@ type CanvasBoardProps = {
   isConnected: boolean;
   wsRef: RefObject<WebSocket | null>;
   roomData: RoomInfo | null;
+  shapes: Shape[];
+  sendEncryptedMessage: (shape: Shape, type: ClientEvents) => void;
   setSelectedShapeIndex: React.Dispatch<SetStateAction<number | null>>;
   handleTouchStart: (event: TouchEvent) => void;
   handleTouchMove: (event: TouchEvent) => void;
@@ -41,6 +45,8 @@ export const CanvasBoard = ({
   isConnected,
   roomData,
   wsRef,
+  shapes,
+  sendEncryptedMessage,
   handleTouchEnd,
   handleTouchMove,
   handleTouchStart,
@@ -63,6 +69,8 @@ export const CanvasBoard = ({
     isConnected,
     wsRef,
     roomData,
+    shapes,
+    sendEncryptedMessage,
     selectedShapeIndex,
     setSelectedShapeIndex,
     setCanvasState,

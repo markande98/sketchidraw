@@ -30,6 +30,7 @@ export interface Message {
       username?: string;
       cursorPos?: { x: number; y: number };
     };
+    encryptedData?: any;
     timestamp: number;
   };
 }
@@ -66,7 +67,8 @@ export class WebsocketServerManager {
     this.wss.on(ServerEvents.Connection, (ws: WebSocket) => {
       ws.on(WebSocketServerEvents.Message, (data) => {
         const parsedData = JSON.parse(data.toString());
-        const { userId, roomId, username, cursorPos } = parsedData.payload;
+        const { userId, roomId, username, cursorPos, encryptedData } =
+          parsedData.payload;
 
         const user: User = {
           id: userId,
@@ -145,6 +147,19 @@ export class WebsocketServerManager {
                     id: user.id,
                     cursorPos,
                   },
+                  timestamp: Date.now(),
+                },
+              },
+              user,
+              roomId
+            );
+            break;
+          case WebSocketClientEvents.Drawing:
+            RoomManager.getInstance().broadcast(
+              {
+                type: WebSocketServerEvents.Drawed,
+                payload: {
+                  encryptedData,
                   timestamp: Date.now(),
                 },
               },

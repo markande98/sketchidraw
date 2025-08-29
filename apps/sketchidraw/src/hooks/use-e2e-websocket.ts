@@ -1,9 +1,10 @@
 "use client";
 
 import { E2EEncryption } from "@/lib/crypto";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ClientEvents, ServerEvents } from "@/constants";
 import { toast } from "sonner";
+import { Shape } from "@/types/shape";
 
 export type RoomInfo = {
   roomId: string;
@@ -23,6 +24,7 @@ export type User = {
 
 export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
   const [users, setUsers] = useState<User[]>([]);
+  const [shapes, setShapes] = useState<Shape[]>([]);
   const [roomData, setRoomData] = useState<RoomInfo | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef<WebSocket>(null);
@@ -64,7 +66,7 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
       );
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = async (event) => {
       const data = JSON.parse(event.data);
 
       switch (data.type) {
@@ -104,6 +106,23 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
             )
           );
           break;
+        case ServerEvents.Drawed:
+          const { encryptedData } = data.payload;
+          try {
+            const decryptedData: Shape =
+              await encryptionRef.current?.decrypt(encryptedData);
+            // update shape state.
+            setShapes((prev) => {
+              const existingShape = prev.find((s) => s.id === decryptedData.id);
+              if (!existingShape) return [...prev, decryptedData];
+              return prev.map((s) =>
+                s.id === decryptedData.id ? { ...decryptedData } : s
+              );
+            });
+          } catch (error) {
+            console.log("failed to decrypt message: ", error);
+          }
+          break;
         default:
           break;
       }
@@ -112,6 +131,9 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
     ws.onclose = () => {
       setIsConnected(false);
       setUsers([]);
+      setShapes([]);
+      wsRef.current = null;
+      encryptionRef.current = null;
     };
     ws.onerror = (error) => {
       console.log("Websocket error: ", error);
@@ -126,10 +148,56 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
     };
   }, [hash, currentUser]);
 
+  const sendEncryptedMessage = useCallback(
+    async (shape: Shape, type: ClientEvents) => {
+      if (
+        !currentUser ||
+        !wsRef.current ||
+        wsRef.current.readyState !== WebSocket.OPEN
+      ) {
+        throw new Error("Websocket not connected");
+      }
+      if (!encryptionRef.current) {
+        throw new Error("Encryption not initialized");
+      }
+      if (!roomData) {
+        throw new Error("Room is not initialized");
+      }
+
+      try {
+        const encryptedData = await encryptionRef.current.encrypt(shape);
+        // send encrypted payload to server
+        wsRef.current.send(
+          JSON.stringify({
+            type,
+            payload: {
+              roomId: roomData.roomId,
+              userId: currentUser.id,
+              encryptedData,
+            },
+          })
+        );
+
+        setShapes((prev) => {
+          const existingShape = prev.find((s) => s.id === shape.id);
+          if (!existingShape) return [...prev, shape];
+          return prev.map((s) => (s.id === shape.id ? { ...shape } : s));
+        });
+      } catch (error) {
+        console.log("Failed to encrypt message:", error);
+        throw error;
+      }
+    },
+    [roomData, currentUser]
+  );
+
+  console.log(shapes);
   return {
     roomData,
     isConnected,
     wsRef,
     users,
+    sendEncryptedMessage,
+    shapes,
   };
 };

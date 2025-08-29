@@ -43,10 +43,11 @@ export const CanvasView = () => {
     panY,
   } = useInfiniteCanvas({ canvasRef });
 
-  const { isConnected, wsRef, roomData, users } = useE2EWebsocket({
-    hash,
-    currentUser,
-  });
+  const { isConnected, wsRef, roomData, users, shapes, sendEncryptedMessage } =
+    useE2EWebsocket({
+      hash,
+      currentUser,
+    });
 
   const handleClick = useCallback(() => {
     if (!currentUser || !isAuthenticated) {
@@ -200,6 +201,8 @@ export const CanvasView = () => {
         isConnected={isConnected}
         wsRef={wsRef}
         roomData={roomData}
+        shapes={shapes}
+        sendEncryptedMessage={sendEncryptedMessage}
         setSelectedShapeIndex={setSelectedShapeIndex}
         handleTouchStart={handleTouchStart}
         handleTouchMove={handleTouchMove}

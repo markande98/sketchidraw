@@ -54,6 +54,7 @@ export class RoomManager {
       }
     });
   }
+
   public removeUser(roomId: string, user: User) {
     if (!this.rooms.has(roomId)) return;
     const users = this.rooms.get(roomId)?.filter((u) => u.id !== user.id) ?? [];

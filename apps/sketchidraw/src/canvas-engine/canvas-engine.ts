@@ -585,13 +585,20 @@ export class CanvasEngine {
     selectedShapeIndex: number | null,
     scale: number,
     panX: number,
-    panY: number
+    panY: number,
+    isConnected?: boolean,
+    shapes?: Shape[]
   ): void {
     const ctx = this.canvas.getContext("2d");
 
     ctx?.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.shapes.forEach((shape, index) => {
+    let shapesToBeDrawn = this.shapes;
+    if (isConnected && shapes) {
+      shapesToBeDrawn = shapes;
+    }
+
+    shapesToBeDrawn.forEach((shape, index) => {
       const isSelected = selectedShapeIndex === index;
       const options = {
         isDeleted: false,
