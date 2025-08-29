@@ -24,9 +24,7 @@ import { UsersShareIcon } from "../users-share-icon";
 export const CanvasView = () => {
   const [hash, setHash] = useState("");
   const { currentUser, isAuthenticated } = useCurrentUser();
-  const [selectedShapeIndex, setSelectedShapeIndex] = useState<number | null>(
-    null
-  );
+  const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
   const { tooltype, canvaShapes, onSetCanvaShapes, onOpen } = useCanva();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const {
@@ -167,13 +165,10 @@ export const CanvasView = () => {
   return (
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
       {showWelcomeScreen && <WelcomeScreen />}
-      <CanvaClearModal setSelectedShapeIndex={setSelectedShapeIndex} />
+      <CanvaClearModal setSelectedShapeId={setSelectedShapeId} />
       <CanvaCollabModal />
       <CanvaShareModal wsRef={wsRef} roomId={roomData?.roomId} />
-      <CanvasProperty
-        canvasRef={canvasRef}
-        selectedShapeIndex={selectedShapeIndex}
-      />
+      <CanvasProperty canvasRef={canvasRef} selectedShapeId={selectedShapeId} />
       <CanvasMenu />
       <ToolsMenu />
       {isConnected && <UsersShareIcon users={users} />}
@@ -197,13 +192,13 @@ export const CanvasView = () => {
         panX={panX}
         panY={panY}
         canvasRef={canvasRef}
-        selectedShapeIndex={selectedShapeIndex}
+        selectedShapeId={selectedShapeId}
         isConnected={isConnected}
         wsRef={wsRef}
         roomData={roomData}
         shapes={shapes}
         sendEncryptedMessage={sendEncryptedMessage}
-        setSelectedShapeIndex={setSelectedShapeIndex}
+        setSelectedShapeId={setSelectedShapeId}
         handleTouchStart={handleTouchStart}
         handleTouchMove={handleTouchMove}
         handleTouchEnd={handleTouchEnd}

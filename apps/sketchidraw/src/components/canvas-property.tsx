@@ -18,12 +18,12 @@ import { FontFamily } from "./font-family";
 import { RefObject } from "react";
 
 type CanvasPropertyProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
   canvasRef: RefObject<HTMLCanvasElement | null>;
 };
 
 export const CanvasProperty = ({
-  selectedShapeIndex,
+  selectedShapeId,
   canvasRef,
 }: CanvasPropertyProps) => {
   const isMobile = useMediaQuery("(max-width: 639px)");
@@ -41,30 +41,25 @@ export const CanvasProperty = ({
   return (
     <ScrollArea className="z-[100] absolute top-22 bg-white dark:bg-surface-low border shadow-md rounded-md left-6 w-[210px] max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-190px)] overflow-y-auto">
       <div className="p-3 space-y-6">
-        <StrokeOptions selectedShapeIndex={selectedShapeIndex} />
-        {!isTextTool && (
-          <BackgroundOptions selectedShapeIndex={selectedShapeIndex} />
-        )}
-        {!isTextTool && <FillStyle selectedShapeIndex={selectedShapeIndex} />}
-        {!isTextTool && <StrokeWidth selectedShapeIndex={selectedShapeIndex} />}
+        <StrokeOptions selectedShapeId={selectedShapeId} />
+        {!isTextTool && <BackgroundOptions selectedShapeId={selectedShapeId} />}
+        {!isTextTool && <FillStyle selectedShapeId={selectedShapeId} />}
+        {!isTextTool && <StrokeWidth selectedShapeId={selectedShapeId} />}
         {!isPencilTool && !isTextTool && (
-          <StrokeStyle selectedShapeIndex={selectedShapeIndex} />
+          <StrokeStyle selectedShapeId={selectedShapeId} />
         )}
         {!isPencilTool && !isTextTool && (
-          <Sloppiness selectedShapeIndex={selectedShapeIndex} />
+          <Sloppiness selectedShapeId={selectedShapeId} />
         )}
         {!isEllipseTool && !isArrowTool && !isPencilTool && !isTextTool && (
-          <EdgeStyle selectedShapeIndex={selectedShapeIndex} />
+          <EdgeStyle selectedShapeId={selectedShapeId} />
         )}
         {isArrowTool && !isPencilTool && (
-          <ArrowHeads selectedShapeIndex={selectedShapeIndex} />
+          <ArrowHeads selectedShapeId={selectedShapeId} />
         )}
-        {isTextTool && <FontFamily selectedShapeIndex={selectedShapeIndex} />}
+        {isTextTool && <FontFamily selectedShapeId={selectedShapeId} />}
         {isTextTool && (
-          <FontSize
-            canvasRef={canvasRef}
-            selectedShapeIndex={selectedShapeIndex}
-          />
+          <FontSize canvasRef={canvasRef} selectedShapeId={selectedShapeId} />
         )}
       </div>
     </ScrollArea>

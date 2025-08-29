@@ -106,7 +106,7 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
             )
           );
           break;
-        case ServerEvents.Drawed:
+        case ServerEvents.Decryption:
           const { encryptedData } = data.payload;
           try {
             const decryptedData: Shape =

@@ -7,17 +7,17 @@ import { cn } from "@/lib/utils";
 import { ToolType } from "@/types/tools";
 
 type EdgeStyleProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
 };
 
-export const EdgeStyle = ({ selectedShapeIndex }: EdgeStyleProps) => {
+export const EdgeStyle = ({ selectedShapeId }: EdgeStyleProps) => {
   const { canvaEdge, onSetCanvaEdge, canvaShapes, onSetCanvaShapes } =
     useCanva();
   const onClick = (edge: Edges) => {
     onSetCanvaEdge(edge);
-    if (selectedShapeIndex !== null) {
-      const newShapes = canvaShapes;
-      let shapeToUpdate = newShapes[selectedShapeIndex];
+    if (selectedShapeId !== null) {
+      let newShapes = canvaShapes;
+      let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       if (
         shapeToUpdate.type === ToolType.Rectangle ||
         shapeToUpdate.type === ToolType.Diamond
@@ -27,7 +27,9 @@ export const EdgeStyle = ({ selectedShapeIndex }: EdgeStyleProps) => {
           edgeType: edge,
         };
       }
-      newShapes[selectedShapeIndex] = shapeToUpdate;
+      newShapes = canvaShapes.map((s) =>
+        s.id === selectedShapeId ? shapeToUpdate : s
+      );
       onSetCanvaShapes([...newShapes]);
     }
   };

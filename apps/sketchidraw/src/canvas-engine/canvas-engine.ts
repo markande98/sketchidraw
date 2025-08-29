@@ -582,7 +582,7 @@ export class CanvasEngine {
   }
 
   public redrawShapes(
-    selectedShapeIndex: number | null,
+    selectedShapeId: string | null,
     scale: number,
     panX: number,
     panY: number,
@@ -598,8 +598,8 @@ export class CanvasEngine {
       shapesToBeDrawn = shapes;
     }
 
-    shapesToBeDrawn.forEach((shape, index) => {
-      const isSelected = selectedShapeIndex === index;
+    shapesToBeDrawn.forEach((shape) => {
+      const isSelected = selectedShapeId === shape.id;
       const options = {
         isDeleted: false,
         stroke: shape.isDeleted

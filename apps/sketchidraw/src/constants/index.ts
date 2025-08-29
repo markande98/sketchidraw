@@ -126,12 +126,12 @@ export enum ServerEvents {
   UserJoined = "user-joined",
   UserLeaved = "user-leaved",
   CursorMoved = "cursor-moved",
-  Drawed = "drawed",
+  Decryption = "decryption",
 }
 
 export enum ClientEvents {
   RoomJoin = "room-join",
   LeaveRoom = "leave-room",
   CursorMove = "cursor-move",
-  Drawing = "drawing",
+  Encryption = "encryption",
 }

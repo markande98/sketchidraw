@@ -10,11 +10,11 @@ import { useTheme } from "next-themes";
 import { ColorToolTip } from "./color-tooltip";
 
 type BackgroundOptionsProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
 };
 
 export const BackgroundOptions = ({
-  selectedShapeIndex,
+  selectedShapeId,
 }: BackgroundOptionsProps) => {
   const { resolvedTheme } = useTheme();
   const { canvaBgColor, onSetCanvaBgColor, canvaShapes, onSetCanvaShapes } =
@@ -22,14 +22,16 @@ export const BackgroundOptions = ({
 
   const onChange = (color: string | "transparent") => {
     onSetCanvaBgColor(color);
-    if (selectedShapeIndex !== null) {
-      const newShapes = canvaShapes;
-      let shapeToUpdate = newShapes[selectedShapeIndex];
+    if (selectedShapeId !== null) {
+      let newShapes = canvaShapes;
+      let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         fill: color,
       };
-      newShapes[selectedShapeIndex] = shapeToUpdate;
+      newShapes = canvaShapes.map((s) =>
+        s.id === selectedShapeId ? shapeToUpdate : s
+      );
       onSetCanvaShapes([...newShapes]);
     }
   };

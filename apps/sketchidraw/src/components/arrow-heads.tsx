@@ -7,25 +7,27 @@ import { cn } from "@/lib/utils";
 import { ToolType } from "@/types/tools";
 
 type ArrowHeadsProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
 };
 
-export const ArrowHeads = ({ selectedShapeIndex }: ArrowHeadsProps) => {
+export const ArrowHeads = ({ selectedShapeId }: ArrowHeadsProps) => {
   const { canvaArrowType, onsetCanvaArrowType, canvaShapes, onSetCanvaShapes } =
     useCanva();
 
   const onClick = (type: ArrowTypes) => {
     onsetCanvaArrowType(type);
-    if (selectedShapeIndex !== null) {
-      const newShapes = canvaShapes;
-      let shapeToUpdate = newShapes[selectedShapeIndex];
+    if (selectedShapeId !== null) {
+      let newShapes = canvaShapes;
+      let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       if (shapeToUpdate.type === ToolType.Arrow) {
         shapeToUpdate = {
           ...shapeToUpdate,
           arrowType: type,
         };
       }
-      newShapes[selectedShapeIndex] = shapeToUpdate;
+      newShapes = canvaShapes.map((s) =>
+        s.id === selectedShapeId ? shapeToUpdate : s
+      );
       onSetCanvaShapes([...newShapes]);
     }
   };

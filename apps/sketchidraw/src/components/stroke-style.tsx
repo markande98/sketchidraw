@@ -6,10 +6,10 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 type StrokeStyleProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
 };
 
-export const StrokeStyle = ({ selectedShapeIndex }: StrokeStyleProps) => {
+export const StrokeStyle = ({ selectedShapeId }: StrokeStyleProps) => {
   const { onSetCanvaStrokeDashOffset, canvaShapes, onSetCanvaShapes } =
     useCanva();
   const [strokeDashIndex, setStrokeDashIndex] = useState(0);
@@ -17,14 +17,16 @@ export const StrokeStyle = ({ selectedShapeIndex }: StrokeStyleProps) => {
   const onClick = (index: number) => {
     onSetCanvaStrokeDashOffset(STROKE_DASH_OFFSET[index]);
     setStrokeDashIndex(index);
-    if (selectedShapeIndex !== null) {
-      const newShapes = canvaShapes;
-      let shapeToUpdate = newShapes[selectedShapeIndex];
+    if (selectedShapeId !== null) {
+      let newShapes = canvaShapes;
+      let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         strokeDashOffset: STROKE_DASH_OFFSET[index],
       };
-      newShapes[selectedShapeIndex] = shapeToUpdate;
+      newShapes = canvaShapes.map((s) =>
+        s.id === selectedShapeId ? shapeToUpdate : s
+      );
       onSetCanvaShapes([...newShapes]);
     }
   };

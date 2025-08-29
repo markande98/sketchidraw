@@ -14,11 +14,11 @@ import { RefObject } from "react";
 import { Text } from "@/types/shape";
 
 type FontSizeProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
   canvasRef: RefObject<HTMLCanvasElement | null>;
 };
 
-export const FontSize = ({ selectedShapeIndex, canvasRef }: FontSizeProps) => {
+export const FontSize = ({ selectedShapeId, canvasRef }: FontSizeProps) => {
   const { canvaFontSize, canvaShapes, onSetCanvaFontSize, onSetCanvaShapes } =
     useCanva();
 
@@ -49,9 +49,9 @@ export const FontSize = ({ selectedShapeIndex, canvasRef }: FontSizeProps) => {
 
   const onClick = (fontSize: FONT_SIZE) => {
     onSetCanvaFontSize(fontSize);
-    if (selectedShapeIndex !== null) {
-      const newShapes = canvaShapes;
-      let shapeToUpdate = newShapes[selectedShapeIndex];
+    if (selectedShapeId !== null) {
+      let newShapes = canvaShapes;
+      let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       if (shapeToUpdate.type === ToolType.Text) {
         shapeToUpdate = {
           ...shapeToUpdate,
@@ -66,7 +66,9 @@ export const FontSize = ({ selectedShapeIndex, canvasRef }: FontSizeProps) => {
           endY,
         };
       }
-      newShapes[selectedShapeIndex] = shapeToUpdate;
+      newShapes = canvaShapes.map((s) =>
+        s.id === selectedShapeId ? shapeToUpdate : s
+      );
       onSetCanvaShapes([...newShapes]);
     }
   };

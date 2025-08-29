@@ -154,10 +154,10 @@ export class WebsocketServerManager {
               roomId
             );
             break;
-          case WebSocketClientEvents.Drawing:
-            RoomManager.getInstance().broadcast(
+          case WebSocketClientEvents.Encryption:
+            const type = RoomManager.getInstance().broadcast(
               {
-                type: WebSocketServerEvents.Drawed,
+                type: WebSocketServerEvents.Decryption,
                 payload: {
                   encryptedData,
                   timestamp: Date.now(),

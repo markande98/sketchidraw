@@ -6,23 +6,25 @@ import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
 
 type FillStyleProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
 };
 
-export const FillStyle = ({ selectedShapeIndex }: FillStyleProps) => {
+export const FillStyle = ({ selectedShapeId }: FillStyleProps) => {
   const { canvaFillstyle, onSetCanvaFillstyle, canvaShapes, onSetCanvaShapes } =
     useCanva();
 
   const onClick = (fillStyle: FILLSTYLE) => {
     onSetCanvaFillstyle(fillStyle);
-    if (selectedShapeIndex !== null) {
-      const newShapes = canvaShapes;
-      let shapeToUpdate = newShapes[selectedShapeIndex];
+    if (selectedShapeId !== null) {
+      let newShapes = canvaShapes;
+      let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         fillStyle,
       };
-      newShapes[selectedShapeIndex] = shapeToUpdate;
+      newShapes = canvaShapes.map((s) =>
+        s.id === selectedShapeId ? shapeToUpdate : s
+      );
       onSetCanvaShapes([...newShapes]);
     }
   };

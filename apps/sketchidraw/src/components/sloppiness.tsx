@@ -6,10 +6,10 @@ import { ArchitectSvg, ArtistSvg, CartoonistSvg } from "@/constants/svg";
 import { cn } from "@/lib/utils";
 
 type SloppinessProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
 };
 
-export const Sloppiness = ({ selectedShapeIndex }: SloppinessProps) => {
+export const Sloppiness = ({ selectedShapeId }: SloppinessProps) => {
   const {
     canvaSloppiness,
     onSetCanvaSloppiness,
@@ -19,14 +19,16 @@ export const Sloppiness = ({ selectedShapeIndex }: SloppinessProps) => {
 
   const onClick = (sloppiness: SLOPPINESS) => {
     onSetCanvaSloppiness(sloppiness);
-    if (selectedShapeIndex !== null) {
-      const newShapes = canvaShapes;
-      let shapeToUpdate = newShapes[selectedShapeIndex];
+    if (selectedShapeId !== null) {
+      let newShapes = canvaShapes;
+      let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         sloppiness,
       };
-      newShapes[selectedShapeIndex] = shapeToUpdate;
+      newShapes = canvaShapes.map((s) =>
+        s.id === selectedShapeId ? shapeToUpdate : s
+      );
       onSetCanvaShapes([...newShapes]);
     }
   };

@@ -11,10 +11,10 @@ import { cn, getFontCSS } from "@/lib/utils";
 import { ToolType } from "@/types/tools";
 
 type FontFamilyProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
 };
 
-export const FontFamily = ({ selectedShapeIndex }: FontFamilyProps) => {
+export const FontFamily = ({ selectedShapeId }: FontFamilyProps) => {
   const {
     canvaFontFamily,
     canvaShapes,
@@ -24,16 +24,18 @@ export const FontFamily = ({ selectedShapeIndex }: FontFamilyProps) => {
 
   const onClick = (font: FONT_FAMILY) => {
     onSetCanvaFontFamily(font);
-    if (selectedShapeIndex !== null) {
-      const newShapes = canvaShapes;
-      let shapeToUpdate = newShapes[selectedShapeIndex];
+    if (selectedShapeId !== null) {
+      let newShapes = canvaShapes;
+      let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       if (shapeToUpdate.type === ToolType.Text) {
         shapeToUpdate = {
           ...shapeToUpdate,
           fontFamily: getFontCSS(font),
         };
       }
-      newShapes[selectedShapeIndex] = shapeToUpdate;
+      newShapes = canvaShapes.map((s) =>
+        s.id === selectedShapeId ? shapeToUpdate : s
+      );
       onSetCanvaShapes([...newShapes]);
     }
   };

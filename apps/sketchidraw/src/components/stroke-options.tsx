@@ -9,10 +9,10 @@ import { ColorToolTip } from "./color-tooltip";
 import { ToolType } from "@/types/tools";
 
 type StrokeOptionsProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
 };
 
-export const StrokeOptions = ({ selectedShapeIndex }: StrokeOptionsProps) => {
+export const StrokeOptions = ({ selectedShapeId }: StrokeOptionsProps) => {
   const { resolvedTheme } = useTheme();
   const {
     canvaStrokeColor,
@@ -23,9 +23,9 @@ export const StrokeOptions = ({ selectedShapeIndex }: StrokeOptionsProps) => {
 
   const onChange = (color: string) => {
     onSetCanvaStrokeColor(color);
-    if (selectedShapeIndex !== null) {
-      const newShapes = canvaShapes;
-      let shapeToUpdate = newShapes[selectedShapeIndex];
+    if (selectedShapeId !== null) {
+      let newShapes = canvaShapes;
+      let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         stroke: color,
@@ -36,7 +36,9 @@ export const StrokeOptions = ({ selectedShapeIndex }: StrokeOptionsProps) => {
           color,
         };
       }
-      newShapes[selectedShapeIndex] = shapeToUpdate;
+      newShapes = canvaShapes.map((s) =>
+        s.id === selectedShapeId ? shapeToUpdate : s
+      );
       onSetCanvaShapes([...newShapes]);
     }
   };

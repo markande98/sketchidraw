@@ -8,10 +8,10 @@ import { useTheme } from "next-themes";
 import { useState } from "react";
 
 type StrokeWidthProps = {
-  selectedShapeIndex: number | null;
+  selectedShapeId: string | null;
 };
 
-export const StrokeWidth = ({ selectedShapeIndex }: StrokeWidthProps) => {
+export const StrokeWidth = ({ selectedShapeId }: StrokeWidthProps) => {
   const { resolvedTheme } = useTheme();
   const { onSetCanvaStrokeWidth, canvaShapes, onSetCanvaShapes } = useCanva();
   const [widthIndex, setWidthIndex] = useState(0);
@@ -19,14 +19,16 @@ export const StrokeWidth = ({ selectedShapeIndex }: StrokeWidthProps) => {
   const onClick = (index: number) => {
     setWidthIndex(index);
     onSetCanvaStrokeWidth(STROKE_WIDTH[index]);
-    if (selectedShapeIndex !== null) {
-      const newShapes = canvaShapes;
-      let shapeToUpdate = newShapes[selectedShapeIndex];
+    if (selectedShapeId !== null) {
+      let newShapes = canvaShapes;
+      let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         strokeWidth: STROKE_WIDTH[index],
       };
-      newShapes[selectedShapeIndex] = shapeToUpdate;
+      newShapes = canvaShapes.map((s) =>
+        s.id === selectedShapeId ? shapeToUpdate : s
+      );
       onSetCanvaShapes([...newShapes]);
     }
   };

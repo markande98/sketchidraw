@@ -7,10 +7,10 @@ import { Separator } from "../ui/separator";
 import { CanvaModalType } from "@/constants";
 
 type CanvaClearModalProps = {
-  setSelectedShapeIndex: React.Dispatch<SetStateAction<number | null>>;
+  setSelectedShapeId: React.Dispatch<SetStateAction<string | null>>;
 };
 export const CanvaClearModal = ({
-  setSelectedShapeIndex,
+  setSelectedShapeId,
 }: CanvaClearModalProps) => {
   const { isOpen, canvasModalType, onClose, onSetCanvaShapes } = useCanva();
   const [showModal, setShowModal] = useState(isOpen);
@@ -21,21 +21,21 @@ export const CanvaClearModal = ({
 
   const handleCancel = useCallback(() => {
     setShowModal(false);
-    setSelectedShapeIndex(null);
+    setSelectedShapeId(null);
     setTimeout(() => {
       onClose();
     }, 300);
-  }, [onClose, setSelectedShapeIndex]);
+  }, [onClose, setSelectedShapeId]);
 
   const handleConfirm = useCallback(() => {
     saveToLocalStorage([]);
     onSetCanvaShapes([]);
     setShowModal(false);
-    setSelectedShapeIndex(null);
+    setSelectedShapeId(null);
     setTimeout(() => {
       onClose();
     }, 300);
-  }, [onClose, onSetCanvaShapes, setSelectedShapeIndex]);
+  }, [onClose, onSetCanvaShapes, setSelectedShapeId]);
 
   const isModalOpen = showModal && canvasModalType === CanvaModalType.Clear;
 
