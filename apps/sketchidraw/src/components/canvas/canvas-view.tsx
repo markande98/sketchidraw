@@ -73,12 +73,16 @@ export const CanvasView = () => {
   }, []);
 
   useEffect(() => {
+    setSelectedShapeId(null);
+    if (isConnected) {
+      return;
+    }
     const hasShapes = localStorage.getItem("sketchidraw");
     if (hasShapes) {
       const shapes: Shape[] = JSON.parse(hasShapes);
       onSetCanvaShapes(shapes);
     }
-  }, [onSetCanvaShapes]);
+  }, [onSetCanvaShapes, isConnected]);
 
   useEffect(() => {
     saveToLocalStorage(canvaShapes);
@@ -164,7 +168,7 @@ export const CanvasView = () => {
     tooltype === ToolType.Select && canvaShapes.length === 0;
   return (
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
-      {showWelcomeScreen && <WelcomeScreen />}
+      {!isConnected && showWelcomeScreen && <WelcomeScreen />}
       <CanvaClearModal setSelectedShapeId={setSelectedShapeId} />
       <CanvaCollabModal />
       <CanvaShareModal wsRef={wsRef} roomId={roomData?.roomId} />

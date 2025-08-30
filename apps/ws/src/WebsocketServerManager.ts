@@ -30,7 +30,10 @@ export interface Message {
       username?: string;
       cursorPos?: { x: number; y: number };
     };
+    toBeAdded?: boolean;
+    toBeDeleted?: boolean;
     encryptedData?: any;
+    dataToDecrypt?: any;
     timestamp: number;
   };
 }
@@ -67,7 +70,7 @@ export class WebsocketServerManager {
     this.wss.on(ServerEvents.Connection, (ws: WebSocket) => {
       ws.on(WebSocketServerEvents.Message, (data) => {
         const parsedData = JSON.parse(data.toString());
-        const { userId, roomId, username, cursorPos, encryptedData } =
+        const { userId, roomId, username, cursorPos, encryptedData, flags } =
           parsedData.payload;
 
         const user: User = {
@@ -98,6 +101,9 @@ export class WebsocketServerManager {
                     username: u.username,
                     cursorPos: u.cursorPos,
                   })),
+                dataToDecrypt: RoomManager.getInstance()
+                  .encryptedDataInRooms.get(roomId)
+                  ?.map((ecypt) => ecypt.encryptedData),
                 timestamp: Date.now(),
               },
             });
@@ -155,11 +161,26 @@ export class WebsocketServerManager {
             );
             break;
           case WebSocketClientEvents.Encryption:
+            const { encryptedDataId, toBeAdded, toBeDeleted } = flags;
+            if (toBeAdded) {
+              RoomManager.getInstance().addEncryptedData(roomId, {
+                id: encryptedDataId,
+                encryptedData,
+              });
+            }
+            if (toBeDeleted) {
+              RoomManager.getInstance().deleteEncryptedData(roomId, {
+                id: encryptedDataId,
+                encryptedData,
+              });
+            }
             const type = RoomManager.getInstance().broadcast(
               {
                 type: WebSocketServerEvents.Decryption,
                 payload: {
                   encryptedData,
+                  toBeAdded,
+                  toBeDeleted,
                   timestamp: Date.now(),
                 },
               },

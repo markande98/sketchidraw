@@ -31,10 +31,15 @@ type DrawProps = {
   roomData: RoomInfo | null;
   selectedShapeId: string | null;
   shapes: Shape[];
-  sendEncryptedMessage: (shape: Shape, type: ClientEvents) => void;
   setSelectedShapeId: React.Dispatch<SetStateAction<string | null>>;
   setCanvasState: React.Dispatch<SetStateAction<CanvasState>>;
   expandCanvasForPanning: () => void;
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
 export const useDraw = ({
@@ -93,6 +98,8 @@ export const useDraw = ({
   const CURSOR_UPDATE_THROTTLE_MS = 16; // ~60fps
   const MIN_DISTANCE_THRESHOLD = 2; // pixels
   const BATCH_DELAY_MS = 10; // milliseconds
+
+  const shapesToBeChosen = isConnected ? shapes : canvaShapes;
 
   const sendCursorPosition = useCallback(
     (pos: { x: number; y: number }) => {
@@ -196,6 +203,7 @@ export const useDraw = ({
       }
     }
   }, [
+    shapesToBeChosen,
     canvaShapes,
     currentShape,
     canvasEngine,
@@ -286,7 +294,6 @@ export const useDraw = ({
       height: lines.length * fontSize * 1.2,
     };
   };
-
   const handlePointDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (tooltype === ToolType.Grab) {
       const pos = getMousePos(e);
@@ -298,7 +305,7 @@ export const useDraw = ({
     if (tooltype === ToolType.Eraser) {
       setIsDeleting(true);
       setSelectedShapeId(null);
-      let updatedCanvas = canvaShapes;
+      let updatedCanvas = shapesToBeChosen;
       updatedCanvas = updatedCanvas.map((shape) => {
         let updatedShape = shape;
         if (canvasEngine?.isPointInshape(cursorPos, shape)) {
@@ -307,9 +314,16 @@ export const useDraw = ({
             isDeleted: true,
           };
         }
+        if (isConnected && updatedShape.isDeleted)
+          sendEncryptedMessage(
+            updatedShape,
+            ClientEvents.Encryption,
+            false,
+            true
+          );
         return updatedShape;
       });
-      onSetCanvaShapes([...updatedCanvas]);
+      if (!isConnected) onSetCanvaShapes([...updatedCanvas]);
       return;
     }
     if (tooltype === ToolType.Text) {
@@ -319,7 +333,7 @@ export const useDraw = ({
     }
     const pos = getMousePos(e);
     if (selectedShapeId !== null) {
-      const shape = canvaShapes.find((s) => s.id === selectedShapeId)!;
+      const shape = shapesToBeChosen.find((s) => s.id === selectedShapeId)!;
       const handle = canvasEngine?.getResizeHandle(pos, shape, canvasScale);
       if (handle) {
         setIsResizing(true);
@@ -348,9 +362,9 @@ export const useDraw = ({
 
     if (tooltype === ToolType.Select) {
       let clickedId = null;
-      for (let i = 0; i < canvaShapes.length; i++) {
-        if (canvasEngine?.isPointInshape(pos, canvaShapes[i])) {
-          clickedId = canvaShapes[i].id;
+      for (let i = 0; i < shapesToBeChosen.length; i++) {
+        if (canvasEngine?.isPointInshape(pos, shapesToBeChosen[i])) {
+          clickedId = shapesToBeChosen[i].id;
           break;
         }
       }
@@ -479,7 +493,9 @@ export const useDraw = ({
       return;
     }
     if (isResizing && selectedShapeId !== null) {
-      const shape = { ...canvaShapes.find((s) => s.id === selectedShapeId)! };
+      const shape = {
+        ...shapesToBeChosen.find((s) => s.id === selectedShapeId)!,
+      };
       const dx = pos.x - dragStart.x;
       const dy = pos.y - dragStart.y;
       switch (shape.type) {
@@ -722,12 +738,13 @@ export const useDraw = ({
         default:
           break;
       }
-      const newShapes = canvaShapes.map((s) =>
+      const newShapes = shapesToBeChosen.map((s) =>
         s.id === selectedShapeId ? shape : s
       );
-      onSetCanvaShapes([...newShapes]);
+      if (!isConnected) onSetCanvaShapes([...newShapes]);
+      if (isConnected)
+        sendEncryptedMessage(shape, ClientEvents.Encryption, false, false);
       setDragStart(pos);
-      if (isConnected) sendEncryptedMessage(shape, ClientEvents.Encryption);
     } else if (isDragging && tooltype === ToolType.Grab) {
       const pos = getMousePos(e);
       const deltaX = pos.x - dragStart.x;
@@ -743,8 +760,10 @@ export const useDraw = ({
       selectedShapeId != null &&
       tooltype === ToolType.Select
     ) {
-      let updatedShapes = canvaShapes;
-      const draggingShape = canvaShapes.find((s) => s.id === selectedShapeId)!;
+      let updatedShapes = shapesToBeChosen;
+      const draggingShape = shapesToBeChosen.find(
+        (s) => s.id === selectedShapeId
+      )!;
       const dx = pos.x - dragStart.x;
       const dy = pos.y - dragStart.y;
       switch (draggingShape.type) {
@@ -803,17 +822,22 @@ export const useDraw = ({
               endY: shape.endY + dy,
             };
           }
-          updatedShapes = canvaShapes.map((s) =>
+          updatedShapes = shapesToBeChosen.map((s) =>
             s.id === selectedShapeId ? updatedShape : s
           )!;
           if (isConnected)
-            sendEncryptedMessage(updatedShape, ClientEvents.Encryption);
+            sendEncryptedMessage(
+              updatedShape,
+              ClientEvents.Encryption,
+              false,
+              false
+            );
           break;
         default:
           break;
       }
       onSetCanvaCursorType(CursorType.Crossmove);
-      onSetCanvaShapes([...updatedShapes]);
+      if (!isConnected) onSetCanvaShapes([...updatedShapes]);
       setDragStart(pos);
     } else if (isDrawing && currentShape) {
       let updatedShape: Shape | null = null;
@@ -922,10 +946,15 @@ export const useDraw = ({
           break;
       }
       if (isConnected && updatedShape) {
-        sendEncryptedMessage(updatedShape, ClientEvents.Encryption);
+        sendEncryptedMessage(
+          updatedShape,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
       }
     } else if (isDeleting) {
-      let updatedCanvas = canvaShapes;
+      let updatedCanvas = shapesToBeChosen;
       updatedCanvas = updatedCanvas.map((shape) => {
         let updatedShape = shape;
         if (canvasEngine?.isPointInshape(cursorPos, shape)) {
@@ -934,9 +963,16 @@ export const useDraw = ({
             isDeleted: true,
           };
         }
+        if (isConnected && updatedShape.isDeleted)
+          sendEncryptedMessage(
+            updatedShape,
+            ClientEvents.Encryption,
+            false,
+            true
+          );
         return updatedShape;
       });
-      onSetCanvaShapes([...updatedCanvas]);
+      if (!isConnected) onSetCanvaShapes([...updatedCanvas]);
     }
   };
 
@@ -947,8 +983,10 @@ export const useDraw = ({
       return;
     }
     if (tooltype === ToolType.Eraser) {
-      const updatedShapes = canvaShapes.filter((shape) => !shape.isDeleted);
-      onSetCanvaShapes([...updatedShapes]);
+      const updatedShapes = shapesToBeChosen.filter(
+        (shape) => !shape.isDeleted
+      );
+      if (!isConnected) onSetCanvaShapes([...updatedShapes]);
       setIsDeleting(false);
       return;
     }
@@ -960,12 +998,12 @@ export const useDraw = ({
     if (isDrawing && currentShape) {
       onSelectTooltype(ToolType.Select);
       setSelectedShapeId(currentShape.id);
-      onSetCanvaShapes([...canvaShapes, currentShape]);
+      if (!isConnected) onSetCanvaShapes([...shapesToBeChosen, currentShape]);
       setCurrentShape(null);
     }
     if (isResizing && selectedShapeId !== null) {
-      let updatedShapes = canvaShapes;
-      const shape = canvaShapes.find((s) => s.id === selectedShapeId)!;
+      let updatedShapes = shapesToBeChosen;
+      const shape = shapesToBeChosen.find((s) => s.id === selectedShapeId)!;
       switch (shape.type) {
         case ToolType.Rectangle:
         case ToolType.Ellipse:
@@ -978,7 +1016,7 @@ export const useDraw = ({
             startY: Math.min(shape.startY, shape.endY),
             endY: Math.max(shape.endY, shape.startY),
           };
-          updatedShapes = canvaShapes.map((s) =>
+          updatedShapes = shapesToBeChosen.map((s) =>
             s.id === selectedShapeId ? updatedShape : s
           );
           break;
@@ -991,14 +1029,14 @@ export const useDraw = ({
             endX: Math.max(shape.sX, shape.mX, shape.eX),
             endY: Math.max(shape.sY, shape.mY, shape.eY),
           };
-          updatedShapes = canvaShapes.map((s) =>
+          updatedShapes = shapesToBeChosen.map((s) =>
             s.id === selectedShapeId ? updatedLine : s
           );
           break;
         default:
           break;
       }
-      onSetCanvaShapes([...updatedShapes]);
+      if (!isConnected) onSetCanvaShapes([...updatedShapes]);
     }
     onSetCanvaCursorType(CursorType.Crosshair);
     setIsDrawing(false);

@@ -28,7 +28,6 @@ type CanvasBoardProps = {
   wsRef: RefObject<WebSocket | null>;
   roomData: RoomInfo | null;
   shapes: Shape[];
-  sendEncryptedMessage: (shape: Shape, type: ClientEvents) => void;
   setSelectedShapeId: React.Dispatch<SetStateAction<string | null>>;
   handleTouchStart: (event: TouchEvent) => void;
   handleTouchMove: (event: TouchEvent) => void;
@@ -36,6 +35,12 @@ type CanvasBoardProps = {
   handleWheel: (e: WheelEvent) => void;
   setCanvasState: React.Dispatch<SetStateAction<CanvasState>>;
   expandCanvasForPanning: () => void;
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
 export const CanvasBoard = ({

@@ -4,12 +4,19 @@ import {
   WebsocketServerManager,
 } from "./WebsocketServerManager.js";
 
+type EncryptedData = {
+  id: string;
+  encryptedData: any;
+};
+
 export class RoomManager {
   public rooms: Map<string, User[]>;
+  public encryptedDataInRooms: Map<string, EncryptedData[]>;
   static instance: RoomManager;
 
   private constructor() {
     this.rooms = new Map<string, User[]>();
+    this.encryptedDataInRooms = new Map<string, EncryptedData[]>();
   }
 
   static getInstance() {
@@ -27,6 +34,22 @@ export class RoomManager {
     const hasUser = this.rooms.get(roomId)?.some((u) => u.id === user.id);
     if (!hasUser)
       this.rooms.set(roomId, [...(this.rooms.get(roomId) ?? []), user]);
+  }
+
+  public addEncryptedData(roomId: string, encryptedData: EncryptedData) {
+    if (!this.encryptedDataInRooms.has(roomId)) {
+      this.encryptedDataInRooms.set(roomId, [encryptedData]);
+      return;
+    }
+    const hasData = this.encryptedDataInRooms
+      .get(roomId)
+      ?.some((data) => data.id === encryptedData.id);
+    if (!hasData) {
+      this.encryptedDataInRooms.set(roomId, [
+        ...(this.encryptedDataInRooms.get(roomId) ?? []),
+        encryptedData,
+      ]);
+    }
   }
 
   public updateUser(
@@ -63,5 +86,19 @@ export class RoomManager {
       return;
     }
     this.rooms.delete(roomId);
+  }
+
+  public deleteEncryptedData(roomId: string, encryptedData: EncryptedData) {
+    if (!this.encryptedDataInRooms.has(roomId)) return;
+    const filteredEncryptedData =
+      this.encryptedDataInRooms
+        .get(roomId)
+        ?.filter((data) => data.id !== encryptedData.id) ?? [];
+
+    if (filteredEncryptedData.length > 0) {
+      this.encryptedDataInRooms.set(roomId, filteredEncryptedData);
+      return;
+    }
+    this.encryptedDataInRooms.delete(roomId);
   }
 }
