@@ -1,8 +1,8 @@
 "use client";
 
 import { v4 as uuidv4 } from "uuid";
-import { KeyTypes } from "@/constants";
-import { Text } from "@/types/shape";
+import { ClientEvents, KeyTypes } from "@/constants";
+import { Shape, Text } from "@/types/shape";
 import { ToolType } from "@/types/tools";
 import { RefObject, useCallback, useEffect, useState } from "react";
 import { useCanva } from "./use-canva-store";
@@ -15,6 +15,14 @@ type TextProps = {
   panX: number;
   panY: number;
   selectedShapeId: string | null;
+  isConnected: boolean;
+  newShapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
 export const useText = ({
@@ -23,6 +31,9 @@ export const useText = ({
   panX,
   panY,
   selectedShapeId,
+  isConnected,
+  sendEncryptedMessage,
+  newShapes,
 }: TextProps) => {
   const {
     tooltype,
@@ -40,10 +51,12 @@ export const useText = ({
   const [selectionStart, setSelectionStart] = useState<number | null>(null);
   const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
 
-  const textObjects = canvaShapes.filter(
+  const selectedShapes = isConnected ? newShapes : canvaShapes;
+
+  const textObjects = selectedShapes.filter(
     (shape) => shape.type === ToolType.Text
   );
-  const shapes = canvaShapes.filter((shape) => shape.type !== ToolType.Text);
+  const shapes = selectedShapes.filter((shape) => shape.type !== ToolType.Text);
 
   const createTextObject = useCallback(
     (x: number, y: number, text: string = ""): Text => ({
@@ -221,7 +234,9 @@ export const useText = ({
         setCursorPosition(textIndex);
       } else {
         const newText = createTextObject(pos.x, pos.y, "");
-        onSetCanvaShapes([...shapes, ...textObjects, newText]);
+        if (isConnected)
+          sendEncryptedMessage(newText, ClientEvents.Encryption, true, false);
+        else onSetCanvaShapes([...shapes, ...textObjects, newText]);
         setActiveTextId(newText.id);
         setIsEditing(true);
         setCursorPosition(0);
@@ -231,15 +246,17 @@ export const useText = ({
       setSelectionEnd(null);
     },
     [
+      tooltype,
       canvasRef,
       getMousePos,
       textObjects,
       getTextMetrics,
       getTextIndexFromCoordinates,
       createTextObject,
+      isConnected,
+      sendEncryptedMessage,
       onSetCanvaShapes,
       shapes,
-      tooltype,
     ]
   );
   const handleMouseDown = useCallback(
@@ -579,6 +596,14 @@ export const useText = ({
             const metrics = getTextMetrics(t);
             const endX = t.startX + (metrics?.width ?? 0);
             const endY = t.startY + (metrics?.height ?? 0);
+            const updatedText = { ...t, text: newText, endX, endY };
+            if (isConnected)
+              sendEncryptedMessage(
+                updatedText,
+                ClientEvents.Encryption,
+                true,
+                false
+              );
             return {
               ...t,
               text: newText,
@@ -588,7 +613,7 @@ export const useText = ({
           }
           return t;
         });
-        onSetCanvaShapes([...shapes, ...updatedTextObjects]);
+        if (!isConnected) onSetCanvaShapes([...shapes, ...updatedTextObjects]);
         setCursorPosition(newCursor);
         setSelectionStart(newSelectStart);
         setSelectionEnd(newSelectEnd);
@@ -599,10 +624,12 @@ export const useText = ({
       activeTextId,
       cursorPosition,
       getTextMetrics,
+      isConnected,
       isEditing,
       onSetCanvaShapes,
       selectionEnd,
       selectionStart,
+      sendEncryptedMessage,
       shapes,
       textObjects,
       tooltype,
@@ -617,8 +644,15 @@ export const useText = ({
       !canvasEngine
     )
       return;
-    canvasEngine.redrawShapes(selectedShapeId, canvasScale, panX, panY);
-    const text = canvaShapes.find(
+    canvasEngine.redrawShapes(
+      selectedShapeId,
+      canvasScale,
+      panX,
+      panY,
+      isConnected,
+      selectedShapes
+    );
+    const text = selectedShapes.find(
       (shape) => shape.type === ToolType.Text && shape.id === activeTextId
     );
     if (text) {
@@ -643,7 +677,6 @@ export const useText = ({
     canvasScale,
     activeTextId,
     canvasEngine,
-    canvaShapes,
     selectionStart,
     selectionEnd,
     cursorPosition,
@@ -651,6 +684,8 @@ export const useText = ({
     panX,
     panY,
     selectedShapeId,
+    isConnected,
+    selectedShapes,
   ]);
 
   useEffect(() => {

@@ -81,10 +81,10 @@ export const useDraw = ({
     panX,
     panY,
     selectedShapeId,
+    isConnected,
+    sendEncryptedMessage,
+    newShapes: shapes,
   });
-  const [shapesToBeChosen, setShapesToBeChosen] = useState<Shape[]>(
-    isConnected ? shapes : canvaShapes
-  );
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
@@ -101,6 +101,8 @@ export const useDraw = ({
   const CURSOR_UPDATE_THROTTLE_MS = 16; // ~60fps
   const MIN_DISTANCE_THRESHOLD = 2; // pixels
   const BATCH_DELAY_MS = 10; // milliseconds
+
+  const shapesToBeChosen = isConnected ? shapes : canvaShapes;
 
   const sendCursorPosition = useCallback(
     (pos: { x: number; y: number }) => {
@@ -190,11 +192,6 @@ export const useDraw = ({
   };
 
   useEffect(() => {
-    if (isConnected) setShapesToBeChosen(shapes);
-    else setShapesToBeChosen(canvaShapes);
-  }, [isConnected, canvaShapes, shapes]);
-
-  useEffect(() => {
     if (canvasEngine) {
       canvasEngine.redrawShapes(
         selectedShapeId,
@@ -218,7 +215,6 @@ export const useDraw = ({
     panX,
     panY,
     isConnected,
-    canvasRef,
   ]);
 
   const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -339,30 +335,32 @@ export const useDraw = ({
     }
     const pos = getMousePos(e);
     if (selectedShapeId !== null) {
-      const shape = shapesToBeChosen.find((s) => s.id === selectedShapeId)!;
-      const handle = canvasEngine?.getResizeHandle(pos, shape, canvasScale);
-      if (handle) {
-        setIsResizing(true);
-        setResizehandle(handle);
-        setDragStart(pos);
-        switch (handle) {
-          case "ne":
-          case "sw":
-            onSetCanvaCursorType(CursorType.NESWResize);
-            break;
-          case "nw":
-          case "se":
-            onSetCanvaCursorType(CursorType.NWSEResize);
-            break;
-          case "start":
-          case "mid":
-          case "end":
-            onSetCanvaCursorType(CursorType.Pointer);
-            break;
-          default:
-            break;
+      const shape = shapesToBeChosen.find((s) => s.id === selectedShapeId);
+      if (shape) {
+        const handle = canvasEngine?.getResizeHandle(pos, shape, canvasScale);
+        if (handle) {
+          setIsResizing(true);
+          setResizehandle(handle);
+          setDragStart(pos);
+          switch (handle) {
+            case "ne":
+            case "sw":
+              onSetCanvaCursorType(CursorType.NESWResize);
+              break;
+            case "nw":
+            case "se":
+              onSetCanvaCursorType(CursorType.NWSEResize);
+              break;
+            case "start":
+            case "mid":
+            case "end":
+              onSetCanvaCursorType(CursorType.Pointer);
+              break;
+            default:
+              break;
+          }
+          return;
         }
-        return;
       }
     }
 
