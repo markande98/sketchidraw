@@ -597,6 +597,7 @@ export class CanvasEngine {
     if (isConnected && shapes) {
       shapesToBeDrawn = shapes;
     }
+    if (shapesToBeDrawn.length === 0) return;
 
     shapesToBeDrawn.forEach((shape) => {
       const isSelected = selectedShapeId === shape.id;
@@ -626,6 +627,7 @@ export class CanvasEngine {
         panX,
         panY
       );
+      console.log(transformedShape);
       switch (transformedShape.type) {
         case ToolType.Rectangle:
           const rectPath = this.roundedRectPath(

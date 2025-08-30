@@ -2,17 +2,35 @@
 
 import { cn } from "@/lib/utils";
 
-import { STROKE_DARK_COLORS, STROKE_LIGHT_COLORS } from "@/constants/index";
+import {
+  ClientEvents,
+  STROKE_DARK_COLORS,
+  STROKE_LIGHT_COLORS,
+} from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { useTheme } from "next-themes";
 import { ColorToolTip } from "./color-tooltip";
 import { ToolType } from "@/types/tools";
+import { Shape } from "@/types/shape";
 
 type StrokeOptionsProps = {
   selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
-export const StrokeOptions = ({ selectedShapeId }: StrokeOptionsProps) => {
+export const StrokeOptions = ({
+  selectedShapeId,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
+}: StrokeOptionsProps) => {
   const { resolvedTheme } = useTheme();
   const {
     canvaStrokeColor,
@@ -21,10 +39,11 @@ export const StrokeOptions = ({ selectedShapeId }: StrokeOptionsProps) => {
     onSetCanvaShapes,
   } = useCanva();
 
+  let newShapes = isConnected ? shapes : canvaShapes;
+
   const onChange = (color: string) => {
     onSetCanvaStrokeColor(color);
     if (selectedShapeId !== null) {
-      let newShapes = canvaShapes;
       let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
@@ -36,10 +55,19 @@ export const StrokeOptions = ({ selectedShapeId }: StrokeOptionsProps) => {
           color,
         };
       }
-      newShapes = canvaShapes.map((s) =>
-        s.id === selectedShapeId ? shapeToUpdate : s
-      );
-      onSetCanvaShapes([...newShapes]);
+      if (isConnected) {
+        sendEncryptedMessage(
+          shapeToUpdate,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
+      } else {
+        newShapes = canvaShapes.map((s) =>
+          s.id === selectedShapeId ? shapeToUpdate : s
+        );
+        onSetCanvaShapes([...newShapes]);
+      }
     }
   };
 

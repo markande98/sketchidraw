@@ -1,23 +1,38 @@
 "use client";
 
-import { ArrowTypes } from "@/constants";
+import { ArrowTypes, ClientEvents } from "@/constants";
 import { ArrowSvg, TriangleOutlineSvg, TriangleSvg } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
+import { Shape } from "@/types/shape";
 import { ToolType } from "@/types/tools";
 
 type ArrowHeadsProps = {
   selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
-export const ArrowHeads = ({ selectedShapeId }: ArrowHeadsProps) => {
+export const ArrowHeads = ({
+  selectedShapeId,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
+}: ArrowHeadsProps) => {
   const { canvaArrowType, onsetCanvaArrowType, canvaShapes, onSetCanvaShapes } =
     useCanva();
+
+  let newShapes = isConnected ? shapes : canvaShapes;
 
   const onClick = (type: ArrowTypes) => {
     onsetCanvaArrowType(type);
     if (selectedShapeId !== null) {
-      let newShapes = canvaShapes;
       let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       if (shapeToUpdate.type === ToolType.Arrow) {
         shapeToUpdate = {
@@ -25,10 +40,19 @@ export const ArrowHeads = ({ selectedShapeId }: ArrowHeadsProps) => {
           arrowType: type,
         };
       }
-      newShapes = canvaShapes.map((s) =>
-        s.id === selectedShapeId ? shapeToUpdate : s
-      );
-      onSetCanvaShapes([...newShapes]);
+      if (isConnected) {
+        sendEncryptedMessage(
+          shapeToUpdate,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
+      } else {
+        newShapes = canvaShapes.map((s) =>
+          s.id === selectedShapeId ? shapeToUpdate : s
+        );
+        onSetCanvaShapes([...newShapes]);
+      }
     }
   };
 

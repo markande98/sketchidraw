@@ -1,35 +1,59 @@
 "use client";
 
-import { STROKE_WIDTH } from "@/constants/index";
+import { ClientEvents, STROKE_WIDTH } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
+import { Shape } from "@/types/shape";
 import { Minus } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
 
 type StrokeWidthProps = {
   selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
-export const StrokeWidth = ({ selectedShapeId }: StrokeWidthProps) => {
+export const StrokeWidth = ({
+  selectedShapeId,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
+}: StrokeWidthProps) => {
   const { resolvedTheme } = useTheme();
   const { onSetCanvaStrokeWidth, canvaShapes, onSetCanvaShapes } = useCanva();
   const [widthIndex, setWidthIndex] = useState(0);
+
+  let newShapes = isConnected ? shapes : canvaShapes;
 
   const onClick = (index: number) => {
     setWidthIndex(index);
     onSetCanvaStrokeWidth(STROKE_WIDTH[index]);
     if (selectedShapeId !== null) {
-      let newShapes = canvaShapes;
       let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         strokeWidth: STROKE_WIDTH[index],
       };
-      newShapes = canvaShapes.map((s) =>
-        s.id === selectedShapeId ? shapeToUpdate : s
-      );
-      onSetCanvaShapes([...newShapes]);
+      if (isConnected) {
+        sendEncryptedMessage(
+          shapeToUpdate,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
+      } else {
+        newShapes = canvaShapes.map((s) =>
+          s.id === selectedShapeId ? shapeToUpdate : s
+        );
+        onSetCanvaShapes([...newShapes]);
+      }
     }
   };
 

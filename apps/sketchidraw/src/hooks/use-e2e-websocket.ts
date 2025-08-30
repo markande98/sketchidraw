@@ -73,14 +73,14 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
         case ServerEvents.RoomJoined:
           try {
             const { users, dataToDecrypt } = data.payload;
-            // const shapes = await Promise.all(
-            //   dataToDecrypt.map(
-            //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            //     async (data: any) => await encryptionRef.current?.decrypt(data)
-            //   )
-            // );
+            const newShapes = await Promise.all(
+              dataToDecrypt.map(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                async (data: any) => await encryptionRef.current?.decrypt(data)
+              )
+            );
             setUsers([...users]);
-            // setShapes([...shapes]);
+            setShapes([...newShapes]);
             toast.success(`Welcome to room ${currentUser.username} 👋`);
           } catch (error) {
             console.log("failed to join room or decrypt message: ", error);
@@ -181,7 +181,7 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
     async (
       shape: Shape,
       type: ClientEvents,
-      toBeAdded: boolean,
+      toBeAddedOrUpdated: boolean,
       toBeDeleted: boolean
     ) => {
       if (
@@ -210,13 +210,13 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
               encryptedData,
               flags: {
                 encryptedDataId: shape.id,
-                toBeAdded,
+                toBeAddedOrUpdated,
                 toBeDeleted,
               },
             },
           })
         );
-        if (toBeAdded) {
+        if (toBeAddedOrUpdated) {
           setShapes((prev) => {
             const existingShape = prev.find((s) => s.id === shape.id);
             if (!existingShape) return [...prev, shape];

@@ -30,7 +30,7 @@ export interface Message {
       username?: string;
       cursorPos?: { x: number; y: number };
     };
-    toBeAdded?: boolean;
+    toBeAddedOrUpdated?: boolean;
     toBeDeleted?: boolean;
     encryptedData?: any;
     dataToDecrypt?: any;
@@ -94,16 +94,18 @@ export class WebsocketServerManager {
               payload: {
                 id: userId,
                 message: "Welcome to Websocket server!",
-                users: RoomManager.getInstance()
-                  .rooms.get(roomId)
-                  ?.map((u) => ({
-                    id: u.id,
-                    username: u.username,
-                    cursorPos: u.cursorPos,
-                  })),
-                dataToDecrypt: RoomManager.getInstance()
-                  .encryptedDataInRooms.get(roomId)
-                  ?.map((ecypt) => ecypt.encryptedData),
+                users:
+                  RoomManager.getInstance()
+                    .rooms.get(roomId)
+                    ?.map((u) => ({
+                      id: u.id,
+                      username: u.username,
+                      cursorPos: u.cursorPos,
+                    })) ?? [],
+                dataToDecrypt:
+                  RoomManager.getInstance()
+                    .encryptedDataInRooms.get(roomId)
+                    ?.map((ecypt) => ecypt.encryptedData) ?? [],
                 timestamp: Date.now(),
               },
             });
@@ -161,25 +163,23 @@ export class WebsocketServerManager {
             );
             break;
           case WebSocketClientEvents.Encryption:
-            const { encryptedDataId, toBeAdded, toBeDeleted } = flags;
-            if (toBeAdded) {
-              RoomManager.getInstance().addEncryptedData(roomId, {
-                id: encryptedDataId,
-                encryptedData,
-              });
-            }
+            const { encryptedDataId, toBeAddedOrUpdated, toBeDeleted } = flags;
             if (toBeDeleted) {
               RoomManager.getInstance().deleteEncryptedData(roomId, {
                 id: encryptedDataId,
                 encryptedData,
               });
-            }
+            } else
+              RoomManager.getInstance().addOrUpdateEncryptedData(roomId, {
+                id: encryptedDataId,
+                encryptedData,
+              });
             const type = RoomManager.getInstance().broadcast(
               {
                 type: WebSocketServerEvents.Decryption,
                 payload: {
                   encryptedData,
-                  toBeAdded,
+                  toBeAddedOrUpdated,
                   toBeDeleted,
                   timestamp: Date.now(),
                 },

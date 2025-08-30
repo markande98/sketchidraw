@@ -1,6 +1,6 @@
 "use client";
 
-import { FontFamily as FONT_FAMILY } from "@/constants/index";
+import { ClientEvents, FontFamily as FONT_FAMILY } from "@/constants/index";
 import {
   ComicShannsFontSvg,
   NunitoFontSvg,
@@ -8,13 +8,27 @@ import {
 } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn, getFontCSS } from "@/lib/utils";
+import { Shape } from "@/types/shape";
 import { ToolType } from "@/types/tools";
 
 type FontFamilyProps = {
   selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
-export const FontFamily = ({ selectedShapeId }: FontFamilyProps) => {
+export const FontFamily = ({
+  selectedShapeId,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
+}: FontFamilyProps) => {
   const {
     canvaFontFamily,
     canvaShapes,
@@ -22,10 +36,11 @@ export const FontFamily = ({ selectedShapeId }: FontFamilyProps) => {
     onSetCanvaShapes,
   } = useCanva();
 
+  let newShapes = isConnected ? shapes : canvaShapes;
+
   const onClick = (font: FONT_FAMILY) => {
     onSetCanvaFontFamily(font);
     if (selectedShapeId !== null) {
-      let newShapes = canvaShapes;
       let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       if (shapeToUpdate.type === ToolType.Text) {
         shapeToUpdate = {
@@ -33,10 +48,19 @@ export const FontFamily = ({ selectedShapeId }: FontFamilyProps) => {
           fontFamily: getFontCSS(font),
         };
       }
-      newShapes = canvaShapes.map((s) =>
-        s.id === selectedShapeId ? shapeToUpdate : s
-      );
-      onSetCanvaShapes([...newShapes]);
+      if (isConnected) {
+        sendEncryptedMessage(
+          shapeToUpdate,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
+      } else {
+        newShapes = canvaShapes.map((s) =>
+          s.id === selectedShapeId ? shapeToUpdate : s
+        );
+        onSetCanvaShapes([...newShapes]);
+      }
     }
   };
   return (

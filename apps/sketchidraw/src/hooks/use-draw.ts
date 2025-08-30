@@ -82,6 +82,9 @@ export const useDraw = ({
     panY,
     selectedShapeId,
   });
+  const [shapesToBeChosen, setShapesToBeChosen] = useState<Shape[]>(
+    isConnected ? shapes : canvaShapes
+  );
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
@@ -98,8 +101,6 @@ export const useDraw = ({
   const CURSOR_UPDATE_THROTTLE_MS = 16; // ~60fps
   const MIN_DISTANCE_THRESHOLD = 2; // pixels
   const BATCH_DELAY_MS = 10; // milliseconds
-
-  const shapesToBeChosen = isConnected ? shapes : canvaShapes;
 
   const sendCursorPosition = useCallback(
     (pos: { x: number; y: number }) => {
@@ -187,6 +188,12 @@ export const useDraw = ({
     strokeDashOffset: canvaStrokeDashOffset,
     sloppiness: canvaSloppiness,
   };
+
+  useEffect(() => {
+    if (isConnected) setShapesToBeChosen(shapes);
+    else setShapesToBeChosen(canvaShapes);
+  }, [isConnected, canvaShapes, shapes]);
+
   useEffect(() => {
     if (canvasEngine) {
       canvasEngine.redrawShapes(
@@ -195,7 +202,7 @@ export const useDraw = ({
         panX,
         panY,
         isConnected,
-        shapes
+        shapesToBeChosen
       );
 
       if (currentShape) {
@@ -204,15 +211,14 @@ export const useDraw = ({
     }
   }, [
     shapesToBeChosen,
-    canvaShapes,
     currentShape,
     canvasEngine,
     selectedShapeId,
     canvasScale,
     panX,
     panY,
-    shapes,
     isConnected,
+    canvasRef,
   ]);
 
   const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -743,7 +749,7 @@ export const useDraw = ({
       );
       if (!isConnected) onSetCanvaShapes([...newShapes]);
       if (isConnected)
-        sendEncryptedMessage(shape, ClientEvents.Encryption, false, false);
+        sendEncryptedMessage(shape, ClientEvents.Encryption, true, false);
       setDragStart(pos);
     } else if (isDragging && tooltype === ToolType.Grab) {
       const pos = getMousePos(e);
@@ -829,7 +835,7 @@ export const useDraw = ({
             sendEncryptedMessage(
               updatedShape,
               ClientEvents.Encryption,
-              false,
+              true,
               false
             );
           break;
@@ -1016,6 +1022,13 @@ export const useDraw = ({
             startY: Math.min(shape.startY, shape.endY),
             endY: Math.max(shape.endY, shape.startY),
           };
+          if (isConnected)
+            sendEncryptedMessage(
+              updatedShape,
+              ClientEvents.Encryption,
+              true,
+              false
+            );
           updatedShapes = shapesToBeChosen.map((s) =>
             s.id === selectedShapeId ? updatedShape : s
           );
@@ -1029,6 +1042,13 @@ export const useDraw = ({
             endX: Math.max(shape.sX, shape.mX, shape.eX),
             endY: Math.max(shape.sY, shape.mY, shape.eY),
           };
+          if (isConnected)
+            sendEncryptedMessage(
+              updatedLine,
+              ClientEvents.Encryption,
+              true,
+              false
+            );
           updatedShapes = shapesToBeChosen.map((s) =>
             s.id === selectedShapeId ? updatedLine : s
           );

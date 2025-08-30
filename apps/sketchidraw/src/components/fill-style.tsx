@@ -1,31 +1,53 @@
 "use client";
 
 import { CrossHatchSvg, HachureSvg, SolidSvg } from "@/constants/svg";
-import { FillStyle as FILLSTYLE } from "@/constants/index";
+import { ClientEvents, FillStyle as FILLSTYLE } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
+import { Shape } from "@/types/shape";
 
 type FillStyleProps = {
   selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
-export const FillStyle = ({ selectedShapeId }: FillStyleProps) => {
+export const FillStyle = ({
+  selectedShapeId,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
+}: FillStyleProps) => {
   const { canvaFillstyle, onSetCanvaFillstyle, canvaShapes, onSetCanvaShapes } =
     useCanva();
-
+  let newShapes = isConnected ? shapes : canvaShapes;
   const onClick = (fillStyle: FILLSTYLE) => {
     onSetCanvaFillstyle(fillStyle);
     if (selectedShapeId !== null) {
-      let newShapes = canvaShapes;
       let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         fillStyle,
       };
-      newShapes = canvaShapes.map((s) =>
-        s.id === selectedShapeId ? shapeToUpdate : s
-      );
-      onSetCanvaShapes([...newShapes]);
+      if (isConnected) {
+        sendEncryptedMessage(
+          shapeToUpdate,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
+      } else {
+        newShapes = canvaShapes.map((s) =>
+          s.id === selectedShapeId ? shapeToUpdate : s
+        );
+        onSetCanvaShapes([...newShapes]);
+      }
     }
   };
   return (

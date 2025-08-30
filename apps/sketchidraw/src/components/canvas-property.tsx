@@ -16,15 +16,28 @@ import { ArrowHeads } from "./arrow-heads";
 import { FontSize } from "./font-size";
 import { FontFamily } from "./font-family";
 import { RefObject } from "react";
+import { Shape } from "@/types/shape";
+import { ClientEvents } from "@/constants";
 
 type CanvasPropertyProps = {
   selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
   canvasRef: RefObject<HTMLCanvasElement | null>;
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
 export const CanvasProperty = ({
   selectedShapeId,
   canvasRef,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
 }: CanvasPropertyProps) => {
   const isMobile = useMediaQuery("(max-width: 639px)");
   const { tooltype } = useCanva();
@@ -41,25 +54,84 @@ export const CanvasProperty = ({
   return (
     <ScrollArea className="z-[100] absolute top-22 bg-white dark:bg-surface-low border shadow-md rounded-md left-6 w-[210px] max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-190px)] overflow-y-auto">
       <div className="p-3 space-y-6">
-        <StrokeOptions selectedShapeId={selectedShapeId} />
-        {!isTextTool && <BackgroundOptions selectedShapeId={selectedShapeId} />}
-        {!isTextTool && <FillStyle selectedShapeId={selectedShapeId} />}
-        {!isTextTool && <StrokeWidth selectedShapeId={selectedShapeId} />}
-        {!isPencilTool && !isTextTool && (
-          <StrokeStyle selectedShapeId={selectedShapeId} />
+        <StrokeOptions
+          isConnected={isConnected}
+          shapes={shapes}
+          selectedShapeId={selectedShapeId}
+          sendEncryptedMessage={sendEncryptedMessage}
+        />
+        {!isTextTool && (
+          <BackgroundOptions
+            isConnected={isConnected}
+            shapes={shapes}
+            selectedShapeId={selectedShapeId}
+            sendEncryptedMessage={sendEncryptedMessage}
+          />
+        )}
+        {!isTextTool && (
+          <FillStyle
+            isConnected={isConnected}
+            shapes={shapes}
+            selectedShapeId={selectedShapeId}
+            sendEncryptedMessage={sendEncryptedMessage}
+          />
+        )}
+        {!isTextTool && (
+          <StrokeWidth
+            isConnected={isConnected}
+            shapes={shapes}
+            selectedShapeId={selectedShapeId}
+            sendEncryptedMessage={sendEncryptedMessage}
+          />
         )}
         {!isPencilTool && !isTextTool && (
-          <Sloppiness selectedShapeId={selectedShapeId} />
+          <StrokeStyle
+            isConnected={isConnected}
+            shapes={shapes}
+            selectedShapeId={selectedShapeId}
+            sendEncryptedMessage={sendEncryptedMessage}
+          />
+        )}
+        {!isPencilTool && !isTextTool && (
+          <Sloppiness
+            isConnected={isConnected}
+            shapes={shapes}
+            selectedShapeId={selectedShapeId}
+            sendEncryptedMessage={sendEncryptedMessage}
+          />
         )}
         {!isEllipseTool && !isArrowTool && !isPencilTool && !isTextTool && (
-          <EdgeStyle selectedShapeId={selectedShapeId} />
+          <EdgeStyle
+            isConnected={isConnected}
+            shapes={shapes}
+            selectedShapeId={selectedShapeId}
+            sendEncryptedMessage={sendEncryptedMessage}
+          />
         )}
         {isArrowTool && !isPencilTool && (
-          <ArrowHeads selectedShapeId={selectedShapeId} />
+          <ArrowHeads
+            isConnected={isConnected}
+            shapes={shapes}
+            selectedShapeId={selectedShapeId}
+            sendEncryptedMessage={sendEncryptedMessage}
+          />
         )}
-        {isTextTool && <FontFamily selectedShapeId={selectedShapeId} />}
         {isTextTool && (
-          <FontSize canvasRef={canvasRef} selectedShapeId={selectedShapeId} />
+          <FontFamily
+            isConnected={isConnected}
+            shapes={shapes}
+            selectedShapeId={selectedShapeId}
+            sendEncryptedMessage={sendEncryptedMessage}
+          />
+        )}
+        {isTextTool && (
+          <FontSize
+            canvasRef={canvasRef}
+            isConnected={isConnected}
+            shapes={shapes}
+            selectedShapeId={selectedShapeId}
+            sendEncryptedMessage={sendEncryptedMessage}
+          />
         )}
       </div>
     </ScrollArea>

@@ -1,15 +1,29 @@
 "use client";
 
 import { useCanva } from "@/hooks/use-canva-store";
-import { Sloppiness as SLOPPINESS } from "@/constants/index";
+import { ClientEvents, Sloppiness as SLOPPINESS } from "@/constants/index";
 import { ArchitectSvg, ArtistSvg, CartoonistSvg } from "@/constants/svg";
 import { cn } from "@/lib/utils";
+import { Shape } from "@/types/shape";
 
 type SloppinessProps = {
   selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
-export const Sloppiness = ({ selectedShapeId }: SloppinessProps) => {
+export const Sloppiness = ({
+  selectedShapeId,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
+}: SloppinessProps) => {
   const {
     canvaSloppiness,
     onSetCanvaSloppiness,
@@ -17,19 +31,29 @@ export const Sloppiness = ({ selectedShapeId }: SloppinessProps) => {
     onSetCanvaShapes,
   } = useCanva();
 
+  let newShapes = isConnected ? shapes : canvaShapes;
+
   const onClick = (sloppiness: SLOPPINESS) => {
     onSetCanvaSloppiness(sloppiness);
     if (selectedShapeId !== null) {
-      let newShapes = canvaShapes;
       let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         sloppiness,
       };
-      newShapes = canvaShapes.map((s) =>
-        s.id === selectedShapeId ? shapeToUpdate : s
-      );
-      onSetCanvaShapes([...newShapes]);
+      if (isConnected) {
+        sendEncryptedMessage(
+          shapeToUpdate,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
+      } else {
+        newShapes = canvaShapes.map((s) =>
+          s.id === selectedShapeId ? shapeToUpdate : s
+        );
+        onSetCanvaShapes([...newShapes]);
+      }
     }
   };
 

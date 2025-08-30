@@ -1,33 +1,57 @@
 "use client";
 
-import { STROKE_DASH_OFFSET } from "@/constants/index";
+import { ClientEvents, STROKE_DASH_OFFSET } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
+import { Shape } from "@/types/shape";
 import { useState } from "react";
 
 type StrokeStyleProps = {
   selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
-export const StrokeStyle = ({ selectedShapeId }: StrokeStyleProps) => {
+export const StrokeStyle = ({
+  selectedShapeId,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
+}: StrokeStyleProps) => {
   const { onSetCanvaStrokeDashOffset, canvaShapes, onSetCanvaShapes } =
     useCanva();
   const [strokeDashIndex, setStrokeDashIndex] = useState(0);
+
+  let newShapes = isConnected ? shapes : canvaShapes;
 
   const onClick = (index: number) => {
     onSetCanvaStrokeDashOffset(STROKE_DASH_OFFSET[index]);
     setStrokeDashIndex(index);
     if (selectedShapeId !== null) {
-      let newShapes = canvaShapes;
       let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         strokeDashOffset: STROKE_DASH_OFFSET[index],
       };
-      newShapes = canvaShapes.map((s) =>
-        s.id === selectedShapeId ? shapeToUpdate : s
-      );
-      onSetCanvaShapes([...newShapes]);
+      if (isConnected) {
+        sendEncryptedMessage(
+          shapeToUpdate,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
+      } else {
+        newShapes = canvaShapes.map((s) =>
+          s.id === selectedShapeId ? shapeToUpdate : s
+        );
+        onSetCanvaShapes([...newShapes]);
+      }
     }
   };
   return (

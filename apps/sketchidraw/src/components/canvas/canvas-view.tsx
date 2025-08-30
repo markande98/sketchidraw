@@ -172,7 +172,13 @@ export const CanvasView = () => {
       <CanvaClearModal setSelectedShapeId={setSelectedShapeId} />
       <CanvaCollabModal />
       <CanvaShareModal wsRef={wsRef} roomId={roomData?.roomId} />
-      <CanvasProperty canvasRef={canvasRef} selectedShapeId={selectedShapeId} />
+      <CanvasProperty
+        isConnected={isConnected}
+        shapes={shapes}
+        canvasRef={canvasRef}
+        selectedShapeId={selectedShapeId}
+        sendEncryptedMessage={sendEncryptedMessage}
+      />
       <CanvasMenu />
       <ToolsMenu />
       {isConnected && <UsersShareIcon users={users} />}

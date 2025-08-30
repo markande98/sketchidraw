@@ -3,36 +3,58 @@
 import {
   BACKGROUND_DARK_COLORS,
   BACKGROUND_LIGHT_COLORS,
+  ClientEvents,
 } from "@/constants/index";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { ColorToolTip } from "./color-tooltip";
+import { Shape } from "@/types/shape";
 
 type BackgroundOptionsProps = {
   selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
 export const BackgroundOptions = ({
   selectedShapeId,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
 }: BackgroundOptionsProps) => {
   const { resolvedTheme } = useTheme();
   const { canvaBgColor, onSetCanvaBgColor, canvaShapes, onSetCanvaShapes } =
     useCanva();
 
+  let newShapes = isConnected ? shapes : canvaShapes;
   const onChange = (color: string | "transparent") => {
     onSetCanvaBgColor(color);
     if (selectedShapeId !== null) {
-      let newShapes = canvaShapes;
       let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       shapeToUpdate = {
         ...shapeToUpdate,
         fill: color,
       };
-      newShapes = canvaShapes.map((s) =>
-        s.id === selectedShapeId ? shapeToUpdate : s
-      );
-      onSetCanvaShapes([...newShapes]);
+      if (isConnected) {
+        sendEncryptedMessage(
+          shapeToUpdate,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
+      } else {
+        newShapes = canvaShapes.map((s) =>
+          s.id === selectedShapeId ? shapeToUpdate : s
+        );
+        onSetCanvaShapes([...newShapes]);
+      }
     }
   };
 

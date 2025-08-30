@@ -36,20 +36,20 @@ export class RoomManager {
       this.rooms.set(roomId, [...(this.rooms.get(roomId) ?? []), user]);
   }
 
-  public addEncryptedData(roomId: string, encryptedData: EncryptedData) {
+  public addOrUpdateEncryptedData(
+    roomId: string,
+    encryptedData: EncryptedData
+  ) {
     if (!this.encryptedDataInRooms.has(roomId)) {
       this.encryptedDataInRooms.set(roomId, [encryptedData]);
       return;
     }
-    const hasData = this.encryptedDataInRooms
-      .get(roomId)
-      ?.some((data) => data.id === encryptedData.id);
-    if (!hasData) {
-      this.encryptedDataInRooms.set(roomId, [
-        ...(this.encryptedDataInRooms.get(roomId) ?? []),
-        encryptedData,
-      ]);
-    }
+    this.encryptedDataInRooms.set(roomId, [
+      ...(this.encryptedDataInRooms
+        .get(roomId)
+        ?.filter((e) => e.id !== encryptedData.id) ?? []),
+      encryptedData,
+    ]);
   }
 
   public updateUser(

@@ -7,21 +7,36 @@ import {
   FontSmallSvg,
 } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
-import { FontSize as FONT_SIZE } from "@/constants/index";
+import { ClientEvents, FontSize as FONT_SIZE } from "@/constants/index";
 import { cn } from "@/lib/utils";
 import { ToolType } from "@/types/tools";
 import { RefObject } from "react";
-import { Text } from "@/types/shape";
+import { Shape, Text } from "@/types/shape";
 
 type FontSizeProps = {
   selectedShapeId: string | null;
   canvasRef: RefObject<HTMLCanvasElement | null>;
+  isConnected: boolean;
+  shapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
-export const FontSize = ({ selectedShapeId, canvasRef }: FontSizeProps) => {
+export const FontSize = ({
+  selectedShapeId,
+  canvasRef,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
+}: FontSizeProps) => {
   const { canvaFontSize, canvaShapes, onSetCanvaFontSize, onSetCanvaShapes } =
     useCanva();
 
+  let newShapes = isConnected ? shapes : canvaShapes;
   const getTextMetrics = (textObj: Text) => {
     if (!canvasRef.current) return { lines: [], width: 0, height: 0 };
 
@@ -50,7 +65,6 @@ export const FontSize = ({ selectedShapeId, canvasRef }: FontSizeProps) => {
   const onClick = (fontSize: FONT_SIZE) => {
     onSetCanvaFontSize(fontSize);
     if (selectedShapeId !== null) {
-      let newShapes = canvaShapes;
       let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       if (shapeToUpdate.type === ToolType.Text) {
         shapeToUpdate = {
@@ -66,10 +80,19 @@ export const FontSize = ({ selectedShapeId, canvasRef }: FontSizeProps) => {
           endY,
         };
       }
-      newShapes = canvaShapes.map((s) =>
-        s.id === selectedShapeId ? shapeToUpdate : s
-      );
-      onSetCanvaShapes([...newShapes]);
+      if (isConnected) {
+        sendEncryptedMessage(
+          shapeToUpdate,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
+      } else {
+        newShapes = canvaShapes.map((s) =>
+          s.id === selectedShapeId ? shapeToUpdate : s
+        );
+        onSetCanvaShapes([...newShapes]);
+      }
     }
   };
 

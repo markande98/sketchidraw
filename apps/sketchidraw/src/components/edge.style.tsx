@@ -1,22 +1,37 @@
 "use client";
 
-import { Edges } from "@/constants";
+import { ClientEvents, Edges } from "@/constants";
 import { RoundEdgeSvg, SharpEdgeSvg } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
 import { cn } from "@/lib/utils";
+import { Shape } from "@/types/shape";
 import { ToolType } from "@/types/tools";
 
 type EdgeStyleProps = {
   selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
 };
 
-export const EdgeStyle = ({ selectedShapeId }: EdgeStyleProps) => {
+export const EdgeStyle = ({
+  selectedShapeId,
+  isConnected,
+  shapes,
+  sendEncryptedMessage,
+}: EdgeStyleProps) => {
   const { canvaEdge, onSetCanvaEdge, canvaShapes, onSetCanvaShapes } =
     useCanva();
+  let newShapes = isConnected ? shapes : canvaShapes;
+
   const onClick = (edge: Edges) => {
     onSetCanvaEdge(edge);
     if (selectedShapeId !== null) {
-      let newShapes = canvaShapes;
       let shapeToUpdate = newShapes.find((s) => s.id === selectedShapeId)!;
       if (
         shapeToUpdate.type === ToolType.Rectangle ||
@@ -27,10 +42,19 @@ export const EdgeStyle = ({ selectedShapeId }: EdgeStyleProps) => {
           edgeType: edge,
         };
       }
-      newShapes = canvaShapes.map((s) =>
-        s.id === selectedShapeId ? shapeToUpdate : s
-      );
-      onSetCanvaShapes([...newShapes]);
+      if (isConnected) {
+        sendEncryptedMessage(
+          shapeToUpdate,
+          ClientEvents.Encryption,
+          true,
+          false
+        );
+      } else {
+        newShapes = canvaShapes.map((s) =>
+          s.id === selectedShapeId ? shapeToUpdate : s
+        );
+        onSetCanvaShapes([...newShapes]);
+      }
     }
   };
   return (
