@@ -23,7 +23,7 @@ const socialLinks = [
 ];
 
 export const SocialLinks = () => {
-  const { user, isLoading, isAuthenticated } = useCurrentUser();
+  const { currentUser, isAuthenticated } = useCurrentUser();
   const router = useRouter();
   const onClick = async (href?: string) => {
     if (isAuthenticated) {
@@ -38,8 +38,7 @@ export const SocialLinks = () => {
   };
   const getDisplayLabel = (originalLabel: string) => {
     if (originalLabel === "Signup") {
-      if (isLoading) return "Loading...";
-      return user ? "Signout" : "Signup";
+      return currentUser ? "Signout" : "Signup";
     }
     return originalLabel;
   };

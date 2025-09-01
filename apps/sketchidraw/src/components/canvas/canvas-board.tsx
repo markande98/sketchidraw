@@ -25,6 +25,7 @@ type CanvasBoardProps = {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   selectedShapeId: string | null;
   isConnected: boolean;
+  fontsLoaded: boolean;
   wsRef: RefObject<WebSocket | null>;
   roomData: RoomInfo | null;
   shapes: Shape[];
@@ -48,6 +49,7 @@ export const CanvasBoard = ({
   panY,
   canvasRef,
   isConnected,
+  fontsLoaded,
   roomData,
   wsRef,
   shapes,
@@ -72,6 +74,7 @@ export const CanvasBoard = ({
     panX,
     panY,
     isConnected,
+    fontsLoaded,
     wsRef,
     roomData,
     shapes,

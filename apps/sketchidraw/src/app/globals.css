@@ -195,7 +195,7 @@ body,
   src: url("/fonts/Sketchidraw_Regular.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
-  font-swap: swap;
+  font-display: swap;
 }
 
 @font-face {
@@ -203,7 +203,7 @@ body,
   src: url("/fonts/Nunito.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
-  font-swap: swap;
+  font-display: swap;
 }
 
 @font-face {
@@ -211,7 +211,7 @@ body,
   src: url("/fonts/ComicSans.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
-  font-swap: swap;
+  font-display: swap;
 }
 
 .animate-float {

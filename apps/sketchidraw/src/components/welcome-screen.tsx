@@ -1,9 +1,11 @@
 "use client";
 
 import { useCanva } from "@/hooks/use-canva-store";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { hexToRgba } from "@/lib/utils";
-import { LogIn, Users } from "lucide-react";
-import Link from "next/link";
+import { LogIn, LogOut, Users } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const welcomeText = [
@@ -26,6 +28,8 @@ const welcomeText = [
 ];
 
 export const WelcomeScreen = () => {
+  const router = useRouter();
+  const { currentUser } = useCurrentUser();
   const { canvas } = useCanva();
   const [mounted, setMounted] = useState(false);
 
@@ -57,6 +61,16 @@ export const WelcomeScreen = () => {
     ctx.lineTo(endX + 10, endY);
     ctx.lineTo(endX - 10, endY);
     ctx.fill();
+  };
+
+  const handleClick = async () => {
+    if (currentUser) {
+      await signOut({
+        callbackUrl: "/auth/signin",
+      });
+      return;
+    }
+    router.push("/auth/signup");
   };
 
   useEffect(() => {
@@ -128,13 +142,23 @@ export const WelcomeScreen = () => {
             <Users size={14} />
             <p className="text-sm">Live collaboration...</p>
           </div>
-          <Link
-            href="/auth/signup"
+          <div
+            onClick={handleClick}
             className="w-74 flex items-center gap-2 cursor-pointer p-3 rounded-md text-[#999999] hover:bg-surface-primary-container/50 dark:hover:bg-surface-high hover:text-on-surface transition duration-150"
           >
-            <LogIn size={14} />
-            <p className="text-sm">Sign up</p>
-          </Link>
+            {currentUser && (
+              <>
+                <LogOut size={14} />
+                <p className="text-sm">Sign out</p>
+              </>
+            )}
+            {!currentUser && (
+              <>
+                <LogIn size={14} />
+                <p className="text-sm">Sign up</p>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
