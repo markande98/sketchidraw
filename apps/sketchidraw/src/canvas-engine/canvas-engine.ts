@@ -627,7 +627,6 @@ export class CanvasEngine {
         panX,
         panY
       );
-      console.log(transformedShape);
       switch (transformedShape.type) {
         case ToolType.Rectangle:
           const rectPath = this.roundedRectPath(
@@ -993,25 +992,26 @@ export class CanvasEngine {
           currentIndex += line.length + 1;
         }
       }
-      if (
-        txt.id === activeTextId &&
-        isEditing &&
-        selectionStart === null &&
-        showCursor
-      ) {
-        const cursorCoords = getCursorCoordinates(txt, cursorPosition!);
-
-        ctx.strokeStyle = txt.color;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(cursorCoords.x, cursorCoords.y);
-        ctx.lineTo(
-          cursorCoords.x,
-          cursorCoords.y + txt.fontSize * txt.lineHeight
-        );
-        ctx.stroke();
-      }
     });
+    if (
+      txt.id === activeTextId &&
+      isEditing &&
+      showCursor &&
+      cursorPosition !== undefined
+    ) {
+      const cursorCoords = getCursorCoordinates(txt, cursorPosition);
+      ctx.save();
+      ctx.strokeStyle = txt.color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cursorCoords.x, cursorCoords.y);
+      ctx.lineTo(
+        cursorCoords.x,
+        cursorCoords.y + txt.fontSize * txt.lineHeight
+      );
+      ctx.stroke();
+      ctx.restore();
+    }
   }
 
   private static transformShape(

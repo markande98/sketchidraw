@@ -46,8 +46,9 @@ export const useText = ({
   } = useCanva();
   const [isEditing, setIsEditing] = useState(false);
   const [showCursor, setShowCursor] = useState(false);
-  const [activeTextId, setActiveTextId] = useState<string | null>(null);
   const [cursorPosition, setCursorPosition] = useState<number>(0);
+  const [lastTypingTime, setLastTypingTime] = useState<number>(0);
+  const [activeTextId, setActiveTextId] = useState<string | null>(null);
   const [selectionStart, setSelectionStart] = useState<number | null>(null);
   const [selectionEnd, setSelectionEnd] = useState<number | null>(null);
 
@@ -356,6 +357,10 @@ export const useText = ({
     (e: KeyboardEvent) => {
       if (!isEditing || activeTextId === null || tooltype !== ToolType.Text)
         return;
+
+      setLastTypingTime(Date.now());
+      setShowCursor(true);
+
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
@@ -617,16 +622,55 @@ export const useText = ({
         setCursorPosition(newCursor);
         setSelectionStart(newSelectStart);
         setSelectionEnd(newSelectEnd);
+
+        // IMMEDIATE RENDER: Force immediate re-render with cursor visible
+        if (canvasEngine) {
+          setTimeout(() => {
+            canvasEngine.redrawShapes(
+              selectedShapeId,
+              canvasScale,
+              panX,
+              panY,
+              isConnected,
+              isConnected ? newShapes : [...shapes, ...updatedTextObjects]
+            );
+
+            const updatedText = updatedTextObjects.find(
+              (t) => t.id === activeTextId
+            );
+            if (updatedText) {
+              canvasEngine.renderText(
+                updatedText,
+                canvasScale,
+                panX,
+                panY,
+                activeTextId,
+                newSelectStart,
+                newSelectEnd,
+                isEditing,
+                newCursor,
+                true, // Force cursor visible
+                getCursorCoordinates
+              );
+            }
+          }, 0); // Execute on next tick to ensure state is updated
+        }
       }
-      setShowCursor(true);
     },
     [
       activeTextId,
+      canvasEngine,
+      canvasScale,
       cursorPosition,
+      getCursorCoordinates,
       getTextMetrics,
       isConnected,
       isEditing,
+      newShapes,
       onSetCanvaShapes,
+      panX,
+      panY,
+      selectedShapeId,
       selectionEnd,
       selectionStart,
       sendEncryptedMessage,
@@ -654,7 +698,8 @@ export const useText = ({
     );
     const text = selectedShapes.find(
       (shape) => shape.type === ToolType.Text && shape.id === activeTextId
-    );
+    ) as Text;
+
     if (text) {
       canvasEngine.renderText(
         text,
@@ -687,20 +732,21 @@ export const useText = ({
     isConnected,
     selectedShapes,
   ]);
-
   useEffect(() => {
     if (!isEditing || tooltype !== ToolType.Text || activeTextId === null) {
       return;
     }
-
     const interval = setInterval(() => {
-      setShowCursor((prev) => !prev);
+      const now = Date.now();
+      if (now - lastTypingTime < 1000) {
+        setShowCursor(true);
+      } else setShowCursor((prev) => !prev);
     }, 500);
 
     return () => {
       clearInterval(interval);
     };
-  }, [isEditing, tooltype, activeTextId]);
+  }, [isEditing, tooltype, activeTextId, lastTypingTime]);
 
   useEffect(() => {
     if (!isEditing || tooltype !== ToolType.Text || activeTextId === null) {
@@ -718,7 +764,6 @@ export const useText = ({
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (isEditing && tooltype === ToolType.Text && activeTextId) {
         handleKeyDown(e);
-        setShowCursor(true);
       }
     };
 
