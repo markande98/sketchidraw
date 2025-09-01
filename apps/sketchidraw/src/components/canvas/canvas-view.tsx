@@ -2,13 +2,18 @@
 
 import { CanvaModalType, FontFamily } from "@/constants";
 import { useCanva } from "@/hooks/use-canva-store";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { useE2EWebsocket } from "@/hooks/use-e2e-websocket";
 import { useInfiniteCanvas } from "@/hooks/use-infinite-canvas";
 import { cn, getFontCSS, saveToLocalStorage } from "@/lib/utils";
 import { Shape } from "@/types/shape";
 import { ToolType } from "@/types/tools";
+import { useTheme } from "next-themes";
+import { redirect } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CanvaZoom } from "../canva-zoom";
 import { CanvasProperty } from "../canvas-property";
+import { CanvasZoom } from "../canvas-zoom";
+import { UsersShareIcon } from "../users-share-icon";
 import { WelcomeScreen } from "../welcome-screen";
 import { CanvaClearModal } from "./canva-clear-modal";
 import { CanvaCollabModal } from "./canva-collab-modal";
@@ -16,12 +21,10 @@ import { CanvaShareModal } from "./canva-share-modal";
 import { CanvasBoard } from "./canvas-board";
 import { CanvasMenu } from "./canvas-Menu";
 import { ToolsMenu } from "./tools-menu";
-import { useCurrentUser } from "@/hooks/use-current-user";
-import { redirect } from "next/navigation";
-import { useE2EWebsocket } from "@/hooks/use-e2e-websocket";
-import { UsersShareIcon } from "../users-share-icon";
+import { CanvasShieldIcon } from "../canvas-shield-icon";
 
 export const CanvasView = () => {
+  const { resolvedTheme } = useTheme();
   const [hash, setHash] = useState("");
   const { currentUser, isAuthenticated } = useCurrentUser();
   const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
@@ -110,8 +113,8 @@ export const CanvasView = () => {
       div.style.position = "absolute";
       div.style.left = `${cursorPos.x}px`;
       div.style.top = `${cursorPos.y}px`;
-      div.style.backgroundColor = "white";
-      div.style.color = "black";
+      div.style.backgroundColor = resolvedTheme === "dark" ? "white" : "black";
+      div.style.color = resolvedTheme === "dark" ? "black" : "white";
       div.style.fontFamily = getFontCSS(FontFamily.SketchiFont);
       div.style.fontSize = "14px";
       div.style.fontWeight = "800";
@@ -137,8 +140,8 @@ export const CanvasView = () => {
       // Add your cursor path/shape here
       cursorSvg.innerHTML = `
         <path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"
-        fill="white"
-        stroke="black"
+        fill=${resolvedTheme === "dark" ? "white" : "black"}
+        stroke=${resolvedTheme === "dark" ? "black" : "white"}
         stroke-width="1"/>
       `;
 
@@ -162,7 +165,7 @@ export const CanvasView = () => {
         }
       });
     };
-  }, [currentUser, users]); // Removed 'canvas' if not needed
+  }, [currentUser, users, resolvedTheme]); // Removed 'canvas' if not needed
 
   const showWelcomeScreen =
     tooltype === ToolType.Select && canvaShapes.length === 0;
@@ -197,7 +200,8 @@ export const CanvasView = () => {
           </div>
         )}
       </button>
-      <CanvaZoom zoomIn={zoomIn} zoomOut={zoomOut} resetZoom={resetZoom} />
+      <CanvasZoom zoomIn={zoomIn} zoomOut={zoomOut} resetZoom={resetZoom} />
+      <CanvasShieldIcon />
       <CanvasBoard
         panX={panX}
         panY={panY}

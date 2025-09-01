@@ -13,7 +13,7 @@ type CanvasZoomProps = {
   resetZoom: () => void;
 };
 
-export const CanvaZoom = ({ zoomIn, zoomOut, resetZoom }: CanvasZoomProps) => {
+export const CanvasZoom = ({ zoomIn, zoomOut, resetZoom }: CanvasZoomProps) => {
   const { canvasScale } = useCanva();
 
   const displayPercetage = (canvasScale * 100).toFixed(0);
@@ -32,10 +32,7 @@ export const CanvaZoom = ({ zoomIn, zoomOut, resetZoom }: CanvasZoomProps) => {
 
       <Tooltip>
         <TooltipTrigger onClick={resetZoom} asChild>
-          <div
-            onClick={resetZoom}
-            className="min-w-[60px] text-center py-2 px-2"
-          >
+          <div className="min-w-[60px] text-center py-2 px-2">
             <span className="text-xs font-normal text-on-surface tracking-wide">
               {displayPercetage}%
             </span>

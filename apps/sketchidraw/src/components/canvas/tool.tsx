@@ -19,6 +19,7 @@ import { ToolType } from "@/types/tools";
 import { TextSvg } from "@/constants/svg";
 import { CursorType } from "@/constants";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 const iconMap = {
   MousePointer,
@@ -47,6 +48,7 @@ export const Tool = ({
   isSelected,
   toolType,
 }: ToolProps) => {
+  const [isMounted, setIsMounted] = useState(false);
   const { onSelectTooltype, onSetCanvaCursorType } = useCanva();
   const { resolvedTheme } = useTheme();
   const Icon = iconName !== "TextSvg" ? iconMap[iconName] : null;
@@ -61,6 +63,12 @@ export const Tool = ({
       onSetCanvaCursorType(CursorType.Crosshair);
     }
   };
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  if (!isMounted) return null;
+
   return (
     <Tooltip>
       <TooltipTrigger onClick={() => handleClick(toolType)} asChild>
