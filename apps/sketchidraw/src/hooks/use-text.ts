@@ -770,7 +770,70 @@ export const useText = ({
     hiddenInput.setAttribute("data-vimium-disable", "true");
     hiddenInput.id = "text-tool-hidden-input";
 
+    const isSystemShortcut = (e: KeyboardEvent): boolean => {
+      // Chrome DevTools shortcuts
+      if ((e.metaKey || e.ctrlKey) && e.altKey && e.key === "j") return true; // Option/Alt + Cmd/Ctrl + J
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "I") return true; // Cmd/Ctrl + Shift + I
+      if (e.key === "F12") return true; // F12
+
+      // Browser shortcuts
+      if ((e.metaKey || e.ctrlKey) && e.key === "r") return true; // Refresh
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "R") return true; // Hard refresh
+      if ((e.metaKey || e.ctrlKey) && e.key === "w") return true; // Close tab
+      if ((e.metaKey || e.ctrlKey) && e.key === "t") return true; // New tab
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "T") return true; // Reopen closed tab
+      if ((e.metaKey || e.ctrlKey) && e.key === "n") return true; // New window
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "N") return true; // New incognito window
+      if ((e.metaKey || e.ctrlKey) && e.key === "l") return true; // Focus address bar
+      if ((e.metaKey || e.ctrlKey) && e.key === "d") return true; // Bookmark page
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "Delete")
+        return true; // Clear browsing data
+
+      // Navigation shortcuts
+      if ((e.metaKey || e.ctrlKey) && e.key === "[") return true; // Back
+      if ((e.metaKey || e.ctrlKey) && e.key === "]") return true; // Forward
+      if (e.key === "F5") return true; // Refresh
+      if (e.ctrlKey && e.key === "F5") return true; // Hard refresh
+
+      // Zoom shortcuts
+      if ((e.metaKey || e.ctrlKey) && (e.key === "+" || e.key === "="))
+        return true; // Zoom in
+      if ((e.metaKey || e.ctrlKey) && e.key === "-") return true; // Zoom out
+      if ((e.metaKey || e.ctrlKey) && e.key === "0") return true; // Reset zoom
+
+      // Tab navigation
+      if ((e.metaKey || e.ctrlKey) && e.key >= "1" && e.key <= "9") return true; // Switch to tab
+      if ((e.metaKey || e.ctrlKey) && e.key === "Tab") return true; // Next tab
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "Tab")
+        return true; // Previous tab
+
+      // System shortcuts (Mac)
+      if (e.metaKey && e.key === " ") return true; // Spotlight
+      if (e.metaKey && e.key === "Tab") return true; // App switcher
+      if (e.metaKey && e.shiftKey && e.key === "Tab") return true; // Reverse app switcher
+      if (e.metaKey && e.key === "q") return true; // Quit app
+      if (e.metaKey && e.key === "h") return true; // Hide app
+      if (e.metaKey && e.altKey && e.key === "h") return true; // Hide others
+      if (e.metaKey && e.key === "m") return true; // Minimize
+
+      // System shortcuts (Windows/Linux)
+      if (e.altKey && e.key === "F4") return true; // Close window
+      if (e.altKey && e.key === "Tab") return true; // Alt+Tab
+      if (e.ctrlKey && e.altKey && e.key === "Delete") return true; // Task manager
+      if (e.key === "F11") return true; // Fullscreen
+
+      // Allow browser find
+      if ((e.metaKey || e.ctrlKey) && e.key === "f") return true; // Find
+      if ((e.metaKey || e.ctrlKey) && e.key === "g") return true; // Find next
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "G") return true; // Find previous
+
+      return false;
+    };
+
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (isSystemShortcut(e)) {
+        return;
+      }
       if (isEditing && tooltype === ToolType.Text && activeTextId) {
         handleKeyDown(e);
       }
@@ -781,7 +844,7 @@ export const useText = ({
     hiddenInput.addEventListener("keydown", handleGlobalKeyDown);
     document.addEventListener("keydown", handleGlobalKeyDown, {
       capture: true,
-      passive: false,
+      passive: true,
     });
 
     return () => {
