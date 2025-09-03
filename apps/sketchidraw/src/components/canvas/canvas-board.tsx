@@ -63,27 +63,34 @@ export const CanvasBoard = ({
   setCanvasState,
   expandCanvasForPanning,
 }: CanvasBoardProps) => {
-  const { onSetCanva, onSetRoughCanvas, themeColor, canvaCursorType } =
-    useCanva();
+  const {
+    onSetCanva,
+    onSetRoughCanvas,
+    themeColor,
+    canvaCursorType,
+    canvasScale,
+    canvaShapes,
+  } = useCanva();
   const roughCanvas = useRef<RoughCanvas>(null);
   const [canvasEngine, setCanvasEngine] = useState<CanvasEngine | null>(null);
 
-  const { handlePointDown, handlePointMove, handlePointUp } = useDraw({
-    canvasEngine,
-    canvasRef,
-    panX,
-    panY,
-    isConnected,
-    fontsLoaded,
-    wsRef,
-    roomData,
-    shapes,
-    sendEncryptedMessage,
-    selectedShapeId,
-    setSelectedShapeId,
-    setCanvasState,
-    expandCanvasForPanning,
-  });
+  const { handlePointDown, handlePointMove, handlePointUp, cursorPos } =
+    useDraw({
+      canvasEngine,
+      canvasRef,
+      panX,
+      panY,
+      isConnected,
+      fontsLoaded,
+      wsRef,
+      roomData,
+      shapes,
+      sendEncryptedMessage,
+      selectedShapeId,
+      setSelectedShapeId,
+      setCanvasState,
+      expandCanvasForPanning,
+    });
 
   const handleUnifiedPointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -155,31 +162,37 @@ export const CanvasBoard = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const isInspectMode =
-      window.navigator.webdriver ||
-      window.outerHeight - window.innerHeight > 100 ||
-      (window.devicePixelRatio !== 1 &&
-        !window.matchMedia("(hover: hover)").matches);
+    const roughCanvasInstance = rough.canvas(canvas);
+    roughCanvas.current = roughCanvasInstance;
+
+    const canvasEngine = new CanvasEngine(canvas, roughCanvasInstance);
+
+    onSetCanva(canvas);
+    onSetRoughCanvas(roughCanvasInstance);
+    setCanvasEngine(canvasEngine);
 
     const handleResize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-
-      const roughCanvasInstance = rough.canvas(canvas);
-      roughCanvas.current = roughCanvasInstance;
-
-      const canvasEngine = new CanvasEngine(canvas, roughCanvasInstance);
-
       const cursor = document.getElementById("cursor");
+      if (canvasEngine && fontsLoaded) {
+        const currentShapes = isConnected ? shapes : canvaShapes;
 
-      if (cursor && isInspectMode) cursor.style.display = "none";
-
-      onSetCanva(canvas);
-      onSetRoughCanvas(roughCanvasInstance);
-      setCanvasEngine(canvasEngine);
-
-      canvas.addEventListener("wheel", handleWheel, { passive: false });
+        canvasEngine.redrawShapes(
+          selectedShapeId,
+          canvasScale,
+          panX,
+          panY,
+          isConnected,
+          currentShapes
+        );
+      }
+      if (cursor) {
+        cursor.style.transform = `translate(${cursorPos.x * canvasScale + panX}px, ${cursorPos.y * canvasScale + panY}px)`;
+      }
     };
+
+    canvas.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("resize", handleResize);
 
     handleResize();

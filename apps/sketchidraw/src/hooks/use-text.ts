@@ -87,9 +87,13 @@ export const useText = ({
         canvasRef.current || (e.target as HTMLCanvasElement);
       if (!canvasElement) return { x: 0, y: 0 };
       const rect = canvasElement.getBoundingClientRect();
+
+      const scaleX = canvasElement.offsetWidth / canvasElement.scrollWidth;
+      const scaleY = canvasElement.offsetHeight / canvasElement.scrollHeight;
+
       return {
-        x: (e.clientX - rect.left - panX) / canvasScale,
-        y: (e.clientY - rect.top - panY) / canvasScale,
+        x: ((e.clientX - rect.left) / scaleX - panX) / canvasScale,
+        y: ((e.clientY - rect.top) / scaleY - panY) / canvasScale,
       };
     },
     [canvasRef, canvasScale, panX, panY]

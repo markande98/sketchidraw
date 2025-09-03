@@ -90,7 +90,7 @@ export const useDraw = ({
   });
   const [currentShape, setCurrentShape] = useState<Shape | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -225,47 +225,67 @@ export const useDraw = ({
     const canvasElement = canvasRef.current || (e.target as HTMLCanvasElement);
     if (!canvasElement) return { x: 0, y: 0 };
     const rect = canvasElement.getBoundingClientRect();
+
+    const scaleX = canvasElement.offsetWidth / canvasElement.scrollWidth;
+    const scaleY = canvasElement.offsetHeight / canvasElement.scrollHeight;
+
     return {
-      x: (e.clientX - rect.left - panX) / canvasScale,
-      y: (e.clientY - rect.top - panY) / canvasScale,
+      x: ((e.clientX - rect.left) / scaleX - panX) / canvasScale,
+      y: ((e.clientY - rect.top) / scaleY - panY) / canvasScale,
     };
   };
 
   useEffect(() => {
     if (tooltype !== ToolType.Eraser) return;
 
-    const isInspectMode =
-      window.navigator.webdriver ||
-      window.outerHeight - window.innerHeight > 100 ||
-      (window.devicePixelRatio !== 1 &&
-        !window.matchMedia("(hover: hover)").matches);
-
     const cursor = document.createElement("div");
     cursor.id = "cursor";
     document.body.appendChild(cursor);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleCursorMove = (e: any) => {
+    const handleCursorMove = (e: PointerEvent) => {
       const canvasElement = canvasRef.current;
       if (!canvasElement) return;
+
       const rect = canvasElement.getBoundingClientRect();
+
+      const scaleX = canvasElement.offsetWidth / canvasElement.scrollWidth || 1;
+      const scaleY =
+        canvasElement.offsetHeight / canvasElement.scrollHeight || 1;
+
+      const isWithinCanvas =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+
+      if (!isWithinCanvas) {
+        cursor.style.display = "none";
+        return;
+      }
+
+      cursor.style.display = "block";
+
       const cursorPos = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: (e.clientX - rect.left) / scaleX,
+        y: (e.clientY - rect.top) / scaleY,
       };
-      if (!isInspectMode)
-        cursor.style.transform = `translate(${cursorPos.x}px, ${cursorPos.y}px)`;
-      if (isInspectMode) cursor.style.display = "none";
+
+      cursor.style.transform = `translate(${cursorPos.x}px, ${cursorPos.y}px)`;
+
       const pos = {
         x: (cursorPos.x - panX) / canvasScale,
         y: (cursorPos.y - panY) / canvasScale,
       };
+
       setCursorPos(pos);
     };
-    if (!isInspectMode) cursor.style.display = "block";
-    if (isInspectMode) cursor.style.display = "none";
+
+    document.addEventListener("pointermove", handleCursorMove, {
+      passive: true,
+    });
+
     cursor.style.transform = `translate(${cursorPos.x * canvasScale + panX}px, ${cursorPos.y * canvasScale + panY}px)`;
-    document.addEventListener("pointermove", handleCursorMove);
+
     return () => {
       if (cursor && cursor.parentNode) {
         cursor.parentNode.removeChild(cursor);
@@ -1072,5 +1092,6 @@ export const useDraw = ({
     handlePointMove,
     handlePointUp,
     selectedShapeId,
+    cursorPos,
   };
 };
