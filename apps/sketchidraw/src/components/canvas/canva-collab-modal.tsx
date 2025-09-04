@@ -1,12 +1,16 @@
 "use client";
 
+import { createRoom } from "@/actions/create-room";
 import { CanvaModalType } from "@/constants";
 import { LiveStartButtonSvg } from "@/constants/svg";
 import { useCanva } from "@/hooks/use-canva-store";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { generateAlphanumericSubstring } from "@/lib/utils";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export const CanvaCollabModal = () => {
+  const { currentUser } = useCurrentUser();
   const { isOpen, onOpen, onClose, canvasModalType } = useCanva();
   const [showModal, setShowModal] = useState(isOpen);
 
@@ -21,14 +25,20 @@ export const CanvaCollabModal = () => {
     }, 300);
   }, [onClose]);
 
-  const handleStartSession = useCallback(() => {
-    const roomId = generateAlphanumericSubstring(20);
-    const key = generateAlphanumericSubstring(22);
-    const fragment = `#room=${roomId},${key}`;
-    const url = `${window.location.origin}/${fragment}`;
-    onOpen(CanvaModalType.Share, url);
-    window.location.hash = fragment;
-  }, [onOpen]);
+  const handleStartSession = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      const roomId = await createRoom(currentUser.id);
+      const key = generateAlphanumericSubstring(22);
+      const fragment = `#room=${roomId},${key}`;
+      const url = `${window.location.origin}/${fragment}`;
+      onOpen(CanvaModalType.Share, url);
+      window.location.hash = fragment;
+    } catch (error) {
+      console.log(error);
+      toast.error("Some error occured!, try again");
+    }
+  }, [onOpen, currentUser]);
 
   const isModalOpen = showModal && canvasModalType === CanvaModalType.Session;
 
