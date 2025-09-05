@@ -13,14 +13,16 @@ export const UsersShareIcon = ({ users }: UsersShareIconProps) => {
   if (!currentUser) return null;
 
   return (
-    <div className="absolute right-24 top-7 z-[100] flex items-center gap-2">
+    <div className="absolute right-24 top-7 z-[100] h-fit max-w-xl flex items-center gap-2">
       {users.map(
         (u) =>
           u.id !== currentUser.id && (
             <Tooltip key={u.id}>
               <TooltipTrigger asChild>
-                <div className="h-8 w-8 rounded-full bg-green-300 flex items-center justify-center text-black font-extrabold">
-                  {u.username.charAt(0).toUpperCase()}
+                <div className="h-7 w-7 mt-0.5 rounded-full bg-green-300 flex items-center justify-center text-black font-semibold">
+                  <span className="text-xs">
+                    {u.username.charAt(0).toUpperCase()}
+                  </span>
                 </div>
               </TooltipTrigger>
               <TooltipContent
