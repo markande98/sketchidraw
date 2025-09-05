@@ -10,14 +10,17 @@ const socialLinks = [
   {
     label: "GitHub",
     icon: GithubSvg,
+    href: "https://github.com/markande98",
   },
   {
     label: "Follow me",
     icon: TwitterSvg,
+    href: "https://x.com/GauravTiw1998",
   },
   {
     label: "LinkedIn",
     icon: LinkedIn,
+    href: "https://www.linkedin.com/in/gaurav-tiwari-a8b50a194/",
   },
   { label: "Signup", icon: SignupSvg, href: "/auth/signup" },
 ];
@@ -25,7 +28,11 @@ const socialLinks = [
 export const SocialLinks = () => {
   const { currentUser, isAuthenticated } = useCurrentUser();
   const router = useRouter();
-  const onClick = async (href?: string) => {
+  const onClick = async (href: string) => {
+    if (href !== "/auth/signup") {
+      window.open(href, "_blank");
+      return;
+    }
     if (isAuthenticated) {
       await signOut({
         callbackUrl: "/auth/signin",

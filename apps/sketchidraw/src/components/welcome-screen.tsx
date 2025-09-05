@@ -5,6 +5,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { hexToRgba } from "@/lib/utils";
 import { LogIn, LogOut, Users } from "lucide-react";
 import { signOut } from "next-auth/react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -127,7 +128,13 @@ export const WelcomeScreen = () => {
   return (
     <div className="absolute z-[100] inset-0 flex items-center justify-center">
       <div className="flex flex-col items-center justify-center space-y-4 mt-20">
-        <div className="flex items-center gap-2 mb-10">
+        <div className="flex items-center gap-4 mb-10">
+          <Image
+            width={40}
+            height={40}
+            src="/images/sketchidraw.png"
+            alt="logo"
+          />
           <h1 className="text-5xl font-extrabold text-logo-text font-sketchifont tracking-tighter">
             SKETCHIDRAW
           </h1>
@@ -147,10 +154,13 @@ export const WelcomeScreen = () => {
             className="w-74 flex items-center gap-2 cursor-pointer p-3 rounded-md text-[#999999] hover:bg-surface-primary-container/50 dark:hover:bg-surface-high hover:text-on-surface transition duration-150"
           >
             {currentUser && (
-              <>
-                <LogOut size={14} />
-                <p className="text-sm">Sign out</p>
-              </>
+              <div className="flex justify-between items-center w-full">
+                <div className="flex items-center gap-2">
+                  <LogOut size={14} />
+                  <p className="text-sm">Sign out</p>
+                </div>
+                <p className="text-sm">{currentUser.username}</p>
+              </div>
             )}
             {!currentUser && (
               <>

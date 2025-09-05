@@ -84,6 +84,9 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
             toast.success(`Welcome to room ${currentUser.username} 👋`);
           } catch (error) {
             console.log("failed to join room or decrypt message: ", error);
+            if (error instanceof Error) {
+              ws.close(1007, error.message);
+            }
           }
           break;
         case ServerEvents.UserJoined:
@@ -150,6 +153,9 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
             });
           } catch (error) {
             console.log("failed to decrypt message: ", error);
+            if (error instanceof Error) {
+              ws.close(1007, error.message);
+            }
           }
           break;
         default:
