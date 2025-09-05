@@ -5,6 +5,7 @@ import {
   WebSocketServerEvents,
 } from "./types.js";
 import { RoomManager } from "./RoomManager.js";
+import { prisma } from "@repo/db/client";
 
 export interface User {
   id: string;
@@ -68,7 +69,7 @@ export class WebsocketServerManager {
 
   private setupServer() {
     this.wss.on(ServerEvents.Connection, (ws: WebSocket) => {
-      ws.on(WebSocketServerEvents.Message, (data) => {
+      ws.on(WebSocketServerEvents.Message, async (data) => {
         const parsedData = JSON.parse(data.toString());
         const { userId, roomId, username, cursorPos, encryptedData, flags } =
           parsedData.payload;
@@ -84,6 +85,16 @@ export class WebsocketServerManager {
 
         switch (parsedData.type) {
           case WebSocketClientEvents.RoomJoin:
+            // check if room exists or not.
+            const room = await prisma.room.findUnique({
+              where: {
+                id: roomId,
+              },
+            });
+            if (!room) {
+              ws.close(1007, "room doesn't exist, wrong url! ❌");
+              return;
+            }
             RoomManager.getInstance().addUser(roomId, user);
             console.log(
               `User connected: ${userId} (${RoomManager.getInstance().rooms.get(roomId)?.length} total)`

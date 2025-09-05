@@ -157,7 +157,10 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
       }
     };
 
-    ws.onclose = () => {
+    ws.onclose = (ev: CloseEvent) => {
+      if (ev.code === 1007) {
+        toast.error(ev.reason);
+      }
       setIsConnected(false);
       setUsers([]);
       setShapes([]);

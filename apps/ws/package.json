@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@repo/db": "workspace:*",
     "dotenv": "^17.2.1",
     "uuid": "^11.1.0",
     "ws": "^8.18.3"

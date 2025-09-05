@@ -1,27 +1,26 @@
 {
   "name": "@repo/db",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
+  "exports": {
+    "./client": "./src/client.ts",
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "db:generate": "prisma generate --no-engine",
-    "db:migrate": "prisma migrate dev --skip-generate",
-    "db:deploy": "prisma migrate deploy"
+    "db:generate": "pnpm prisma generate",
+    "db:migrate": "pnpm prisma migrate dev"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "@types/node": "^24.1.0",
-    "prisma": "^6.12.0"
-  },
+  "description": "",
   "dependencies": {
-    "@prisma/client": "^6.12.0",
+    "@prisma/client": "^5.21.1",
     "@prisma/extension-accelerate": "^2.0.2",
+    "prisma": "^5.21.1",
     "zod": "^4.0.5"
   },
-  "exports": {
-    ".": "./src/index.ts",
-    "./types": "./types.ts"
+  "devDependencies": {
+    "@types/node": "^24.3.1"
   }
 }

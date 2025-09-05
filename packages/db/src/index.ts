@@ -1,2 +1,1 @@
-export { default as prisma } from "./client"; // exports instance of prisma
-export * from "../generated/prisma";
+export { SignInSchema, SignUpSchema } from "./types";

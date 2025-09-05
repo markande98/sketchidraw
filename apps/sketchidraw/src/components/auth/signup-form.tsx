@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { SignUpSchema } from "@repo/db/types";
+import { SignUpSchema } from "@repo/db";
 import {
   Form,
   FormControl,

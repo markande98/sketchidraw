@@ -1,7 +1,7 @@
 "use server";
 
-import { prisma } from "@repo/db";
-import { SignInSchema } from "@repo/db/types";
+import { SignInSchema } from "@repo/db";
+import { prisma } from "@repo/db/client";
 import { AuthError } from "next-auth";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";

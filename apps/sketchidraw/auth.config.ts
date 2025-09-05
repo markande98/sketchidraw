@@ -1,7 +1,7 @@
 import Credentials from "next-auth/providers/credentials";
 import type { NextAuthConfig } from "next-auth";
-import { SignInSchema } from "@repo/db/types";
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/db/client";
+import { SignInSchema } from "@repo/db";
 import bcrypt from "bcryptjs";
 
 export default {
