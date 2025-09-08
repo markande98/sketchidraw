@@ -130,9 +130,9 @@ export const WelcomeScreen = () => {
       <div className="flex flex-col items-center justify-center space-y-4 mt-20">
         <div className="flex items-center gap-4 mb-10">
           <Image
-            width={40}
-            height={40}
-            src="/images/sketchidraw.png"
+            width={50}
+            height={50}
+            src="/images/sketchidraw.svg"
             alt="logo"
           />
           <h1 className="text-5xl font-extrabold text-logo-text font-sketchifont tracking-tighter">
