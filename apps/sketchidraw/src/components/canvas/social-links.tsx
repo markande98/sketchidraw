@@ -5,12 +5,15 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { Star } from "lucide-react";
 
 const socialLinks = [
   {
     label: "GitHub",
     icon: GithubSvg,
     href: "https://github.com/markande98",
+    hasStars: true,
   },
   {
     label: "Follow me",
@@ -27,6 +30,7 @@ const socialLinks = [
 
 export const SocialLinks = () => {
   const { currentUser, isAuthenticated } = useCurrentUser();
+  const [githubStars, setGithubStars] = useState<null | number>(null);
   const router = useRouter();
   const onClick = async (href: string) => {
     if (href !== "/auth/signup") {
@@ -50,9 +54,29 @@ export const SocialLinks = () => {
     return originalLabel;
   };
 
+  useEffect(() => {
+    const fetchStars = async () => {
+      try {
+        const response = await fetch(
+          "https://api.github.com/repos/markande98/sketchidraw"
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setGithubStars(data.stargazers_count);
+      } catch (error) {
+        console.log("Failed to fetch github stars! ", error);
+      }
+    };
+
+    fetchStars();
+  }, []);
+
   return (
     <div className="flex flex-1 flex-col space-y-2">
-      {socialLinks.map(({ icon: Icon, label, href }, index) => (
+      {socialLinks.map(({ icon: Icon, label, href, hasStars }, index) => (
         <div
           onClick={() => onClick(href)}
           key={index}
@@ -69,6 +93,12 @@ export const SocialLinks = () => {
           >
             {getDisplayLabel(label)}
           </h2>
+          {hasStars && (
+            <div className="flex items-center gap-2 text-on-surface ml-auto">
+              <span className="text-xs">{githubStars}</span>
+              <Star size="15" />
+            </div>
+          )}
         </div>
       ))}
     </div>
