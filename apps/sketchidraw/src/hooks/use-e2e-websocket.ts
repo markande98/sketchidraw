@@ -73,6 +73,7 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
         case ServerEvents.RoomJoined:
           try {
             const { users, dataToDecrypt } = data.payload;
+
             const newShapes = await Promise.all(
               dataToDecrypt.map(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -74,7 +74,6 @@ export const useDraw = ({
     canvaShapes,
     onSetCanvaShapes,
     onSetCanvaCursorType,
-    onSelectTooltype,
   } = useCanva();
 
   const { handleMouseDown, handleMouseMove, handleMouseUp } = useText({
@@ -1024,7 +1023,6 @@ export const useDraw = ({
       return;
     }
     if (isDrawing && currentShape) {
-      onSelectTooltype(ToolType.Select);
       setSelectedShapeId(currentShape.id);
       if (!isConnected) onSetCanvaShapes([...shapesToBeChosen, currentShape]);
       setCurrentShape(null);

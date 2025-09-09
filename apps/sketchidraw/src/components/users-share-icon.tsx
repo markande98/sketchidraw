@@ -13,7 +13,7 @@ export const UsersShareIcon = ({ users }: UsersShareIconProps) => {
   if (!currentUser) return null;
 
   return (
-    <div className="absolute right-24 top-7 z-[100] h-fit max-w-xl flex items-center gap-2">
+    <div className="hidden absolute right-24 top-7 z-[100] h-fit max-w-xl md:flex items-center gap-2">
       {users.map(
         (u) =>
           u.id !== currentUser.id && (
