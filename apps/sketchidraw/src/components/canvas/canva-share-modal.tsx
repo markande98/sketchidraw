@@ -49,6 +49,7 @@ export const CanvaShareModal = ({ wsRef, roomId }: CanvaShareModalProps) => {
           },
         })
       );
+      wsRef.current.close();
     }
     onClose();
   }, [onClose, currentUser, wsRef, roomId]);

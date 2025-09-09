@@ -85,7 +85,7 @@ export const ColorToolTip = ({ isCanvaBg, isThemeBg }: ColorToolTipProps) => {
           <div className="flex group items-center px-2 border rounded-md gap-1 bg-surface-high/50">
             <Hash size={16} />
             <Input
-              className="border-none dark:focus:ring-0 dark:focus:ring-offset-0 placeholder:text-sm placeholder:tracking-tighter"
+              className="border-none outline-none ring-0 ring-offset-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-sm placeholder:tracking-tighter"
               placeholder="color"
               onChange={handleChange}
               value={color.replace("#", "")}
