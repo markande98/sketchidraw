@@ -30,6 +30,44 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
   const wsRef = useRef<WebSocket>(null);
   const encryptionRef = useRef<E2EEncryption>(null);
 
+  const sendLeaveNotification = useCallback(() => {
+    if (
+      wsRef.current &&
+      wsRef.current.readyState === WebSocket.OPEN &&
+      currentUser &&
+      roomData
+    ) {
+      try {
+        wsRef.current.send(
+          JSON.stringify({
+            type: ClientEvents.LeaveRoom,
+            payload: {
+              roomId: roomData.roomId,
+              userId: currentUser.id,
+              username: currentUser.username,
+            },
+          })
+        );
+      } catch (error) {
+        console.log("Failed to send leave notification:", error);
+      }
+    }
+  }, [currentUser, roomData]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sendLeaveNotification();
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.close(1000, "User closed tab");
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [sendLeaveNotification]);
+
   useEffect(() => {
     if (!currentUser) return;
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) return;
