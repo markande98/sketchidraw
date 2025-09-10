@@ -16,7 +16,6 @@ type TextProps = {
   panY: number;
   selectedShapeId: string | null;
   isConnected: boolean;
-  fontsLoaded: boolean;
   newShapes: Shape[];
   sendEncryptedMessage: (
     shape: Shape,
@@ -33,7 +32,6 @@ export const useText = ({
   panY,
   selectedShapeId,
   isConnected,
-  fontsLoaded,
   sendEncryptedMessage,
   newShapes,
 }: TextProps) => {
@@ -630,7 +628,7 @@ export const useText = ({
         setSelectionEnd(newSelectEnd);
 
         // IMMEDIATE RENDER: Force immediate re-render with cursor visible
-        if (fontsLoaded && canvasEngine) {
+        if (canvasEngine) {
           setTimeout(() => {
             canvasEngine.redrawShapes(
               selectedShapeId,
@@ -671,7 +669,6 @@ export const useText = ({
       getCursorCoordinates,
       getTextMetrics,
       isConnected,
-      fontsLoaded,
       isEditing,
       newShapes,
       onSetCanvaShapes,
@@ -689,7 +686,6 @@ export const useText = ({
 
   useEffect(() => {
     if (
-      !fontsLoaded ||
       !isEditing ||
       tooltype !== ToolType.Text ||
       activeTextId === null ||
@@ -738,7 +734,6 @@ export const useText = ({
     panY,
     selectedShapeId,
     isConnected,
-    fontsLoaded,
     selectedShapes,
   ]);
   useEffect(() => {

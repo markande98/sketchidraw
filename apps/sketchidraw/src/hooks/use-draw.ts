@@ -27,7 +27,6 @@ type DrawProps = {
   panX: number;
   panY: number;
   isConnected: boolean;
-  fontsLoaded: boolean;
   wsRef: RefObject<WebSocket | null>;
   roomData: RoomInfo | null;
   selectedShapeId: string | null;
@@ -49,7 +48,6 @@ export const useDraw = ({
   panX,
   panY,
   isConnected,
-  fontsLoaded,
   wsRef,
   roomData,
   shapes,
@@ -83,7 +81,6 @@ export const useDraw = ({
     panY,
     selectedShapeId,
     isConnected,
-    fontsLoaded,
     sendEncryptedMessage,
     newShapes: shapes,
   });
@@ -194,7 +191,7 @@ export const useDraw = ({
   };
 
   useEffect(() => {
-    if (fontsLoaded && canvasEngine) {
+    if (canvasEngine) {
       canvasEngine.redrawShapes(
         selectedShapeId,
         canvasScale,
@@ -217,7 +214,6 @@ export const useDraw = ({
     panX,
     panY,
     isConnected,
-    fontsLoaded,
   ]);
 
   const getMousePos = (e: React.PointerEvent<HTMLCanvasElement>) => {

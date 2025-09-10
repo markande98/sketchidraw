@@ -26,7 +26,6 @@ import { CanvasShieldIcon } from "../canvas-shield-icon";
 export const CanvasView = () => {
   const { resolvedTheme } = useTheme();
   const [hash, setHash] = useState("");
-  const [fontsLoaded, setFontsLoaded] = useState(false);
   const { currentUser, isAuthenticated } = useCurrentUser();
   const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
   const { tooltype, canvaShapes, onSetCanvaShapes, onOpen } = useCanva();
@@ -63,20 +62,6 @@ export const CanvasView = () => {
     }
     onOpen(CanvaModalType.Session, null);
   }, [onOpen, isAuthenticated, currentUser, hash]);
-
-  // wait for font loading
-  useEffect(() => {
-    const waitForFonts = async () => {
-      try {
-        await document.fonts.ready;
-        console.log("fonts loaded");
-        setFontsLoaded(true);
-      } catch (error) {
-        console.log("Failed to load fonts:", error);
-      }
-    };
-    waitForFonts();
-  }, []);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -219,7 +204,6 @@ export const CanvasView = () => {
       <CanvasZoom zoomIn={zoomIn} zoomOut={zoomOut} resetZoom={resetZoom} />
       <CanvasShieldIcon />
       <CanvasBoard
-        fontsLoaded={fontsLoaded}
         panX={panX}
         panY={panY}
         canvasRef={canvasRef}

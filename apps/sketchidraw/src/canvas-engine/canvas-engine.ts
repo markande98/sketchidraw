@@ -897,7 +897,18 @@ export class CanvasEngine {
     ctx.fill();
   }
 
-  private renderText2(txt: Text) {
+  private async ensureFontLoaded(fontFamily: string): Promise<void> {
+    if ("fonts" in document) {
+      try {
+        await document.fonts.load(`16px ${fontFamily}`);
+      } catch (error) {
+        console.warn(`Font ${fontFamily} could not be loaded:`, error);
+      }
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
+  private async renderText2(txt: Text) {
     if (!this.canvas) return;
     const ctx = this.canvas.getContext("2d");
     if (!ctx) return;
@@ -906,6 +917,7 @@ export class CanvasEngine {
       x: txt.x,
       y: txt.y,
     };
+    await this.ensureFontLoaded(txt.fontFamily);
     ctx.font = `${txt.fontSize}px ${txt.fontFamily}`;
     ctx.fillStyle = hexToRgba(txt.color, txt.isDeleted ? 0.3 : 1);
 
@@ -918,7 +930,7 @@ export class CanvasEngine {
     });
   }
 
-  public renderText(
+  public async renderText(
     txt: Shape,
     scale: number,
     panX: number,
@@ -947,6 +959,7 @@ export class CanvasEngine {
       endY: txt.endY * scale + panY,
       fontSize: txt.fontSize * scale,
     };
+    await this.ensureFontLoaded(txt.fontFamily);
     ctx.font = `${txt.fontSize}px ${txt.fontFamily}`;
     ctx.fillStyle = hexToRgba(txt.color);
 

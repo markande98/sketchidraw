@@ -25,7 +25,6 @@ type CanvasBoardProps = {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   selectedShapeId: string | null;
   isConnected: boolean;
-  fontsLoaded: boolean;
   wsRef: RefObject<WebSocket | null>;
   roomData: RoomInfo | null;
   shapes: Shape[];
@@ -49,7 +48,6 @@ export const CanvasBoard = ({
   panY,
   canvasRef,
   isConnected,
-  fontsLoaded,
   roomData,
   wsRef,
   shapes,
@@ -81,7 +79,6 @@ export const CanvasBoard = ({
       panX,
       panY,
       isConnected,
-      fontsLoaded,
       wsRef,
       roomData,
       shapes,
@@ -175,7 +172,7 @@ export const CanvasBoard = ({
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       const cursor = document.getElementById("cursor");
-      if (canvasEngine && fontsLoaded) {
+      if (canvasEngine) {
         const currentShapes = isConnected ? shapes : canvaShapes;
 
         canvasEngine.redrawShapes(
