@@ -86,7 +86,9 @@ export const useE2EWebsocket = ({ hash, currentUser }: E2EWebsocketProps) => {
     setRoomData(roomInfo);
 
     encryptionRef.current = new E2EEncryption(roomInfo.key);
-    const ws = new WebSocket(process.env.WS_URL || "ws://localhost:8080");
+    const ws = new WebSocket(
+      process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080"
+    );
     wsRef.current = ws;
 
     ws.onopen = () => {

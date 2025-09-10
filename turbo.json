@@ -6,7 +6,7 @@
       "dependsOn": ["^build", "^db:generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**"],
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL", "AUTH_SECRET", "NEXT_PUBLIC_WS_URL"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -25,9 +25,6 @@
     "db:migrate": {
       "cache": false,
       "persistent": true
-    },
-    "db:deploy": {
-      "cache": false
     }
   }
 }
