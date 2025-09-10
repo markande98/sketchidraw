@@ -22,8 +22,11 @@ import { CanvasBoard } from "./canvas-board";
 import { CanvasMenu } from "./canvas-Menu";
 import { ToolsMenu } from "./tools-menu";
 import { CanvasShieldIcon } from "../canvas-shield-icon";
+import { useMediaQuery } from "use-media-query-react";
+import { ShareSvgIcon } from "@/constants/svg";
 
 export const CanvasView = () => {
+  const isShareIcon = useMediaQuery("(max-width:978px)");
   const { resolvedTheme } = useTheme();
   const [hash, setHash] = useState("");
   const { currentUser, isAuthenticated } = useCurrentUser();
@@ -165,7 +168,7 @@ export const CanvasView = () => {
         }
       });
     };
-  }, [currentUser, users, resolvedTheme]); // Removed 'canvas' if not needed
+  }, [currentUser, users, resolvedTheme]);
 
   const showWelcomeScreen =
     tooltype === ToolType.Select && canvaShapes.length === 0;
@@ -183,7 +186,16 @@ export const CanvasView = () => {
         selectedShapeId={selectedShapeId}
         sendEncryptedMessage={sendEncryptedMessage}
       />
-      <CanvasMenu />
+      <CanvasMenu
+        isConnected={isConnected}
+        shapes={shapes}
+        canvasRef={canvasRef}
+        selectedShapeId={selectedShapeId}
+        sendEncryptedMessage={sendEncryptedMessage}
+        zoomIn={zoomIn}
+        zoomOut={zoomOut}
+        resetZoom={resetZoom}
+      />
       <ToolsMenu />
       {isConnected && <UsersShareIcon users={users} />}
       <button
@@ -194,7 +206,7 @@ export const CanvasView = () => {
           isConnected && "bg-[#0fb884] hover:bg-[#0fb884] border-[#0fb884]"
         )}
       >
-        Share
+        {isShareIcon ? <ShareSvgIcon /> : "Share"}
         {isConnected && (
           <div className="h-4 w-4 flex items-center justify-center -right-1 p-[3px] rounded-full absolute bg-[#b2f2bb] text-[#2b8a3e]">
             {users.length}

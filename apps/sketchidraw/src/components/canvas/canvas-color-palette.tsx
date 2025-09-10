@@ -17,8 +17,30 @@ import { EdgeStyle } from "../edge.style";
 import { ToolType } from "@/types/tools";
 import { useCanva } from "@/hooks/use-canva-store";
 import { Button } from "../ui/button";
+import { Shape } from "@/types/shape";
+import { RefObject } from "react";
+import { ClientEvents } from "@/constants";
 
-export const CanvasColorPalette = () => {
+type CanvasColorPaletteProps = {
+  selectedShapeId: string | null;
+  isConnected: boolean;
+  shapes: Shape[];
+  canvasRef: RefObject<HTMLCanvasElement | null>;
+  sendEncryptedMessage: (
+    shape: Shape,
+    type: ClientEvents,
+    toBeAdded: boolean,
+    toBeDeleted: boolean
+  ) => void;
+};
+
+export const CanvasColorPalette = ({
+  selectedShapeId,
+  isConnected,
+  shapes,
+  canvasRef,
+  sendEncryptedMessage,
+}: CanvasColorPaletteProps) => {
   const { tooltype } = useCanva();
   const isMobile = useMediaQuery("(max-width: 639px)");
   if (!isMobile) return null;
@@ -32,7 +54,6 @@ export const CanvasColorPalette = () => {
   const isEraserTool = tooltype === ToolType.Eraser;
 
   if (isSelectAndGrab || isEraserTool) return null;
-  console.log(isMobile);
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -51,18 +72,85 @@ export const CanvasColorPalette = () => {
       >
         <ScrollArea className="mb-3 bg-white dark:bg-surface-low border w-[calc(100vw-48px)] shadow-md rounded-md max-h-[calc(100vh-200px)] overflow-y-auto">
           <div className="p-3 space-y-6">
-            <StrokeOptions />
-            {!isTextTool && <BackgroundOptions />}
-            {!isTextTool && <FillStyle />}
-            {!isTextTool && <StrokeWidth />}
-            {!isPencilTool && !isTextTool && <StrokeStyle />}
-            {!isPencilTool && !isTextTool && <Sloppiness />}
-            {!isEllipseTool && !isArrowTool && !isPencilTool && !isTextTool && (
-              <EdgeStyle />
+            <StrokeOptions
+              isConnected={isConnected}
+              shapes={shapes}
+              selectedShapeId={selectedShapeId}
+              sendEncryptedMessage={sendEncryptedMessage}
+            />
+            {!isTextTool && (
+              <BackgroundOptions
+                isConnected={isConnected}
+                shapes={shapes}
+                selectedShapeId={selectedShapeId}
+                sendEncryptedMessage={sendEncryptedMessage}
+              />
             )}
-            {isArrowTool && !isPencilTool && <ArrowHeads />}
-            {isTextTool && <FontFamily />}
-            {isTextTool && <FontSize />}
+            {!isTextTool && (
+              <FillStyle
+                isConnected={isConnected}
+                shapes={shapes}
+                selectedShapeId={selectedShapeId}
+                sendEncryptedMessage={sendEncryptedMessage}
+              />
+            )}
+            {!isTextTool && (
+              <StrokeWidth
+                isConnected={isConnected}
+                shapes={shapes}
+                selectedShapeId={selectedShapeId}
+                sendEncryptedMessage={sendEncryptedMessage}
+              />
+            )}
+            {!isPencilTool && !isTextTool && (
+              <StrokeStyle
+                isConnected={isConnected}
+                shapes={shapes}
+                selectedShapeId={selectedShapeId}
+                sendEncryptedMessage={sendEncryptedMessage}
+              />
+            )}
+            {!isPencilTool && !isTextTool && (
+              <Sloppiness
+                isConnected={isConnected}
+                shapes={shapes}
+                selectedShapeId={selectedShapeId}
+                sendEncryptedMessage={sendEncryptedMessage}
+              />
+            )}
+            {!isEllipseTool && !isArrowTool && !isPencilTool && !isTextTool && (
+              <EdgeStyle
+                isConnected={isConnected}
+                shapes={shapes}
+                selectedShapeId={selectedShapeId}
+                sendEncryptedMessage={sendEncryptedMessage}
+              />
+            )}
+            {isArrowTool && !isPencilTool && (
+              <ArrowHeads
+                isConnected={isConnected}
+                shapes={shapes}
+                selectedShapeId={selectedShapeId}
+                sendEncryptedMessage={sendEncryptedMessage}
+              />
+            )}
+            {isTextTool && (
+              <FontFamily
+                isConnected={isConnected}
+                shapes={shapes}
+                selectedShapeId={selectedShapeId}
+                sendEncryptedMessage={sendEncryptedMessage}
+              />
+            )}
+            {isTextTool && (
+              <FontSize
+                canvasRef={canvasRef}
+                isConnected={isConnected}
+                shapes={shapes}
+                selectedShapeId={selectedShapeId}
+                sendEncryptedMessage={sendEncryptedMessage}
+              />
+            )}
           </div>
         </ScrollArea>
       </PopoverContent>

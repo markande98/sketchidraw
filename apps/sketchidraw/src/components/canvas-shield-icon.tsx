@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 export const CanvasShieldIcon = () => {
   return (
     <Tooltip>
-      <TooltipTrigger className="absolute z-[100] bottom-6 right-6">
+      <TooltipTrigger className="hidden sm:block absolute z-[100] bottom-6 right-6">
         <ShieldCheckSvg />
       </TooltipTrigger>
       <TooltipContent
