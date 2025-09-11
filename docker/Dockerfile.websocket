@@ -32,7 +32,7 @@ COPY --from=builder /app/out/full/ .
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 
 # Generate Prisma client and build db package
-RUN cd packages/db && pnpm run db:generate
+RUN cd packages/db && pnpm run db:generate && pnpm run build
 
 # Production runner stage
 FROM node:20-alpine AS runner
