@@ -25,7 +25,7 @@ COPY --from=builder /app/out/full/ .
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 
 # Generate Prisma client and run migrations
-RUN cd packages/db && pnpm run db:generate
+RUN cd packages/db && pnpm run db:generate && pnpm run build
 
 # Build the application
 RUN pnpm run build

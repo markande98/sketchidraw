@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@repo/db";
+import { prisma } from "@repo/db/client";
 
 export const createRoom = async (userId: string) => {
   try {
