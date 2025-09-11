@@ -1,16 +1,13 @@
-[build]
-builder = "dockerfile"
-
 [[services]]
 name = "frontend"
-dockerfile = "./docker/Dockerfile.frontend"
-
-[services.frontend.build]
+source = "."
+[services.build]
 builder = "dockerfile"
+dockerfile = "docker/Dockerfile.frontend"
 
 [[services]]
 name = "websocket"
-dockerfile = "./docker/Dockerfile.websocket"
-
-[services.websocket.build]
+source = "."
+[services.build]
 builder = "dockerfile"
+dockerfile = "docker/Dockerfile.websocket"
