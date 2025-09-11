@@ -3,7 +3,7 @@
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
-import { prisma } from "@repo/db/client";
+import { prisma } from "@repo/db";
 import { SignUpSchema } from "@repo/db";
 
 export const signup = async (values: z.infer<typeof SignUpSchema>) => {

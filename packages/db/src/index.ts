@@ -1,1 +1,2 @@
-export { SignInSchema, SignUpSchema } from "./types";
+export { SignInSchema, SignUpSchema } from "./types.js";
+export { prisma } from "./client.js";

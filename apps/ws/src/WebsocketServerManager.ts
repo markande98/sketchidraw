@@ -5,7 +5,7 @@ import {
   WebSocketServerEvents,
 } from "./types.js";
 import { RoomManager } from "./RoomManager.js";
-import { prisma } from "@repo/db/client";
+import { prisma } from "@repo/db";
 
 export interface User {
   id: string;

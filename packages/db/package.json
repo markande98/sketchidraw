@@ -1,19 +1,28 @@
 {
   "name": "@repo/db",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
   "exports": {
-    "./client": "./src/client.ts",
-    ".": "./src/index.ts"
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js"
+    },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "scripts": {
-    "db:generate": "pnpm prisma generate",
+    "build": "tsc",
+    "db:generate": "pnpm prisma generate --no-engine",
     "db:migrate": "pnpm prisma migrate dev"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "files": [
+    "dist",
+    "prisma"
+  ],
   "dependencies": {
     "@prisma/client": "^5.21.1",
     "@prisma/extension-accelerate": "^2.0.2",
@@ -21,6 +30,7 @@
     "zod": "^4.0.5"
   },
   "devDependencies": {
-    "@types/node": "^24.3.1"
+    "@types/node": "^24.3.1",
+    "typescript": "^5.9.2"
   }
 }
