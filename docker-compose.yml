@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.frontend
+    container_name: sketchidraw-app
+    networks:
+      - app-network
+    ports:
+      - 3000:3000
+    env_file:
+      - ./apps/sketchidraw/.env
+    restart: unless-stopped
+
+  websocket:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.websocket
+    container_name: ws-app
+    depends_on:
+      - frontend
+    networks:
+      - app-network
+    ports:
+      - 8080:8080
+    env_file:
+      - ./apps/ws/.env
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+    name: app-services-network
