@@ -1,0 +1,7 @@
+[[services]]
+name = "frontend"
+source = "frontend"
+
+[[services]]
+name = "websocket"
+source = "websocket"
