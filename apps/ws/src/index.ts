@@ -10,6 +10,12 @@ import {
 const config: ServerConfig = {
   port: parseInt(process.env.PORT || "3001"),
   heartbeatInterval: parseInt(process.env.HEARTBEAT_INTERVAL || "20000"),
+  allowedOrigins: [
+    process.env.ALLOWED_ORIGIN!,
+    "http://localhost:3000",
+    "https://localhost:3000",
+    "http://127.0.0.1:3000",
+  ],
 };
 
 const server = new WebsocketServerManager(config);

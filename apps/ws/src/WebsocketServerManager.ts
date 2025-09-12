@@ -42,6 +42,7 @@ export interface Message {
 export interface ServerConfig {
   port: number;
   heartbeatInterval: number;
+  allowedOrigins: string[];
 }
 
 export class WebsocketServerManager {
@@ -53,6 +54,8 @@ export class WebsocketServerManager {
     this.config = config;
     this.wss = new WebSocketServer({
       port: config.port,
+      host: process.env.NODE_ENV === "production" ? "0.0.0.0" : "localhost",
+      verifyClient: (info: any) => this.verifyClient(info),
       perMessageDeflate: {
         threshold: 1024,
         concurrencyLimit: 10,
@@ -65,6 +68,32 @@ export class WebsocketServerManager {
     });
     this.setupServer();
     this.startHeartbeat();
+  }
+
+  private verifyClient(info: any): boolean {
+    const origin = info.origin;
+
+    console.log("🔍 WebSocket connection attempt from origin:", origin);
+    console.log("🔍 Allowed origins:", this.config.allowedOrigins);
+
+    // Allow connections without origin (for direct WebSocket clients)
+    if (!origin) {
+      console.log(
+        "✅ Connection allowed: No origin header (direct connection)"
+      );
+      return true;
+    }
+
+    // Check if origin is in allowed list
+    const isAllowed = this.config.allowedOrigins.includes(origin);
+
+    if (isAllowed) {
+      console.log("✅ Connection allowed from origin:", origin);
+    } else {
+      console.log("❌ Connection rejected from origin:", origin);
+    }
+
+    return isAllowed;
   }
 
   private setupServer() {
