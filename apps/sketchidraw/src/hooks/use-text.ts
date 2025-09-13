@@ -839,7 +839,7 @@ export const useText = ({
     hiddenInput.addEventListener("keydown", handleGlobalKeyDown);
     document.addEventListener("keydown", handleGlobalKeyDown, {
       capture: true,
-      passive: true,
+      passive: false,
     });
 
     return () => {

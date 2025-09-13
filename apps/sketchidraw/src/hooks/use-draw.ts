@@ -672,7 +672,10 @@ export const useDraw = ({
           let newWidth = Math.abs(nEndX - nStartX);
           let newHeight = Math.abs(nEndY - nStartY);
 
-          if (newWidth < 100 || newHeight < 100) break;
+          const MIN_WIDTH = 60;
+          const MIN_HEIGHT = 20;
+
+          if (newWidth < MIN_WIDTH || newHeight < MIN_HEIGHT) break;
           newWidth = Math.max(newWidth, newHeight);
           newHeight = Math.max(newHeight, newWidth);
 
