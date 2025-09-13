@@ -8,11 +8,11 @@
   </h2>
 </div>
 
-### Demo Video
+### Screenshot
 
-<video controls>
-  <source src="https://github.com/markande98/sketchidraw/releases/download/video/sketchidraw-demo.mp4" type="video/mp4">
-</video>
+![Skechidraw Home](apps/sketchidraw/public/images/sketchidraw-home.png?raw=true "Home page")
+
+---
 
 ## 🎯 About
 
