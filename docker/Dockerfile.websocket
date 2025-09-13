@@ -34,6 +34,9 @@ ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 # Generate Prisma client and build db package
 RUN cd packages/db && pnpm run db:generate && pnpm run build
 
+# Build the WebSocket application HERE during Docker build
+RUN cd apps/ws && pnpm run build
+
 # Production runner stage
 FROM node:20-alpine AS runner
 WORKDIR /app
@@ -61,5 +64,5 @@ EXPOSE 8080
 # Set production environment
 ENV NODE_ENV=production
 
-# Just start the app, don't rebuild
-CMD ["sh", "-c", "cd apps/ws && pnpm run build && pnpm run start"]
+# start the app
+CMD ["sh", "-c", "cd apps/ws && pnpm run start"]
