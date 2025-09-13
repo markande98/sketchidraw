@@ -29,6 +29,7 @@ export const CanvasView = () => {
   const isShareIcon = useMediaQuery("(max-width:978px)");
   const { resolvedTheme } = useTheme();
   const [hash, setHash] = useState("");
+  const [mounted, setMounted] = useState(false);
   const { currentUser, isAuthenticated } = useCurrentUser();
   const [selectedShapeId, setSelectedShapeId] = useState<string | null>(null);
   const { tooltype, canvaShapes, onSetCanvaShapes, onOpen } = useCanva();
@@ -170,12 +171,18 @@ export const CanvasView = () => {
     };
   }, [currentUser, users, resolvedTheme]);
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const showWelcomeScreen =
     tooltype === ToolType.Select && canvaShapes.length === 0;
 
+  if (!mounted) return null;
+
   return (
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
-      {showWelcomeScreen && <WelcomeScreen isConnected={isConnected} />}
+      {!isConnected && showWelcomeScreen && <WelcomeScreen />}
       <CanvaClearModal setSelectedShapeId={setSelectedShapeId} />
       <CanvaCollabModal />
       <CanvaShareModal wsRef={wsRef} roomId={roomData?.roomId} />
