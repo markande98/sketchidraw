@@ -21,8 +21,12 @@ RUN pnpm install --frozen-lockfile
 # Copy source code and build
 COPY --from=builder /app/out/full/ .
 
+ARG NEXT_PUBLIC_WS_URL
+ARG DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+
 # Set build-time environment variables
-ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
+ENV DATABASE_URL=$DATABASE_URL
 
 # Generate Prisma client and run migrations
 RUN cd packages/db && pnpm run db:generate && pnpm run build
