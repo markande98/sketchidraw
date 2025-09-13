@@ -3,7 +3,7 @@
 import { CanvaModalType, FontFamily } from "@/constants";
 import { useCanva } from "@/hooks/use-canva-store";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { getFontCSS, hexToRgba } from "@/lib/utils";
+import { cn, getFontCSS, hexToRgba } from "@/lib/utils";
 import { LogIn, LogOut, Users } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
@@ -29,7 +29,11 @@ const welcomeText = [
   },
 ];
 
-export const WelcomeScreen = () => {
+type WelcomeScreenProps = {
+  isConnected: boolean;
+};
+
+export const WelcomeScreen = ({ isConnected }: WelcomeScreenProps) => {
   const router = useRouter();
   const { currentUser } = useCurrentUser();
   const { canvas, onOpen } = useCanva();
@@ -208,7 +212,10 @@ export const WelcomeScreen = () => {
         <div className="flex flex-col items-start space-y-2">
           <div
             onClick={() => modalClick(CanvaModalType.Session)}
-            className="w-74 flex items-center gap-2 cursor-pointer p-3 rounded-md text-[#999999] hover:bg-surface-primary-container/50 dark:hover:bg-surface-high hover:text-on-surface transition duration-150"
+            className={cn(
+              "w-74 flex items-center gap-2 cursor-pointer p-3 rounded-md text-[#999999] hover:bg-surface-primary-container/50 dark:hover:bg-surface-high hover:text-on-surface transition duration-150",
+              isConnected && "bg-[#ecfdf5] dark:bg-[#064e3c]"
+            )}
           >
             <Users size={14} />
             <p className="text-sm">Live collaboration...</p>

@@ -175,7 +175,7 @@ export const CanvasView = () => {
 
   return (
     <div className="min-h-screen overflow-hidden dark:bg-surface-lowest relative">
-      {!isConnected && showWelcomeScreen && <WelcomeScreen />}
+      {showWelcomeScreen && <WelcomeScreen isConnected={isConnected} />}
       <CanvaClearModal setSelectedShapeId={setSelectedShapeId} />
       <CanvaCollabModal />
       <CanvaShareModal wsRef={wsRef} roomId={roomData?.roomId} />
