@@ -193,7 +193,3 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - Inspired by [Excalidraw](https://excalidraw.com/) for the hand-drawn aesthetic
 - Built with amazing open-source technologies
 - Thanks to all contributors and users! 💙
-
-```
-
-```
