@@ -6,10 +6,14 @@ import { CanvasMenuItem } from "./canvas-menu-item";
 import { SocialLinks } from "./social-links";
 import { ThemeToggler } from "./theme-toggler";
 
-export const CanvasMenuOptions = () => {
+type CanvasMenuOptionsProps = {
+  isConnected: boolean;
+};
+
+export const CanvasMenuOptions = ({ isConnected }: CanvasMenuOptionsProps) => {
   return (
     <div className="flex flex-col space-y-4">
-      <CanvasMenuItem />
+      <CanvasMenuItem isConnected={isConnected} />
       <Separator />
       <SocialLinks />
       <Separator />

@@ -10,6 +10,7 @@ interface MenuItemProps {
   icon: LucideIcon;
   label: string;
   isColor: boolean;
+  isConnected: boolean;
   modalType?: CanvaModalType;
 }
 
@@ -17,6 +18,7 @@ export const MenuItem = ({
   icon: Icon,
   label,
   isColor,
+  isConnected,
   modalType,
 }: MenuItemProps) => {
   const { onOpen } = useCanva();
@@ -40,7 +42,12 @@ export const MenuItem = ({
   return (
     <div
       onClick={() => modalType && handleClick(modalType)}
-      className="flex items-center gap-2 cursor-pointer rounded-md p-2 hover:bg-surface-primary-container/50 dark:hover:bg-surface-high transition duration-150"
+      className={cn(
+        "flex items-center gap-2 cursor-pointer rounded-md p-2 hover:bg-surface-primary-container/50 dark:hover:bg-surface-high transition duration-150",
+        modalType === CanvaModalType.Session &&
+          isConnected &&
+          "bg-[#ecfdf5] dark:bg-[#064e3c]"
+      )}
     >
       <Icon size={15} className={cn(isColor && "text-promo")} />
       <h2

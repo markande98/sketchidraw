@@ -95,8 +95,10 @@ export const SocialLinks = () => {
           </h2>
           {hasStars && (
             <div className="flex items-center gap-2 text-on-surface ml-auto">
-              <span className="text-xs">{githubStars}</span>
-              <Star size="15" />
+              <span className="text-xs text-on-surface font-semibold">
+                {githubStars}
+              </span>
+              <Star size="15" fill="yellow" />
             </div>
           )}
         </div>

@@ -20,7 +20,11 @@ const menuItems = [
   },
 ];
 
-export const CanvasMenuItem = () => {
+type CanvasMenuItemProps = {
+  isConnected: boolean;
+};
+
+export const CanvasMenuItem = ({ isConnected }: CanvasMenuItemProps) => {
   return (
     <div className="flex flex-col space-y-2">
       {menuItems.map((item, index) => (
@@ -29,6 +33,7 @@ export const CanvasMenuItem = () => {
           key={index}
           label={item.label}
           icon={item.icon}
+          isConnected={isConnected}
           modalType={item.modalType}
         />
       ))}

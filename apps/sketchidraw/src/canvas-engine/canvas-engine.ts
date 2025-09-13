@@ -575,7 +575,6 @@ export class CanvasEngine {
           options
         );
         break;
-        break;
       default:
         break;
     }

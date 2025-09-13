@@ -45,7 +45,7 @@ export const CanvasMenu = ({
           align="start"
           className="z-[200] h-[calc(100vh-200px)] sm:h-[calc(100vh-100px)] w-[calc(100vw-48px)] sm:w-60 mb-2 -ml-2  px-4 py-6 sm:mt-2 sm:ml-0 bg-white dark:bg-surface-low max-h-[75vh] overflow-y-auto"
         >
-          <CanvasMenuOptions />
+          <CanvasMenuOptions isConnected={isConnected} />
         </PopoverContent>
       </Popover>
       <CanvasColorPalette
