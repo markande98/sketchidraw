@@ -1,9 +1,9 @@
 "use client";
 
-import { CanvaModalType } from "@/constants";
+import { CanvaModalType, FontFamily } from "@/constants";
 import { useCanva } from "@/hooks/use-canva-store";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { hexToRgba } from "@/lib/utils";
+import { getFontCSS, hexToRgba } from "@/lib/utils";
 import { LogIn, LogOut, Users } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
@@ -16,7 +16,7 @@ const welcomeText = [
     text: "Pick a tool &\nStart drawing!",
     lineHeight: 1.2,
     fontSize: 16,
-    fontFamily: '"Sketchifont", "Virgil", "Comic Sans MS", cursive',
+    fontFamily: getFontCSS(FontFamily.SketchiFont),
     color: hexToRgba("#a3a3a3"),
   },
   {
@@ -24,7 +24,7 @@ const welcomeText = [
     text: "Export, preferences, languages, ...",
     lineHeight: 1.2,
     fontSize: 16,
-    fontFamily: '"Sketchifont", "Virgil", "Comic Sans MS", cursive',
+    fontFamily: getFontCSS(FontFamily.SketchiFont),
     color: hexToRgba("#a3a3a3"),
   },
 ];
@@ -104,8 +104,11 @@ export const WelcomeScreen = () => {
 
     document.fonts.ready.then(() => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      welcomeText.forEach((txt) => {
+      for (let i = 0; i < welcomeText.length; i++) {
+        const txt = welcomeText[i];
+        if (txt.type === "start" && window.innerWidth < 900) continue;
+        if (txt.type === "middle" && window.innerWidth < 640) continue;
+        if (window.innerHeight < 540) continue;
         const lines = txt.text.split("\n");
         const lineHeight = txt.fontSize * txt.lineHeight;
 
@@ -132,10 +135,50 @@ export const WelcomeScreen = () => {
           const _y = y + index * lineHeight + txt.fontSize;
           ctx.fillText(line, x, _y);
         });
-      });
+      }
     });
 
+    const handleResize = () => {
+      document.fonts.ready.then(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < welcomeText.length; i++) {
+          const txt = welcomeText[i];
+          if (txt.type === "start" && window.innerWidth < 900) continue;
+          if (txt.type === "middle" && window.innerWidth < 640) continue;
+          if (window.innerHeight < 540) continue;
+          const lines = txt.text.split("\n");
+          const lineHeight = txt.fontSize * txt.lineHeight;
+
+          ctx.font = `bold ${txt.fontSize}px ${txt.fontFamily}, Arial, sans-serif`;
+          ctx.fillStyle = txt.color;
+
+          let x: number;
+          let y: number;
+          switch (txt.type) {
+            case "middle":
+              x = canvas.width / 2 - 80;
+              y = 130;
+              drawBezierArrow(ctx, x + 120, x + 155, y + 20, y - 30);
+              break;
+            case "start":
+              x = 80;
+              y = 120;
+              drawBezierArrow(ctx, x - 5, x - 35, y + 10, y - 40, -20);
+              break;
+            default:
+              break;
+          }
+          lines.forEach((line, index) => {
+            const _y = y + index * lineHeight + txt.fontSize;
+            ctx.fillText(line, x, _y);
+          });
+        }
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
     return () => {
+      window.removeEventListener("resize", handleResize);
       if (canvas) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
