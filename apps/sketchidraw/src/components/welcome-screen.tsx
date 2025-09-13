@@ -1,5 +1,6 @@
 "use client";
 
+import { CanvaModalType } from "@/constants";
 import { useCanva } from "@/hooks/use-canva-store";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { hexToRgba } from "@/lib/utils";
@@ -7,7 +8,7 @@ import { LogIn, LogOut, Users } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const welcomeText = [
   {
@@ -31,7 +32,7 @@ const welcomeText = [
 export const WelcomeScreen = () => {
   const router = useRouter();
   const { currentUser } = useCurrentUser();
-  const { canvas } = useCanva();
+  const { canvas, onOpen } = useCanva();
   const [mounted, setMounted] = useState(false);
 
   const drawBezierArrow = (
@@ -73,6 +74,23 @@ export const WelcomeScreen = () => {
     }
     router.push("/auth/signup");
   };
+
+  const modalClick = useCallback(
+    (modalType: CanvaModalType) => {
+      if (modalType === CanvaModalType.Clear) {
+        onOpen(modalType, null);
+        return;
+      }
+      const hash = window.location.hash;
+      if (hash) {
+        const url = `${window.location.origin}/${hash}`;
+        onOpen(CanvaModalType.Share, url);
+        return;
+      }
+      onOpen(CanvaModalType.Session, null);
+    },
+    [onOpen]
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -145,7 +163,10 @@ export const WelcomeScreen = () => {
           </p>
         </div>
         <div className="flex flex-col items-start space-y-2">
-          <div className="w-74 flex items-center gap-2 cursor-pointer p-3 rounded-md text-[#999999] hover:bg-surface-primary-container/50 dark:hover:bg-surface-high hover:text-on-surface transition duration-150">
+          <div
+            onClick={() => modalClick(CanvaModalType.Session)}
+            className="w-74 flex items-center gap-2 cursor-pointer p-3 rounded-md text-[#999999] hover:bg-surface-primary-container/50 dark:hover:bg-surface-high hover:text-on-surface transition duration-150"
+          >
             <Users size={14} />
             <p className="text-sm">Live collaboration...</p>
           </div>
