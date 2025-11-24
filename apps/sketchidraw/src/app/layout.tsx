@@ -39,7 +39,6 @@ export default async function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <Analytics />
           <Toaster />
           <ThemeProvider
             attribute="class"
@@ -49,6 +48,7 @@ export default async function RootLayout({
           >
             <ThemeSync />
             {children}
+            <Analytics />
           </ThemeProvider>
         </body>
       </html>
