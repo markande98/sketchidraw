@@ -19,11 +19,6 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  icons: {
-    icon: "/images/sketchidraw.svg",
-    shortcut: "/images/sketchidraw.svg",
-    apple: "/images/sketchidraw.svg",
-  },
   title:
     "Sketchidraw | Collaborative Whiteboard 👉 Secure 👋 Hand-drawn look & feel",
   description: "Collaborative Whiteboard with Secure Hand-drawn look & feel",
