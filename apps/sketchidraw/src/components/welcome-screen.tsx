@@ -195,6 +195,7 @@ export const WelcomeScreen = () => {
             height={50}
             src="/images/sketchidraw.svg"
             alt="logo"
+            className="dark:invert dark:brightness-0 dark:contrast-100"
           />
           <h1 className="text-5xl font-extrabold text-logo-text font-sketchifont tracking-tighter">
             SKETCHIDRAW
