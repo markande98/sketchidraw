@@ -18,7 +18,7 @@ const socialLinks = [
   {
     label: "Follow me",
     icon: TwitterSvg,
-    href: "https://x.com/GauravTiw1998",
+    href: "https://x.com/markande_dev",
   },
   {
     label: "LinkedIn",
