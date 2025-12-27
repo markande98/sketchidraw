@@ -12,7 +12,7 @@ const socialLinks = [
   {
     label: "GitHub",
     icon: GithubSvg,
-    href: "https://github.com/markande98",
+    href: "https://github.com/markandedev/sketchidraw",
     hasStars: true,
   },
   {
